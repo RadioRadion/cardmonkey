@@ -1,0 +1,79 @@
+<!-- <form name="login">
+  <input name="offer" type="email">
+  <input name="target" type="email">
+  <button type="submit">Log in</button>
+</form> -->
+
+<form class="simple_form new_trade" id="new_trade" action="/users/2/trades" accept-charset="UTF-8" method="post" name="sneackyValue">
+  <input id="one" type="hidden" >
+    <div class="form-group text optional trade_statut">
+      <textarea class="form-control text optional" name="trade[statut]" id="trade_statut"></textarea>
+    </div>
+  <input id="two" type="hidden" >
+    <div class="form-group text optional trade_statut">
+      <textarea class="form-control text optional" name="trade[statut]" id="trade_statut"></textarea>
+    </div>
+  <input type="submit" name="commit" value="Create Trade" class="btn" data-disable-with="Create Trade">
+</form>
+
+
+<script>
+
+  const one = document.querySelector("#one");
+  const two = document.querySelector("#two");
+  //pour chopper tous les éléments du form
+  var loginForm = document.forms.sneackyValue;
+  // loginForm.elements.offer.placeholder = 'test@example.com';
+  // loginForm.elements.target.placeholder = 'password';
+
+  // je récupère toutes les cartes de la colloc current puis collect target
+  const cardsOffer = document.querySelectorAll(".card-offer");
+  let offer = [];
+  const cardsTarget = document.querySelectorAll(".card-target");
+  let target = [];
+
+  //fonction trouvée sur le net pour pouvoir applique une méthode remove toute prête sur l'array plus loin
+  Array.prototype.remove = function() {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+        what = a[--L];
+        while ((ax = this.indexOf(what)) !== -1) {
+            this.splice(ax, 1);
+        }
+    }
+    return this;
+  };
+
+
+  cardsOffer.forEach(card => card.addEventListener("click", (event) => {
+    if (card.classList.length === 2) {
+      //la classe selected permet de rendre la card verte sur le clic
+      card.classList.add("selected");
+      //on récupère l'id de la carte cliquée pour l'insérer dans la valeur finale
+      offer.push(card.dataset.id);
+      //on actualise la value du form de l'input Offer
+      // one.value = offer.toString();
+      console.log(one.value);
+      // loginForm.elements.offer.value = offer.toString();
+    }
+    else {
+      offer.remove(card.dataset.id);
+      card.classList.remove("selected");
+      // one.value = offer.toString();
+      // loginForm.elements.offer.value = offer.toString();
+    }
+  }));
+
+  cardsTarget.forEach(card => card.addEventListener("click", (event) => {
+    if (card.classList.length === 2) {
+      card.classList.add("selected");
+      target.push(card.dataset.id);
+      // two.value = target.toString();
+    }
+    else {
+      target.remove(card.dataset.id);
+      card.classList.remove("selected");
+      // two.value = target.toString();
+    }
+  }));
+</script>

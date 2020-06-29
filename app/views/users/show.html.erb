@@ -1,0 +1,43 @@
+<div class="container">
+
+<% if current_user == @user %>
+  <span>Total collection : <%= @cards.length %></span><br>
+  <span>Total WantList : <%= @wants.length %></span><br>
+  <span>Nombre de trades en cours</span><br>
+  <span>Nombre de trades réalisés en cours</span><br>
+
+<% else %>
+    <div class="row justify-content-between">
+      <div class="col-5">
+        <h2>MY COLLECTION</h2>
+        <% @cards.each do |card| %>
+        <div class="card-offer card-product" data-id=<%= card.id%> >
+          <img src="https://raw.githubusercontent.com/lewagon/fullstack-images/master/uikit/skateboard.jpg" />
+          <div class="card-product-infos">
+            <h2><%= card.name %></h2>
+          </div>
+        </div>
+        <% end  %>
+      </div>
+
+
+      <div class="col-5">
+        <h2>ITS COLLECTION</h2>
+        <% @othercards.each do |card| %>
+        <div class="card-target card-product" data-id=<%= card.id%> >
+          <img src="https://raw.githubusercontent.com/lewagon/fullstack-images/master/uikit/skateboard.jpg" />
+          <div class="card-product-infos">
+            <h2><%= card.name %></h2>
+          </div>
+        </div>
+        <% end %>
+      </div>
+        <%= render "form" %>
+
+
+    </div>
+  <% end %>
+
+</div>
+
+
