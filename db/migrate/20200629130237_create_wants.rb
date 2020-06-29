@@ -1,6 +1,6 @@
-class CreateWantlists < ActiveRecord::Migration[6.0]
+class CreateWants < ActiveRecord::Migration[6.0]
   def change
-    create_table :wantlists do |t|
+    create_table :wants do |t|
       t.string :name
       t.integer :quantity
       t.string :extension

@@ -75,7 +75,7 @@ ActiveRecord::Schema.define(version: 2020_06_29_131750) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
-  create_table "wantlists", force: :cascade do |t|
+  create_table "wants", force: :cascade do |t|
     t.string "name"
     t.integer "quantity"
     t.string "extension"
@@ -84,7 +84,7 @@ ActiveRecord::Schema.define(version: 2020_06_29_131750) do
     t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_id"], name: "index_wantlists_on_user_id"
+    t.index ["user_id"], name: "index_wants_on_user_id"
   end
 
   add_foreign_key "card_trades", "cards"
@@ -93,5 +93,5 @@ ActiveRecord::Schema.define(version: 2020_06_29_131750) do
   add_foreign_key "messages", "chatrooms"
   add_foreign_key "messages", "users"
   add_foreign_key "trades", "users"
-  add_foreign_key "wantlists", "users"
+  add_foreign_key "wants", "users"
 end
