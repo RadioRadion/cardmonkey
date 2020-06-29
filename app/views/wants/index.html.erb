@@ -1,0 +1,23 @@
+<div class="container">
+
+<h1>My Wantlist</h1>
+  <div>
+    <ul>
+    <% @wants.each do |want| %>
+
+      <li> name: <%= want.name %> </li>
+          <%= link_to "Del", user_want_path(current_user, want), method: :delete, class: "btn btn-warning"%>
+          <%= link_to "edit", edit_user_want_path(current_user, want), class: "btn btn-warning"%>
+    <% end %>
+    </ul>
+  </div>
+  <div>
+      <%= link_to "Add card", new_user_want_path, class: 'btn btn-secondary' %>
+  </div>
+</div>
+
+
+
+
+
+
