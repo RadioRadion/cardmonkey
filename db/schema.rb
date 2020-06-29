@@ -10,10 +10,41 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_29_123026) do
+ActiveRecord::Schema.define(version: 2020_06_29_130447) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "card_trades", force: :cascade do |t|
+    t.bigint "trade_id", null: false
+    t.bigint "card_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["card_id"], name: "index_card_trades_on_card_id"
+    t.index ["trade_id"], name: "index_card_trades_on_trade_id"
+  end
+
+  create_table "cards", force: :cascade do |t|
+    t.string "uuid"
+    t.string "condition"
+    t.boolean "foil"
+    t.string "img"
+    t.string "language"
+    t.string "extension"
+    t.bigint "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_cards_on_user_id"
+  end
+
+  create_table "trades", force: :cascade do |t|
+    t.string "status"
+    t.bigint "user_id", null: false
+    t.integer "user_id_invit"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_trades_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -27,4 +58,21 @@ ActiveRecord::Schema.define(version: 2020_06_29_123026) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "wantlists", force: :cascade do |t|
+    t.string "name"
+    t.integer "quantity"
+    t.string "extension"
+    t.string "min_cond"
+    t.boolean "foil"
+    t.bigint "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_wantlists_on_user_id"
+  end
+
+  add_foreign_key "card_trades", "cards"
+  add_foreign_key "card_trades", "trades"
+  add_foreign_key "cards", "users"
+  add_foreign_key "trades", "users"
+  add_foreign_key "wantlists", "users"
 end
