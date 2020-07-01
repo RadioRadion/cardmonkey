@@ -1,7 +1,11 @@
 <div>
-<%= link_to "Nouveau message", class: 'btn btn-success' %>
-
+  <%= link_to "New Message", new_chatroom_path, class: 'btn btn-secondary' %>
 </div>
+
+<div>
+  <% link_to "Conversations", chatrooms_path, class: "btn btn-success"  %>
+</div>
+
 <div class="container">
   <div class="row">
     <div class="col-sm-6 col-sm-offset-3">
@@ -10,7 +14,8 @@
       </div>
       <div class="messages">
         <% @chatroom.messages.each do |message| %>
-          <%= render "messages/message", message: message, user_session_author: message.user == current_user %>
+          <%= render "messages/message", message: message, user_is_messages_author:
+          message.user == current_user %>
           <% end %>
       </div>
       <div id="create-message">
@@ -25,9 +30,8 @@
 
 <% content_for :after_js do %>
   <script>
-            console.log("kikoo");
     App['chatroom_<%= @chatroom.id %>'] = App.cable.subscriptions.create(
-      { channel: 'ChatRoomsChannel', chatroom_id: <%= @chatroom.id %> },
+      { channel: 'ChatroomsChannel', chatroom_id: <%= @chatroom.id %> },
       {
         received: (data) => {
           if (data.current_user_id !== <%= current_user.id %>) {
