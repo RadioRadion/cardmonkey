@@ -1,0 +1,19 @@
+<div class="container">
+  <h1>My chatroom</h1>
+    <div>
+      <ul>
+        <%  @chatrooms.each do |chatroom| %>
+        <li> <%= link_to chatroom.name, chatroom_path(chatroom) %></li>
+          <%= link_to "delete Conversation", chatroom_path(current_user, chatroom), method: :delete, class: "btn btn-warning"%>
+
+        <% end %>
+      </ul>
+    </div>
+    <div>
+      <%= link_to "New Message", new_chatroom_path, class: 'btn btn-secondary' %>
+    </div>
+
+
+
+</div>
+
