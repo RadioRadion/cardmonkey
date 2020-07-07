@@ -17,7 +17,8 @@ class ChatroomsController < ApplicationController
   end
 
   def show
-    @chatroom = Chatroom.includes(messages: :user).find(params[:id])
+    @chatroom = Chatroom.find(params[:id])
+    @message = Message.new
   end
 
   def destroy
