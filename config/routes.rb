@@ -7,10 +7,10 @@ Rails.application.routes.draw do
     resources :cards, only: [:index, :destroy, :new, :edit, :create, :update]
     resources :wants, only: [:index, :destroy, :new, :edit, :create, :update]
     resources :trades, only: [:create]
-  end
-
-  resources :chatrooms, only: [:index, :show,:new, :create, :destroy] do
-    resources :messages, only: [:create]
+    resources :chatrooms, only: [:index, :show, :new, :create, :destroy] do
+      resources :messages, only: [:create]
+    end
   end
 end
+
 
