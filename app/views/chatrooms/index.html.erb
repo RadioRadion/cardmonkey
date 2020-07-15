@@ -1,18 +1,35 @@
 <div class="container">
-  <h1>Messagerie</h1>
-  <div>
-    <%= link_to "New Message", new_chatroom_path, class: 'btn far fa-edit' %>
-  </div>
-  <%  @chatrooms.each do |chatroom| %>
-    <div class="card-messagerie">
-        <ul>
-          <div class="card-messagerie-infos">
-            <%= link_to chatroom.name, chatroom_path(chatroom) %>
-            <%= link_to "delete Conversation", chatroom_path(chatroom), method: :delete, class: "btn btn-warning"%>
-          </div>
-        </ul>
+  <div class="chat_container">
+    <div class="row">
+      <div class="col-sm-3">
+        <div class="dropdown all_conversation">
+          <button class="dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="far fa-comments" aria-hidden="true"></i>
+            Messagerie
+            <span class="caret pull-right"></span>
+          </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+              <li><%= link_to "New Message", new_user_chatroom_path, class: 'far fa-edit' %></li>
+            </ul>
+        </div>
+        <div class="member_list">
+          <%  @chatrooms.each do |chatroom| %>
+            <ul class="list-unstyled">
+              <li class="left clearfix">
+                <span class="chat-img pull-left">
+                  <%= image_tag "https://kitt.lewagon.com/placeholder/users/#{current_user.username}", class: "avatar" %>
+                </span>
+                <div class="chat-body clearfix">
+                  <div class="header_sec">
+                      <%= link_to chatroom.name, user_chatroom_path(current_user, chatroom) %>
+                  </div>
+                      <%#= link_to "", user_chatroom_path(chatroom), method: :delete, class: "far fa-trash-alt"%>
+                </div>
+              </li>
+            </ul>
+          <% end %>
+      </div>
     </div>
-  <% end %>
+  </div>
 </div>
-
 

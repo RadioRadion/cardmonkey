@@ -1,4 +1,4 @@
-<%= form_for(@chatroom) do |f| %>
+<%= form_for [current_user, @chatroom] do |f| %>
   <%= f.label :name %>
   <%= f.text_field :name %>
   <%= f.submit %>

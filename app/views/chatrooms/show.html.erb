@@ -12,7 +12,7 @@
           <% end %>
         </div>
         <div id="create-message">
-          <%= simple_form_for [ @chatroom, @message ], remote: true do |f| %>
+          <%= simple_form_for [ current_user, @chatroom, @message ], remote: true do |f| %>
             <%= f.input :content, label: false, placeholder: "Message ##{@chatroom.name}" %>
           <% end %>
         </div>
@@ -22,10 +22,10 @@
 
 <div class="d-flex align-items-center rounded-circle">
   <div>
-    <%= link_to "Messagerie", chatrooms_path, class: 'btn btn-secondary' %>
+    <%= link_to "Messagerie", user_chatrooms_path, class: 'btn btn-secondary' %>
   </div>
    <div>
-    <%= link_to "New Message", new_chatroom_path, class: 'btn far fa-edit' %>
+    <%= link_to "New Message", new_user_chatroom_path, class: 'btn far fa-edit' %>
   </div>
 </div>
 

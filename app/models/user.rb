@@ -8,5 +8,7 @@ class User < ApplicationRecord
   has_many :cards
   has_many :wants
   has_many :trades
-
+  has_many :messages
+  has_many :chatrooms, through: :messages
 end
+

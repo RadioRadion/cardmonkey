@@ -1,6 +1,6 @@
 class ChatroomsController < ApplicationController
   def index
-    @chatrooms = Chatroom.all
+    @chatrooms = current_user.chatrooms.uniq
   end
 
   def new
@@ -10,7 +10,7 @@ class ChatroomsController < ApplicationController
   def create
     @chatroom = Chatroom.new(chatroom_params)
     if @chatroom.save!
-      redirect_to chatrooms_path
+      redirect_to user_chatrooms_path
     else
       render :new
     end
@@ -24,9 +24,8 @@ class ChatroomsController < ApplicationController
   def destroy
     @chatroom = Chatroom.find(params[:id])
     @chatroom.destroy
-    redirect_to chatrooms_path
+    redirect_to user_chatroom_path
   end
-
 
    private
 
