@@ -1,6 +1,6 @@
 class ChatroomsController < ApplicationController
   def index
-    @chatrooms = current_user.chatrooms.uniq
+    @chatrooms = Chatroom.where(user_id: current_user).or(Chatroom.where(user_id_invit: current_user))
   end
 
   def new
