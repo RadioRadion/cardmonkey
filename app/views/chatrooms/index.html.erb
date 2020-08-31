@@ -17,14 +17,14 @@
             <ul class="list-unstyled">
               <li class="left clearfix">
                 <span class="chat-img pull-left">
-                  <%= image_tag "https://kitt.lewagon.com/placeholder/users/#{current_user.username}", class: "avatar" %>
+                  <% if current_user.id == chatroom.user_id %>
+                    <% user = User.find(chatroom.user_id_invit) %>
+                    <%=  link_to user.username, user_chatroom_path(current_user, chatroom) %>
+                  <%  else  %>
+                    <% user = User.find(chatroom.user_id) %>
+                    <%=  link_to user.username, user_chatroom_path(current_user, chatroom) %>
+                  <% end %>
                 </span>
-                <div class="chat-body clearfix">
-                  <div class="header_sec">
-                      <%= link_to chatroom.name, user_chatroom_path(current_user, chatroom) %>
-                  </div>
-                      <%#= link_to "", user_chatroom_path(chatroom), method: :delete, class: "far fa-trash-alt"%>
-                </div>
               </li>
             </ul>
           <% end %>
@@ -32,4 +32,5 @@
     </div>
   </div>
 </div>
+
 
