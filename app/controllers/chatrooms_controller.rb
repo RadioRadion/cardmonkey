@@ -9,6 +9,8 @@ class ChatroomsController < ApplicationController
 
   def create
     @chatroom = Chatroom.new(chatroom_params)
+    @chatroom.user = current_user
+
     if @chatroom.save!
       redirect_to user_chatrooms_path
     else
