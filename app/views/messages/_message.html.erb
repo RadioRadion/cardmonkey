@@ -1,7 +1,10 @@
-<div class="message <%= user_session_author ? "right" : "" %>">
-  <h3><%= message.user.username %> </h3>
-  <div class="message-content">
-    <%= message.content %>
-  </div>
+<div class="message-container" id="message-<%= message.id %>">
+      <i class="author">
+        <%= image_tag "https://kitt.lewagon.com/placeholder/users/#{current_user.username}", class: "avatar" %>
+        <span><%= message.user.username %></span>
+      </i>
+       <div class="message-content">
+        <p><%= message.content %></p>
+        <small><%= message.created_at.strftime("%a %b %e at %l:%M%p") %></small>
+      </div>
 </div>
-

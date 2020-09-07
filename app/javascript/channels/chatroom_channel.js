@@ -1,4 +1,5 @@
 import consumer from "./consumer";
+import scroll from "./scroll"
 
 const initChatroomCable = () => {
   const messagesContainer = document.getElementById('messages');
@@ -15,3 +16,4 @@ const initChatroomCable = () => {
 }
 
 export { initChatroomCable };
+
