@@ -4,7 +4,7 @@
   <button type="submit">Log in</button>
 </form> -->
 
-<form class="simple_form new_trade" id="new_trade" action="/users/2/trades" accept-charset="UTF-8" method="post" name="sneackyValue">
+<form class="simple_form new_trade" id="new_trade" action="/users/<%= @user.id %>/trades" accept-charset="UTF-8" method="post" name="sneackyValue">
   <input id="one" type="hidden" >
     <div class="form-group text optional offer">
       <textarea class="form-control text optional" name="trade[offer]" id="offer"></textarea>

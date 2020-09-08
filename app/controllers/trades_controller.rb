@@ -9,9 +9,12 @@ class TradesController < ApplicationController
 
     @cardsOffer = params[:trade][:offer].split(",")
     @cardsTarget = params[:trade][:target].split(",")
+    @cardsOfferNames = []
+    @cardsTargetNames = []
 
     if @trade.save!
       save_card_trades;
+      save_message;
       redirect_to user_path(current_user)
     else
       render 'users/show'
@@ -28,14 +31,33 @@ class TradesController < ApplicationController
     @cardsOffer.each do |card|
       @card = card.to_i
       @cardtrade = CardTrade.new(card_id: @card, trade_id: @trade.id)
+      @cardsOfferNames << Card.find(card).name
       @cardtrade.save!
     end
 
     @cardsTarget.each do |card|
       @card = card.to_i
       @cardtrade = CardTrade.new(card_id: @card, trade_id: @trade.id)
+      @cardsTargetNames << Card.find(card).name
       @cardtrade.save!
     end
+  end
+
+  def save_message
+    @firstChat = Chatroom.where(user_id: current_user, user_id_invit: @userTarget).first
+    @secondChat = Chatroom.where(user_id: @userTarget, user_id_invit: current_user).first
+    @content = "NEW TRADE : test"
+
+    if !@firstChat.nil?
+      Message.new(content: @content, user_id: current_user.id, chatroom_id: @firstChat.id).save!
+    elsif !@secondChat.nil?
+      Message.new(content: @content, user_id: current_user.id, chatroom_id: @secondChat.id).save!
+    else
+      @chatroom = Chatroom.new(user_id: current_user.id, user_id_invit: @userTarget)
+      @chatroom.save!
+      Message.new(content: @content, user_id: current_user.id, chatroom_id: @chatroom.id).save!
+    end
+
   end
 
 end
