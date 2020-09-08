@@ -2,7 +2,6 @@ import consumer from "./consumer";
 import scroll from "./scroll"
 
 const initChatroomCable = () => {
-  console.log("ok");
   const messagesContainer = document.getElementById('messages');
   if (messagesContainer) {
     const id = messagesContainer.dataset.chatroomId;
