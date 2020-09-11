@@ -1,5 +1,7 @@
 class CardsController < ApplicationController
   require 'csv'
+  require 'json'
+  require 'open-uri'
 
   def index
     @cards = current_user.cards
@@ -23,6 +25,10 @@ class CardsController < ApplicationController
 
   def create
     @card = Card.new(cards_params)
+    fetchImage
+    searchImage
+    saveImage if @image.nil?
+    @card.image = @image
     @card.user = current_user
     if @card.save!
       redirect_to user_cards_path
@@ -58,4 +64,22 @@ class CardsController < ApplicationController
   def cards_params
     params.require(:card).permit(:name, :quantity, :extension, :foil, :condition, :language)
   end
+
+  def fetchImage
+    url = 'https://api.scryfall.com/cards/named?fuzzy=' + @card.name
+    card_serialized = open(url).read
+    card = JSON.parse(card_serialized)
+    @api_id = card["id"]
+    @img_path = card["image_uris"]["border_crop"]
+  end
+
+  def searchImage
+    @image = Image.find(img_path: @img_path)
+  end
+
+  def saveImage
+    @image = Image.new(api_id: @api_id, img_path: @img_path)
+    @card.image = @image
+  end
+
 end
