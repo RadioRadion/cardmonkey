@@ -34,6 +34,7 @@ class CardsController < ApplicationController
       redirect_to user_cards_path
     else
       render :new
+
     end
   end
 
