@@ -2,6 +2,8 @@ class CardsController < ApplicationController
   require 'csv'
   require 'json'
   require 'open-uri'
+  require "down"
+  require "fileutils"
 
   def index
     @cards = current_user.cards
@@ -75,12 +77,19 @@ class CardsController < ApplicationController
   end
 
   def searchImage
-    @image = Image.find(img_path: @img_path)
+    @image = Image.find_by(api_id: @api_id)
   end
 
   def saveImage
     @image = Image.new(api_id: @api_id, img_path: @img_path)
-    @card.image = @image
-  end
+    # open("https://api.scryfall.com/cards/named?fuzzy=opt") do |image|
+    #   File.open("./app/assets/images/cards/test2.jpg", "wb") do |file|
+    #     file.write(image.read)
+    #   end
+    # end
 
+    tempfile = Down.download(@img_path)
+    FileUtils.mv(tempfile.path, "./app/assets/images/cards/#{@api_id}.jpg")
+
+  end
 end
