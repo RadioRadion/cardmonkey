@@ -36,7 +36,6 @@ class CardsController < ApplicationController
       redirect_to user_cards_path
     else
       render :new
-
     end
   end
 
@@ -52,7 +51,6 @@ class CardsController < ApplicationController
       redirect_to user_cards_path
     else
       render :new
-
     end
   end
 
@@ -81,15 +79,8 @@ class CardsController < ApplicationController
   end
 
   def saveImage
-    @image = Image.new(api_id: @api_id, img_path: @img_path)
-    # open("https://api.scryfall.com/cards/named?fuzzy=opt") do |image|
-    #   File.open("./app/assets/images/cards/test2.jpg", "wb") do |file|
-    #     file.write(image.read)
-    #   end
-    # end
-
+    @image = Image.new(api_id: @api_id, img_path: "./app/assets/images/cards/#{@api_id}.jpg")
     tempfile = Down.download(@img_path)
     FileUtils.mv(tempfile.path, "./app/assets/images/cards/#{@api_id}.jpg")
-
   end
 end
