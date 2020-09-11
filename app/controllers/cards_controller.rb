@@ -1,5 +1,9 @@
 class CardsController < ApplicationController
   require 'csv'
+  require 'json'
+  require 'open-uri'
+  require "down"
+  require "fileutils"
 
   def index
     @cards = current_user.cards
@@ -23,12 +27,15 @@ class CardsController < ApplicationController
 
   def create
     @card = Card.new(cards_params)
+    fetchImage
+    searchImage
+    saveImage if @image.nil?
+    @card.image = @image
     @card.user = current_user
     if @card.save!
       redirect_to user_cards_path
     else
       render :new
-
     end
   end
 
@@ -44,7 +51,6 @@ class CardsController < ApplicationController
       redirect_to user_cards_path
     else
       render :new
-
     end
   end
 
@@ -58,5 +64,23 @@ class CardsController < ApplicationController
 
   def cards_params
     params.require(:card).permit(:name, :quantity, :extension, :foil, :condition, :language)
+  end
+
+  def fetchImage
+    url = 'https://api.scryfall.com/cards/named?fuzzy=' + @card.name
+    card_serialized = open(url).read
+    card = JSON.parse(card_serialized)
+    @api_id = card["id"]
+    @img_path = card["image_uris"]["border_crop"]
+  end
+
+  def searchImage
+    @image = Image.find_by(api_id: @api_id)
+  end
+
+  def saveImage
+    @image = Image.new(api_id: @api_id, img_path: "./app/assets/images/cards/#{@api_id}.jpg")
+    tempfile = Down.download(@img_path)
+    FileUtils.mv(tempfile.path, "./app/assets/images/cards/#{@api_id}.jpg")
   end
 end

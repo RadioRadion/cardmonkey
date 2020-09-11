@@ -1,11 +1,11 @@
 <div class="container">
 
   <h1>My Collection</h1>
-
   <div>
       <ul>
         <% @cards.each do |card| %>
-        <li> name: <%=  card.name %> </li>
+        <li class="nameScan"> name: <%=  card.name %> </li>
+<%= image_path `#{card.image[:img_path]}` %>
             <%= link_to "Del", user_card_path(current_user, card), method: :delete, class: "btn btn-warning"%>
             <%= link_to "edit", edit_user_card_path(current_user, card), class: "btn btn-warning"%>
       <% end %>
