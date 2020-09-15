@@ -57,6 +57,11 @@ class CardsController < ApplicationController
   def destroy
     @card = Card.find(params[:id])
     @card.destroy
+    if Card.find_by(image_id: @card.image_id).nil?
+      image = Image.find(@card.image_id)
+      FileUtils.rm("./app/assets/images/cards/#{image.api_id}.jpg")
+      image.destroy
+    end
     redirect_to user_cards_path(current_user)
   end
 
