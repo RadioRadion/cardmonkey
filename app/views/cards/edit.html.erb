@@ -1,5 +1,5 @@
 <div class="container">
-  <%= simple_form_for(@card, url: card_path, method: :patch) do |f| %>
+  <%= simple_form_for([current_user, @card], method: :patch) do |f| %>
   <%= f.input :condition, collection: ["neuf", "occasion"] %>
   <%= f.submit "Save card", class: "btn btn-success" %>
   <% end %>

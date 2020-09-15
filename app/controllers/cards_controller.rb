@@ -4,6 +4,7 @@ class CardsController < ApplicationController
   require 'open-uri'
   require "down"
   require "fileutils"
+  require "pry-byebug"
 
   def index
     @cards = current_user.cards
@@ -57,6 +58,7 @@ class CardsController < ApplicationController
   def destroy
     @card = Card.find(params[:id])
     @card.destroy
+    checkDestroyImage
     redirect_to user_cards_path(current_user)
   end
 
@@ -71,7 +73,14 @@ class CardsController < ApplicationController
     card_serialized = open(url).read
     card = JSON.parse(card_serialized)
     @api_id = card["id"]
-    @img_path = card["image_uris"]["border_crop"]
+    cardsUrl = card["prints_search_uri"]
+    cards_serialized = open(cardsUrl).read
+    totalCards = JSON.parse(cards_serialized)
+    numberCards = totalCards["total_cards"]
+    (0...numberCards).to_a.each do |number|
+      @img_path = totalCards["data"][number]["image_uris"]["border_crop"]
+      return @img_path if totalCards["data"][number]["set"].upcase == @card.extension
+    end
   end
 
   def searchImage
@@ -82,5 +91,13 @@ class CardsController < ApplicationController
     @image = Image.new(api_id: @api_id, img_path: "./app/assets/images/cards/#{@api_id}.jpg")
     tempfile = Down.download(@img_path)
     FileUtils.mv(tempfile.path, "./app/assets/images/cards/#{@api_id}.jpg")
+  end
+
+  def checkDestroyImage
+    if Card.find_by(image_id: @card.image_id).nil?
+      image = Image.find(@card.image_id)
+      FileUtils.rm("./app/assets/images/cards/#{image.api_id}.jpg")
+      image.destroy
+    end
   end
 end
