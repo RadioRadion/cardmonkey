@@ -7,4 +7,16 @@ class Card < ApplicationRecord
   validates :quantity, presence: true
   validates :extension, presence: true
   validates :foil, presence: true
+
+  def self.getprices
+    Card.all.each do |card|
+      image = Image.find(@card.image_id)
+      url = 'https://api.scryfall.com/cards/' + image.api_id
+      card_serialized = open(url).read
+      card = JSON.parse(card_serialized)
+      price = card["prices"]["eur"]
+      image.price = price
+      image.update
+    end
+  end
 end
