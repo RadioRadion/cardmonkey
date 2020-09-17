@@ -10,13 +10,12 @@ class Card < ApplicationRecord
 
   def self.getprices
     Card.all.each do |card|
-      image = Image.find(@card.image_id)
+      image = Image.find(card.image_id)
       url = 'https://api.scryfall.com/cards/' + image.api_id
       card_serialized = open(url).read
       card = JSON.parse(card_serialized)
       price = card["prices"]["eur"]
-      image.price = price
-      image.update
+      image.update(price: price)
     end
   end
 end

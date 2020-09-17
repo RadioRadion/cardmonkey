@@ -19,7 +19,7 @@
 
 # Learn more: http://github.com/javan/whenever
 
-# every 1.day, at: '4:30 am' do
-#   rake "data:fetchCards"
-#   rake "data:fetchWants"
-# end
+every 1.day, at: '11:30 am' do
+  rake "data:fetchCards"
+  rake "data:fetchWants"
+end
