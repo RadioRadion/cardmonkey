@@ -16,7 +16,7 @@ class WantsController < ApplicationController
     @cards = []
     @names = []
     filepath = 'lib/datas/cards.csv'
-    CSV.foreach(filepath) do |row|
+    CSV.foreach(filepath, headers: :first_row, liberal_parsing: true, :row_sep => :auto, :col_sep => ";") do |row|
     # Here, row is an array of columns. 46 => name, 59 => setCode
       @cards << [row[9], row[12]]
       @names << row[9]
