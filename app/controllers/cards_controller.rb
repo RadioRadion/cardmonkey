@@ -17,11 +17,11 @@ class CardsController < ApplicationController
     @cards = []
     @names = []
     filepath = 'lib/datas/cards.csv'
-    CSV.foreach(filepath, headers: :first_row) do |row|
+    CSV.foreach(filepath, headers: :first_row, liberal_parsing: true, :row_sep => :auto, :col_sep => ";") do |row|
 
     # Here, row is an array of columns. 46 => name, 59 => setCode, 68 uuid
-      @cards << [row[49], row[62]]
-      @names << row[49]
+      @cards << [row[9], row[12]]
+      @names << row[9]
     end
     @uniqsName = @names.uniq.sort
   end

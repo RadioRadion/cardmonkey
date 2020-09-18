@@ -18,4 +18,5 @@ class Card < ApplicationRecord
       image.update(price: price)
     end
   end
+
 end

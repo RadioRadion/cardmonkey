@@ -18,8 +18,8 @@ class WantsController < ApplicationController
     filepath = 'lib/datas/cards.csv'
     CSV.foreach(filepath) do |row|
     # Here, row is an array of columns. 46 => name, 59 => setCode
-      @cards << [row[49], row[62]]
-      @names << row[49]
+      @cards << [row[9], row[12]]
+      @names << row[9]
     end
     # On veut supprimer dans cette variable tous les doublons
     @uniqsName = @names.uniq.sort
