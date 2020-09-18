@@ -17,11 +17,11 @@ class CardsController < ApplicationController
     @cards = []
     @names = []
     filepath = 'lib/datas/cards.csv'
-    CSV.foreach(filepath) do |row|
+    CSV.foreach(filepath, headers: :first_row, liberal_parsing: true, :row_sep => :auto, :col_sep => ";") do |row|
 
     # Here, row is an array of columns. 46 => name, 59 => setCode, 68 uuid
-      @cards << [row[46], row[59]]
-      @names << row[46]
+      @cards << [row[9], row[12]]
+      @names << row[9]
     end
     @uniqsName = @names.uniq.sort
   end
@@ -94,7 +94,7 @@ class CardsController < ApplicationController
   end
 
   def checkDestroyImage
-    if Card.find_by(image_id: @card.image_id).nil?
+    if Card.find_by(image_id: @card.image_id).nil? && Want.find_by(image_id: @want.image_id).nil?
       image = Image.find(@card.image_id)
       FileUtils.rm("./app/assets/images/cards/#{image.api_id}.jpg")
       image.destroy

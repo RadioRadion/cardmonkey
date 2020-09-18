@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_11_070947) do
+ActiveRecord::Schema.define(version: 2020_09_16_094356) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -55,6 +55,7 @@ ActiveRecord::Schema.define(version: 2020_09_11_070947) do
     t.string "img_path"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "price"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -99,6 +100,8 @@ ActiveRecord::Schema.define(version: 2020_09_11_070947) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "language"
+    t.bigint "image_id"
+    t.index ["image_id"], name: "index_wants_on_image_id"
     t.index ["user_id"], name: "index_wants_on_user_id"
   end
 
@@ -110,5 +113,6 @@ ActiveRecord::Schema.define(version: 2020_09_11_070947) do
   add_foreign_key "messages", "chatrooms"
   add_foreign_key "messages", "users"
   add_foreign_key "trades", "users"
+  add_foreign_key "wants", "images"
   add_foreign_key "wants", "users"
 end
