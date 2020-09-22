@@ -39,6 +39,9 @@ class WantsController < ApplicationController
     end
   end
 
+  def show
+  end
+
   def edit
     @want = Want.find(params[:id])
   end

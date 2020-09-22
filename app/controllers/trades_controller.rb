@@ -21,6 +21,17 @@ class TradesController < ApplicationController
     end
   end
 
+  def show
+    @trade = Trade.find(params[:id])
+    if current_user.id == @trade.user_id
+      @cards = @trade.cards.joins(:user).where(user_id: current_user)
+      @othercards = @trade.cards.joins(:user).where(user_id: @trade.user_id_invit)
+    else
+      @cards = @trade.cards.joins(:user).where(user_id: current_user)
+      @othercards = @trade.cards.joins(:user).where(user_id: @trade.user_id)
+    end
+  end
+
   private
 
   def trade_params
@@ -46,7 +57,7 @@ class TradesController < ApplicationController
   def save_message
     @firstChat = Chatroom.where(user_id: current_user, user_id_invit: @userTarget).first
     @secondChat = Chatroom.where(user_id: @userTarget, user_id_invit: current_user).first
-    @content = "NEW TRADE : test"
+    @content = "Un nouveau trade est arrivé ! #{@trade.id}"
 
     if !@firstChat.nil?
       Message.new(content: @content, user_id: current_user.id, chatroom_id: @firstChat.id).save!

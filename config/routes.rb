@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   resources :users, only: [:show] do
     resources :cards, only: [:index, :destroy, :new, :edit, :create, :update]
     resources :wants, only: [:index, :destroy, :new, :edit, :create, :update]
-    resources :trades, only: [:create]
+    resources :trades, only: [:create, :show]
     resources :chatrooms, only: [:index, :show, :new, :create, :destroy] do
       resources :messages, only: [:create]
     end
