@@ -2,6 +2,12 @@ class TradesController < ApplicationController
 #ce skip permet de forcer le fake formulaire à ce pas nécessité d'authencitytoker
   skip_before_action :verify_authenticity_token
 
+  def index
+    @trades = Trade.where(user_id: current_user)
+    @tradesPending = Trade.where(statut: "pending")
+    @tradesDone = Trade.where(statut: "done")
+  end
+
   def create
     @userTarget = params[:user_id]
     @trade = Trade.new(status: "pending", user_id_invit: @userTarget)
@@ -19,6 +25,33 @@ class TradesController < ApplicationController
     else
       render 'users/show'
     end
+  end
+
+  def show
+    @trade = Trade.find(params[:id])
+    if current_user.id == @trade.user_id
+      @cards = @trade.cards.joins(:user).where(user_id: current_user)
+      @othercards = @trade.cards.joins(:user).where(user_id: @trade.user_id_invit)
+    else
+      @cards = @trade.cards.joins(:user).where(user_id: current_user)
+      @othercards = @trade.cards.joins(:user).where(user_id: @trade.user_id)
+    end
+    calculateTotalPrice
+    calculateOtherTotalPrice
+  end
+
+  def edit
+    @trade = Trade.find(params[:id])
+    if current_user.id == @trade.user_id
+      @cardsTrade = @trade.cards.joins(:user).where(user_id: current_user)
+      @othercardsTrade = @trade.cards.joins(:user).where(user_id: @trade.user_id_invit)
+    else
+      @cardsTrade = @trade.cards.joins(:user).where(user_id: current_user)
+      @othercardsTrade = @trade.cards.joins(:user).where(user_id: @trade.user_id)
+    end
+  end
+
+  def update
   end
 
   private
@@ -46,7 +79,7 @@ class TradesController < ApplicationController
   def save_message
     @firstChat = Chatroom.where(user_id: current_user, user_id_invit: @userTarget).first
     @secondChat = Chatroom.where(user_id: @userTarget, user_id_invit: current_user).first
-    @content = "NEW TRADE : test"
+    @content = "Un nouveau trade est arrivé ! #{@trade.id}"
 
     if !@firstChat.nil?
       Message.new(content: @content, user_id: current_user.id, chatroom_id: @firstChat.id).save!
@@ -57,7 +90,18 @@ class TradesController < ApplicationController
       @chatroom.save!
       Message.new(content: @content, user_id: current_user.id, chatroom_id: @chatroom.id).save!
     end
+  end
 
+  def calculateTotalPrice
+    @totalPrice = 0
+    @cards.each { |card| @totalPrice += card.image.price.to_f }
+    @totalPrice
+  end
+
+  def calculateOtherTotalPrice
+    @otherTotalPrice = 0
+    @othercards.each { |card| @otherTotalPrice += card.image.price.to_f }
+    @otherTotalPrice
   end
 
 end

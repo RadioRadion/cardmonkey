@@ -1,0 +1,4 @@
+<h2>Trades en cours :</h2>
+<% @trades.each do |trade| %>
+  <%= link_to "Trade", user_trade_path(trade.user_id, trade.id) %>
+<% end %>
