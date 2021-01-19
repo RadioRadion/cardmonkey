@@ -30,5 +30,5 @@
 
 </div>
 <%= link_to("Modifier Trade", edit_user_trade_path(@trade.user_id, @trade.id)) %>
-<%= link_to("Accepter Trade", user_want_path(@trade.user_id, @trade.id)) %>
+<%= link_to("Accepter Trade", user_trade_path(@trade.user_id, @trade.id, accept: true), method: 'put') %>
 
