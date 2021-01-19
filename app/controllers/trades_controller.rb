@@ -36,8 +36,8 @@ class TradesController < ApplicationController
       @cards = @trade.cards.joins(:user).where(user_id: current_user)
       @othercards = @trade.cards.joins(:user).where(user_id: @trade.user_id)
     end
-    calculateTotalPrice
-    calculateOtherTotalPrice
+    calcultate_total_price
+    calculate_other_total_price
   end
 
   def edit
@@ -52,6 +52,11 @@ class TradesController < ApplicationController
   end
 
   def update
+    @trade = Trade.find(params[:id])
+    if params[:accept]
+      @trade.update(status: "accepted")
+      redirect_to user_trade_path(@trade.user_id, @trade)
+    end
   end
 
   private
@@ -92,13 +97,13 @@ class TradesController < ApplicationController
     end
   end
 
-  def calculateTotalPrice
+  def calcultate_total_price
     @totalPrice = 0
     @cards.each { |card| @totalPrice += card.image.price.to_f }
     @totalPrice
   end
 
-  def calculateOtherTotalPrice
+  def calculate_other_total_price
     @otherTotalPrice = 0
     @othercards.each { |card| @otherTotalPrice += card.image.price.to_f }
     @otherTotalPrice
