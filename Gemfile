@@ -30,6 +30,9 @@ gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'devise'
 
+# convert on user address to lat & long
+gem 'geocoder'
+
 # PWA
 gem "serviceworker-rails"
 

@@ -1,7 +1,7 @@
 <div class="row justify-content-between">
   <div class="col-5">
     <h2>MY COLLECTION</h2>
-    <h3>total : <%= @totalPrice %> €</h3>
+    <h3>total : <%= @total_price %> €</h3>
     <% @cards.each do |card| %>
     <div class="card-offer card-product" data-id=<%= card.id%> >
       <img src="https://raw.githubusercontent.com/lewagon/fullstack-images/master/uikit/skateboard.jpg" />
@@ -15,8 +15,8 @@
 
   <div class="col-5">
     <h2>ITS COLLECTION</h2>
-    <h3>total : <%= @otherTotalPrice %> €</h3>
-    <% @othercards.each do |card| %>
+    <h3>total : <%= @other_total_price %> €</h3>
+    <% @other_cards.each do |card| %>
     <div class="card-target card-product" data-id=<%= card.id%> >
       <img src="https://raw.githubusercontent.com/lewagon/fullstack-images/master/uikit/skateboard.jpg" />
       <div class="card-product-infos">

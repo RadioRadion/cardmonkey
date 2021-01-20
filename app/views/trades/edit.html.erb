@@ -1,7 +1,7 @@
 <div class="row justify-content-between">
       <div class="col-5">
         <h2>MY COLLECTION</h2>
-        <% @cardsTrade.each do |card| %>
+        <% @cards_trade.each do |card| %>
         <div class="card-offer card-product" data-id=<%= card.id%> >
           <img src="https://raw.githubusercontent.com/lewagon/fullstack-images/master/uikit/skateboard.jpg" />
           <div class="card-product-infos">
@@ -14,7 +14,7 @@
 
       <div class="col-5">
         <h2>ITS COLLECTION</h2>
-        <% @othercardsTrade.each do |card| %>
+        <% @other_cards_trade.each do |card| %>
         <div class="card-target card-product" data-id=<%= card.id%> >
           <img src="https://raw.githubusercontent.com/lewagon/fullstack-images/master/uikit/skateboard.jpg" />
           <div class="card-product-infos">
