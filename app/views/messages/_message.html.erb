@@ -7,12 +7,12 @@
          <div class="message-content">
           <!-- Code pour chopper le lien du trade via actioncable,
             ne marche que si il y +link_to -->
-          <% pattern = /Un nouveau trade est arrivé ! (?<link>\d+)$/
-          if !message.content.match(pattern).nil?
-            match_data = message.content.match(pattern)
-            trade = Trade.find(match_data[:link])
-          end %>
-          <p><%= !match_data.nil? ? link_to("Nouveau trade", user_trade_path(trade.user_id, trade.id)) : message.content %></p>
+          <% pattern = /(?<intro>Un nouveau trade est arrivé !) (?<link>\d+)$/
+          match_data = message.content.match(pattern)
+          trade = Trade.find(match_data[:link]) if match_data
+          %>
+          <p><%= match_data[:intro] if match_data %> </p>
+          <p><%= !match_data.nil? ? link_to("Valider ici", user_trade_path(trade.user_id, trade.id)) : message.content %></p>
 
           <small><%= message.created_at.strftime("%a %b %e at %l:%M%p") %></small>
         </div>

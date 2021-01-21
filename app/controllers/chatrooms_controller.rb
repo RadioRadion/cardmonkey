@@ -29,7 +29,7 @@ class ChatroomsController < ApplicationController
     redirect_to user_chatroom_path
   end
 
-   private
+  private
 
   def chatroom_params
     params.require(:chatroom).permit(:name)

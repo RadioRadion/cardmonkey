@@ -104,7 +104,7 @@ class TradesController < ApplicationController
 
   def calculate_other_total_price
     @other_total_price = 0
-    @othercards.each { |card| @other_total_price += card.image.price.to_f }
+    @other_cards.each { |card| @other_total_price += card.image.price.to_f }
     @other_total_price
   end
 end
