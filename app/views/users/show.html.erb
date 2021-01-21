@@ -9,8 +9,8 @@
 <% else %>
 
     <div class="row justify-content-between">
-      <%= render "shared/card", locals: {title: "Ma collection", total_price: @total_price, cards: @cards}  %>
-      <%= render "shared/card", locals: {title: "Sa collection", total_price: @other_total_price, cards: @other_cards}  %>
+      <%= render "shared/card", locals: {title: "Ma collection", cards: @cards}  %>
+      <%= render "shared/card", locals: {title: "Sa collection", cards: @other_cards}  %>
       <%= render "form" %>
     </div>
 

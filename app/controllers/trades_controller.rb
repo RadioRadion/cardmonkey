@@ -9,8 +9,8 @@ class TradesController < ApplicationController
   end
 
   def create
-    @user_target = params[:user_id]
-    @trade = Trade.new(status: "pending", user_id_invit: @user_target)
+    other_user_id = params[:user_id]
+    @trade = Trade.new(status: "pending", user_id_invit: other_user_id)
     @trade.user = current_user
 
     @cards_offer = params[:trade][:offer].split(",")
@@ -20,7 +20,10 @@ class TradesController < ApplicationController
 
     if @trade.save!
       save_card_trades
-      save_message
+      content = "Un nouveau trade est arrivé ! #{@trade.id}"
+      Trade.save_message(current_user.id, other_user_id, content)
+
+      flash[:alert] = "Proposition de trade envoyée !"
       redirect_to user_path(current_user)
     else
       render 'users/show'
@@ -54,6 +57,11 @@ class TradesController < ApplicationController
     @trade = Trade.find(params[:id])
     if params[:accept]
       @trade.update(status: "accepted")
+      @trade.user_id == current_user.id ? other_user_id = @trade.user_id_invit : other_user_id = @trade.user_id
+      content = "Trade accepté ! Discutez-ici pour vous donner rendez-vous et procéder à l'échange.
+      Une fois le trade terminé, n'oubliez pas de de valider !"
+      Trade.save_message(current_user.id, other_user_id, content)
+      flash[:alert] = "Trade validé !"
       redirect_to user_trade_path(@trade.user_id, @trade)
     end
   end
@@ -77,22 +85,6 @@ class TradesController < ApplicationController
       @card_trade = CardTrade.new(card_id: @card, trade_id: @trade.id)
       @cards_target_names << Card.find(card).name
       @card_trade.save!
-    end
-  end
-
-  def save_message
-    @first_chat = Chatroom.where(user_id: current_user, user_id_invit: @user_target).first
-    @second_chat = Chatroom.where(user_id: @user_target, user_id_invit: current_user).first
-    @content = "Un nouveau trade est arrivé ! #{@trade.id}"
-
-    if !@first_chat.nil?
-      Message.new(content: @content, user_id: current_user.id, chatroom_id: @first_chat.id).save!
-    elsif !@second_chat.nil?
-      Message.new(content: @content, user_id: current_user.id, chatroom_id: @second_chat.id).save!
-    else
-      @chatroom = Chatroom.new(user_id: current_user.id, user_id_invit: @user_target)
-      @chatroom.save!
-      Message.new(content: @content, user_id: current_user.id, chatroom_id: @chatroom.id).save!
     end
   end
 
