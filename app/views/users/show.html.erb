@@ -7,12 +7,21 @@
   <span>Nombre de trades réalisés en cours</span><br>
 
 <% else %>
+  <div class="row justify-content-between text-center">
+    <div class="col-6"><p>Mon total: <span id="monTotal">0</span></p></div>
+    <div class="col-6"><p>Son total: <span id="sonTotal">0</span></p></div>
+  </div>
 
-    <div class="row justify-content-between">
-      <%= render "shared/card", locals: {title: "Ma collection", cards: @cards}  %>
-      <%= render "shared/card", locals: {title: "Sa collection", cards: @other_cards}  %>
-      <%= render "form" %>
-    </div>
+
+  <div class="row justify-content-between">
+    <%= render "shared/card", locals: {title: "Ma collection",
+      cards: @cards,
+      side: "card-offer"}  %>
+    <%= render "shared/card", locals: {title: "Sa collection",
+      cards: @other_cards,
+      side: "card-target"}  %>
+  </div>
+  <%= render "form" %>
 
   <% end %>
 

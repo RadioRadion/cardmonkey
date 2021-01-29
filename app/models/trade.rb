@@ -3,7 +3,9 @@ class Trade < ApplicationRecord
   has_many :card_trades
   has_many :cards, through: :card_trades
 
-  private
+  scope :pending, -> { where(status: "pending") }
+  scope :accepted, -> { where(status: "accepted") }
+  scope :done, -> { where(status: "done") }
 
   def self.save_message(current_user_id, other_user_id, content)
     first_chat = Chatroom.where(user_id: current_user_id, user_id_invit: other_user_id).first
