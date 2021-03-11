@@ -10,6 +10,10 @@ Rails.application.configure do
   # Do not eager load code on boot.
   config.eager_load = false
 
+  #testing mails in develoment
+  config.action_mailer.delivery_method = :letter_opener
+  config.action_mailer.perform_deliveries = true
+
   # Show full error reports.
   config.consider_all_requests_local = true
 

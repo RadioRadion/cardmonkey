@@ -33,6 +33,9 @@ gem 'devise'
 # convert on user address to lat & long
 gem 'geocoder'
 
+# testing mail in development
+gem "letter_opener", group: :development
+
 # PWA
 gem "serviceworker-rails"
 
