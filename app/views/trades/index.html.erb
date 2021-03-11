@@ -1,4 +1,14 @@
-<h2>Trades en cours :</h2>
-<% @trades.each do |trade| %>
+<h2>Trades acceptés :</h2>
+<% @trades_accepted.each do |trade| %>
+  <%= link_to "Trade", user_trade_path(trade.user_id, trade.id) %>
+<% end %>
+
+<h2>Trades en attente de confirmation :</h2>
+<% @trades_pending.each do |trade| %>
+  <%= link_to "Trade", user_trade_path(trade.user_id, trade.id) %>
+<% end %>
+
+<h2>Anciens trades :</h2>
+<% @trades_done.each do |trade| %>
   <%= link_to "Trade", user_trade_path(trade.user_id, trade.id) %>
 <% end %>

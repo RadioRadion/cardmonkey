@@ -1,0 +1,21 @@
+<div class="col-5">
+    <h2><%= locals[:title] %> </h2>
+
+    <% if locals[:total_price] %>
+      <h3>total : <%= locals[:total_price] %> €</h3>
+    <% end %>
+
+    <% classes = "#{locals[:side]} card-product" %>
+
+    <% locals[:cards].each do |card| %>
+    <div class="container-symb" data-img-id="<%= card.id%>">
+      <%= image_tag ("cards/#{card.image[:api_id]}.jpg"), class: "card-absolute" %>
+    </div>
+    <div class="<%= classes %>" data-id="<%= card.id%>" data-price="<%= card.image.price%>" >
+      <div class="card-product-infos">
+        <h2><%= card.name %></h2>
+        <h2><%= card.image.price %></h2>
+      </div>
+    </div>
+    <% end %>
+  </div>

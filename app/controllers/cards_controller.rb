@@ -23,14 +23,14 @@ class CardsController < ApplicationController
       @cards << [row[9], row[12]]
       @names << row[9]
     end
-    @uniqsName = @names.uniq.sort
+    @uniqs_name = @names.uniq.sort
   end
 
   def create
     @card = Card.new(cards_params)
-    fetchImage
-    searchImage
-    saveImage if @image.nil?
+    fetch_image
+    search_image
+    save_image if @image.nil?
     @card.image = @image
     @card.user = current_user
     if @card.save!
@@ -58,7 +58,7 @@ class CardsController < ApplicationController
   def destroy
     @card = Card.find(params[:id])
     @card.destroy
-    checkDestroyImage
+    check_destroy_image
     redirect_to user_cards_path(current_user)
   end
 
@@ -68,32 +68,32 @@ class CardsController < ApplicationController
     params.require(:card).permit(:name, :quantity, :extension, :foil, :condition, :language)
   end
 
-  def fetchImage
+  def fetch_image
     url = 'https://api.scryfall.com/cards/named?fuzzy=' + @card.name
     card_serialized = open(url).read
     card = JSON.parse(card_serialized)
     @api_id = card["id"]
-    cardsUrl = card["prints_search_uri"]
-    cards_serialized = open(cardsUrl).read
-    totalCards = JSON.parse(cards_serialized)
-    numberCards = totalCards["total_cards"]
-    (0...numberCards).to_a.each do |number|
-      @img_path = totalCards["data"][number]["image_uris"]["border_crop"]
-      return @img_path if totalCards["data"][number]["set"].upcase == @card.extension
+    cards_url = card["prints_search_uri"]
+    cards_serialized = open(cards_url).read
+    total_cards = JSON.parse(cards_serialized)
+    number_cards = total_cards["total_cards"]
+    (0...number_cards).to_a.each do |number|
+      @img_path = total_cards["data"][number]["image_uris"]["border_crop"]
+      return @img_path if total_cards["data"][number]["set"].upcase == @card.extension
     end
   end
 
-  def searchImage
+  def search_image
     @image = Image.find_by(api_id: @api_id)
   end
 
-  def saveImage
+  def save_image
     @image = Image.new(api_id: @api_id, img_path: "./app/assets/images/cards/#{@api_id}.jpg")
     tempfile = Down.download(@img_path)
     FileUtils.mv(tempfile.path, "./app/assets/images/cards/#{@api_id}.jpg")
   end
 
-  def checkDestroyImage
+  def check_destroy_image
     if Card.find_by(image_id: @card.image_id).nil? && Want.find_by(image_id: @want.image_id).nil?
       image = Image.find(@card.image_id)
       FileUtils.rm("./app/assets/images/cards/#{image.api_id}.jpg")

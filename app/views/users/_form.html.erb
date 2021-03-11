@@ -13,7 +13,7 @@
     <div class="form-group text optional target">
       <textarea class="form-control text optional" name="trade[target]" id="target"></textarea>
     </div>
-  <input type="submit" name="commit" value="Create Trade" class="btn" data-disable-with="Create Trade">
+  <input type="submit" name="commit" value="Create Trade" class="btn btn-warning" data-disable-with="Create Trade">
 </form>
 
 
@@ -33,6 +33,13 @@
 
   const one = document.querySelector("#one");
   const two = document.querySelector("#two");
+
+  const monTotalDiv = document.querySelector("#monTotal");
+  const sonTotalDiv = document.querySelector("#sonTotal");
+  const monTotal = []
+  const sonTotal = []
+  //préparer le reducer pour faire la somme plus loin
+  const reducer = (accumulator, currentValue) => accumulator + currentValue;
   //pour chopper tous les éléments du form
   var loginForm = document.forms.sneackyValue;
   loginForm.elements.offer.placeholder = 'test@example.com';
@@ -45,8 +52,51 @@
   let target = [];
 
 
+  cardsTarget.forEach(card => card.addEventListener("click", (event) => {
+    if (card.classList.contains("selected")) {
+      //Si c'est la dernière carte sélectionnée
+      if (sonTotal.length == "1" ) {
+        sonTotalDiv.textContent = 0;
+        sonTotal.shift();
+      }
+      else {
+        sonTotal.remove(parseFloat(card.dataset.price));
+        sonTotalDiv.textContent = Math.round(sonTotal.reduce(reducer)*100)/100;
+      }
+    }
+    else {
+      sonTotal.push(parseFloat(card.dataset.price));
+      sonTotalDiv.textContent = Math.round(sonTotal.reduce(reducer)*100)/100;
+    }
+    if (card.classList.length === 2) {
+      card.classList.add("selected");
+      target.push(card.dataset.id);
+      loginForm.elements.target.value = target.toString();
+      // two.value = target.toString();
+    }
+    else {
+      target.remove(card.dataset.id);
+      card.classList.remove("selected");
+      loginForm.elements.target.value = target.toString();
+      // two.value = target.toString();
+    }
+  }));
 
   cardsOffer.forEach(card => card.addEventListener("click", (event) => {
+    if (card.classList.contains("selected")) {
+      if (monTotal.length == "1" ) {
+        monTotalDiv.textContent = 0;
+        monTotal.shift();
+      }
+      else {
+        monTotal.remove(parseFloat(card.dataset.price));
+        monTotalDiv.textContent = Math.round(monTotal.reduce(reducer)*100)/100;
+      }
+    }
+    else {
+      monTotal.push(parseFloat(card.dataset.price));
+      monTotalDiv.textContent = Math.round(monTotal.reduce(reducer)*100)/100;
+    }
     if (card.classList.length === 2) {
       //la classe selected permet de rendre la card verte sur le clic
       card.classList.add("selected");
@@ -62,20 +112,6 @@
       // one.value = offer.toString();
       loginForm.elements.offer.value = offer.toString();
     }
-  }));
 
-  cardsTarget.forEach(card => card.addEventListener("click", (event) => {
-    if (card.classList.length === 2) {
-      card.classList.add("selected");
-      target.push(card.dataset.id);
-      loginForm.elements.target.value = target.toString();
-      // two.value = target.toString();
-    }
-    else {
-      target.remove(card.dataset.id);
-      card.classList.remove("selected");
-      loginForm.elements.target.value = target.toString();
-      // two.value = target.toString();
-    }
   }));
 </script>

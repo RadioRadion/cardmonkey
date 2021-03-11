@@ -19,6 +19,7 @@ class ChatroomsController < ApplicationController
   end
 
   def show
+    @chatrooms = Chatroom.where(user_id: current_user).or(Chatroom.where(user_id_invit: current_user))
     @chatroom = Chatroom.find(params[:id])
     @message = Message.new
   end
@@ -29,7 +30,7 @@ class ChatroomsController < ApplicationController
     redirect_to user_chatroom_path
   end
 
-   private
+  private
 
   def chatroom_params
     params.require(:chatroom).permit(:name)

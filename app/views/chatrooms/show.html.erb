@@ -2,7 +2,26 @@
   <div class="row">
   <!--   <div class="col-6">
     </div> -->
-    <div class="col-12">
+    <div class="col-3">
+      <div class="member_list">
+        <%  @chatrooms.each do |chatroom| %>
+          <ul class="list-unstyled">
+            <li class="left clearfix">
+              <span class="chat-img pull-left">
+                <% if current_user.id == chatroom.user_id %>
+                  <% user = User.find(chatroom.user_id_invit) %>
+                  <%=  link_to user.username, user_chatroom_path(current_user, chatroom) %>
+                <%  else  %>
+                  <% user = User.find(chatroom.user_id) %>
+                  <%=  link_to user.username, user_chatroom_path(current_user, chatroom) %>
+                <% end %>
+              </span>
+            </li>
+          </ul>
+        <% end %>
+      </div>
+    </div>
+    <div class="col-9">
       <div class="chat-header">
         <h4> <%= @chatroom.name %></h4>
       </div>
