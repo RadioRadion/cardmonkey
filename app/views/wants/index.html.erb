@@ -1,23 +1,13 @@
 <div class="container">
 
-<h1>My Wantlist</h1>
+  <%= render "shared/card", locals: {
+  title: "Mes wants",
+  # total_price: @total_price,
+  cards: @wants,
+  side: "card-offer",
+  view: "wants"}  %>
+
   <div>
-    <ul>
-    <% @wants.each do |want| %>
-  <li class="nameScan"> name: <%= want.name %>
-        <%= image_tag ("cards/#{want.image[:api_id]}.jpg") %>
-          <%= link_to "Del", user_want_path(current_user, want), method: :delete, class: "btn btn-warning"%>
-          <%= link_to "edit", edit_user_want_path(current_user, want), class: "btn btn-warning"%>
-    <% end %>
-    </ul>
-  </div>
-  <div>
-      <%= link_to "Add card", new_user_want_path, class: 'btn btn-secondary' %>
+    <%= link_to "Add card", new_user_want_path, class: 'btn btn-secondary' %>
   </div>
 </div>
-
-
-
-
-
-

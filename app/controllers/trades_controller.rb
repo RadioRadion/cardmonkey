@@ -32,6 +32,7 @@ class TradesController < ApplicationController
 
   def show
     @trade = Trade.find(params[:id])
+
     @cards = @trade.cards.joins(:user).where(user_id: current_user)
     if current_user.id == @trade.user_id
       @other_cards = @trade.cards.joins(:user).where(user_id: @trade.user_id_invit)
@@ -43,13 +44,28 @@ class TradesController < ApplicationController
   end
 
   def edit
+    @user = User.find(params[:user_id])
     @trade = Trade.find(params[:id])
+    @path = "/users/#{@user.id}/trades/#{@trade.id}"
+
     @cards_trade = @trade.cards.joins(:user).where(user_id: current_user)
     if current_user.id == @trade.user_id
       @other_cards_trade = @trade.cards.joins(:user).where(user_id: @trade.user_id_invit)
     else
       @other_cards_trade = @trade.cards.joins(:user).where(user_id: @trade.user_id)
     end
+    @trade.user_id == current_user.id ? @other_user = User.find(@trade.user_id_invit) : @other_user = User.find(@trade.user_id)
+    cards_id_wants = want_cards_id_by_user(current_user, @other_user)
+    # On prend les instances de ces cartes
+    @cards_i_wants = Card.find(cards_id_wants - @other_cards_trade.ids)
+    # les autres cards
+    @other_cards = @other_user.cards.where.not(id: cards_id_wants + @other_cards_trade.ids)
+
+    # Inversement
+    cards_id_other_wants = want_cards_id_by_user(@other_user, current_user)
+    # cards_id_other_wants.reject { |id| @cards_trade.ids.include?(id) }
+    @cards_other_wants = Card.find(cards_id_other_wants - @cards_trade.ids)
+    @my_cards = current_user.cards.where.not(id: cards_id_other_wants + @cards_trade.ids)
   end
 
   def update
@@ -92,5 +108,11 @@ class TradesController < ApplicationController
     total_price = 0
     cards.each { |card| total_price += card.image.price.to_f }
     total_price
+  end
+
+  def want_cards_id_by_user(user, other_user)
+    # format avant {user_id: [card_id, card_id], user_id: ......}
+    user.want_cards_by_user.select { |user_cards| user_cards[:user_id] == other_user.id }[0][:cards]
+    # format apres [card_id, card_id]
   end
 end

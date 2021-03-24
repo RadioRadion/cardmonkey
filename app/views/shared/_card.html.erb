@@ -13,8 +13,21 @@
     </div>
     <div class="<%= classes %>" data-id="<%= card.id%>" data-price="<%= card.image.price%>" >
       <div class="card-product-infos">
-        <h2><%= card.name %></h2>
-        <h2><%= card.image.price %></h2>
+        <%= card.user.id %>
+          <h2><%= card.name %></h2>
+          <h2><%= card.image.price %></h2>
+          <% if locals[:view] == "wants" %>
+            <div class="card-buttons">
+              <%= link_to "Del", user_want_path(current_user, card), method: :delete, class: "btn btn-warning"%>
+              <%= link_to "edit", edit_user_want_path(current_user, card), class: "btn btn-warning"%>
+            </div>
+          <% end %>
+          <% if locals[:view] == "cards" %>
+            <div class="card-buttons">
+              <%= link_to "Del", user_card_path(current_user, card), method: :delete, class: "btn btn-warning"%>
+              <%= link_to "edit", edit_user_card_path(current_user, card), class: "btn btn-warning"%>
+            </div>
+          <% end %>
       </div>
     </div>
     <% end %>

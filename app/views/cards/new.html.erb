@@ -43,16 +43,17 @@ function complete(name) {
   document.querySelector('.search').value = name;
   suggestions.innerHTML = "";
   let carte = name;
-  cards.map ( (card) => {
-  if (card[0] === carte)
-    extensions.push(card[1]);
+  cards.map ((card) => {
+    if (card[0] === carte && extensions.length == 0) {
+      extensions.push(card[1]);
+    }
   });
   wholeForm();
 }
 
 const wholeForm = () => {
   const form =[`<option value=''>--Please choose an extension--</option>`];
-  extensions.map( (extension) => {
+  extensions[0].split(',').map((extension) => {
     form.push(`<option value='${extension}'>${extension}</option>`);
   });
   nextForm.innerHTML = (`<div class="form-group string optional card_extension">
