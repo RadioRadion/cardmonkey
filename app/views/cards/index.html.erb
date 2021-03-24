@@ -1,18 +1,13 @@
 <div class="container">
 
-  <h1>My Collection</h1>
+  <%= render "shared/card", locals: {
+  title: "Ma collection",
+  # total_price: @total_price,
+  cards: @cards,
+  side: "card-offer",
+  view: "cards"}  %>
+
   <div>
-      <ul>
-        <% @cards.each do |card| %>
-        <li class="nameScan"> name: <%= card.name %>
-        <%= image_tag ("cards/#{card.image[:api_id]}.jpg") %>
-            <%= link_to "Del", user_card_path(current_user, card), method: :delete, class: "btn btn-warning"%>
-            <%= link_to "edit", edit_user_card_path(current_user, card), class: "btn btn-warning"%>
-        <% end %>
-        </li>
-      </ul>
-       <div>
-        <%= link_to "Add card", new_user_card_path, class: 'btn btn-secondary' %>
-      </div>
+    <%= link_to "Add card", new_user_card_path, class: 'btn btn-secondary' %>
   </div>
 </div>

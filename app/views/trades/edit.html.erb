@@ -1,28 +1,39 @@
-<div class="row justify-content-between">
-      <div class="col-5">
-        <h2>MY COLLECTION</h2>
-        <% @cards_trade.each do |card| %>
-        <div class="card-offer card-product" data-id=<%= card.id%> >
-          <img src="https://raw.githubusercontent.com/lewagon/fullstack-images/master/uikit/skateboard.jpg" />
-          <div class="card-product-infos">
-            <h2><%= card.name %></h2>
-          </div>
-        </div>
-        <% end  %>
-      </div>
+<div class="container">
+
+  <div class="row justify-content-between text-center">
+    <div class="col-6"><p>Mon total: <span id="monTotal">0</span></p></div>
+    <div class="col-6"><p>Son total: <span id="sonTotal">0</span></p></div>
+  </div>
+
+  <div class="row justify-content-between">
+    <%= render "shared/card", locals: {title: "Mes cartes trade",
+      cards: @cards_trade,
+      side: "card-offer"}  %>
+    <%= render "shared/card", locals: {title: "Ses cartes trade",
+      cards: @other_cards_trade,
+      side: "card-target"}  %>
+  </div>
+
+  <div class="row justify-content-between">
+    <%= render "shared/card", locals: {title: "Cartes qu'il recherche",
+      cards: @cards_other_wants,
+      side: "card-offer"}  %>
+    <%= render "shared/card", locals: {title: "Cartes que je recherche",
+      cards: @cards_i_wants,
+      side: "card-target"}  %>
+  </div>
 
 
-      <div class="col-5">
-        <h2>ITS COLLECTION</h2>
-        <% @other_cards_trade.each do |card| %>
-        <div class="card-target card-product" data-id=<%= card.id%> >
-          <img src="https://raw.githubusercontent.com/lewagon/fullstack-images/master/uikit/skateboard.jpg" />
-          <div class="card-product-infos">
-            <h2><%= card.name %></h2>
-          </div>
-        </div>
-        <% end %>
-      </div>
+  <div class="row justify-content-between">
+    <%= render "shared/card", locals: {title: "Ma collection",
+      cards: @my_cards,
+      side: "card-offer"}  %>
+    <%= render "shared/card", locals: {title: "Sa collection",
+      cards: @other_cards,
+      side: "card-target"}  %>
+  </div>
+  <%= render "shared/form" %>
+
+</div>
 
 
-    </div>

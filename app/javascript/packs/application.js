@@ -27,6 +27,7 @@ import "bootstrap";
 import "../channels/index.js";
 import { initChatroomCable } from "../channels/chatroom_channel.js";
 import { displayImage } from "../cards/trigger.js";
+import { triggerForm } from "../forms/trigger_form.js";
 // Internal imports, e.g:
 // import { initSelect2 } from '../components/init_select2';
 
@@ -35,4 +36,5 @@ document.addEventListener('turbolinks:load', () => {
   // initSelect2();
   initChatroomCable();
   displayImage();
+  triggerForm();
 });

@@ -26,7 +26,7 @@
 //Pour chaque extension on créé un champ select en plus, qu'on injecte ensuite dans le form final.
 const wholeForm = () => {
   const form =[`<option value=''>--Please choose an extension--</option>`];
-  extensions.map( (extension) => {
+  extensions[0].split(',').map((extension) => {
     form.push(`<option value='${extension}'>${extension}</option>`);
   });
   nextForm.innerHTML = (`<div class="form-group string optional want_extension">
@@ -87,12 +87,12 @@ const wholeForm = () => {
 //on check dans toutes les cartes les match de name, dès qu'il y a un match, on ajoute l'extension appropriée
 //On lance la dernière fonction qui permet d'afficher le reste du formulaire
 function complete(name) {
-  document.querySelector('.search').value = name;
+  let carte = document.querySelector('.search').value = name;
   suggestions.innerHTML = "";
-  let carte = name;
-  cards.map ( (card) => {
-  if (card[0] === carte)
-    extensions.push(card[1]);
+  cards.map ((card) => {
+    if (card[0] === carte && extensions.length == 0) {
+      extensions.push(card[1]);
+    }
   });
   wholeForm();
 }

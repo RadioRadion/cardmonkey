@@ -5,6 +5,8 @@
   <span>Total WantList : <%= @wants.length %></span><br>
   <span>Nombre de trades en cours</span><br>
   <span>Nombre de trades réalisés en cours</span><br>
+  <span>Votre périmètres de recherche: <%= @user.area %> km</span><br>
+  <%= link_to "Changer mes paramètres", edit_user_path(@user) %>
 
 <% else %>
   <div class="row justify-content-between text-center">
@@ -12,16 +14,25 @@
     <div class="col-6"><p>Son total: <span id="sonTotal">0</span></p></div>
   </div>
 
+  <div class="row justify-content-between">
+    <%= render "shared/card", locals: {title: "Cartes qu'il recherche",
+      cards: @cards_other_wants,
+      side: "card-offer"}  %>
+    <%= render "shared/card", locals: {title: "Cartes que je recherche",
+      cards: @cards_i_wants,
+      side: "card-target"}  %>
+  </div>
+
 
   <div class="row justify-content-between">
     <%= render "shared/card", locals: {title: "Ma collection",
-      cards: @cards,
+      cards: @my_cards,
       side: "card-offer"}  %>
     <%= render "shared/card", locals: {title: "Sa collection",
       cards: @other_cards,
       side: "card-target"}  %>
   </div>
-  <%= render "form" %>
+  <%= render "shared/form" %>
 
   <% end %>
 

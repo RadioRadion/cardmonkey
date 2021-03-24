@@ -1,0 +1,7 @@
+<div class="container">
+  <%= simple_form_for([@user], method: :put) do |f| %>
+  <%= f.input :area %>
+  <%= f.input :address %>
+  <%= f.submit "Save user", class: "btn btn-success" %>
+  <% end %>
+ </div>

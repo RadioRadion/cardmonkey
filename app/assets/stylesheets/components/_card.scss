@@ -39,6 +39,9 @@
 
 .card-product .card-product-infos {
   padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .card-absolute {
@@ -51,4 +54,5 @@
 .container-symb {
   position: relative;
   display: none;
+  z-index: 1;
 }

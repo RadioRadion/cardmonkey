@@ -12,5 +12,25 @@ class User < ApplicationRecord
   has_many :trades
   has_many :messages
   has_many :chatrooms, through: :messages
-end
 
+  def want_cards_by_user
+    matches = {}
+    result = []
+    users = User.near(self.address, self.area)
+    self.wants.each do |want|
+      want.cards.each do |card|
+        if users.include?(card.user)
+          matches[card.user.id] ? matches[card.user.id] << card.id : matches[card.user.id] = [card.id]
+        end
+      end
+    end
+    matches.each do |user_id, total_cards|
+      result << {
+        username: User.find(user_id).username,
+        user_id: user_id,
+        cards: total_cards
+      }
+    end
+    result
+  end
+end

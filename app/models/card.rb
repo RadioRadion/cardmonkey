@@ -3,6 +3,8 @@ class Card < ApplicationRecord
   belongs_to :image
   has_many :card_trades
   has_many :trades, through: :card_trades
+  has_many :matches, dependent: :destroy
+  has_many :wants, through: :matches
 
   validates :name, presence: true
   validates :quantity, presence: true

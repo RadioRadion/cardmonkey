@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_19_165447) do
+ActiveRecord::Schema.define(version: 2021_03_23_130429) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -58,6 +58,15 @@ ActiveRecord::Schema.define(version: 2021_01_19_165447) do
     t.string "price"
   end
 
+  create_table "matches", force: :cascade do |t|
+    t.bigint "card_id", null: false
+    t.bigint "want_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["card_id"], name: "index_matches_on_card_id"
+    t.index ["want_id"], name: "index_matches_on_want_id"
+  end
+
   create_table "messages", force: :cascade do |t|
     t.string "content"
     t.bigint "user_id", null: false
@@ -89,6 +98,7 @@ ActiveRecord::Schema.define(version: 2021_01_19_165447) do
     t.float "latitude"
     t.float "longitude"
     t.string "address"
+    t.integer "area"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
@@ -113,6 +123,8 @@ ActiveRecord::Schema.define(version: 2021_01_19_165447) do
   add_foreign_key "cards", "images"
   add_foreign_key "cards", "users"
   add_foreign_key "chatrooms", "users"
+  add_foreign_key "matches", "cards"
+  add_foreign_key "matches", "wants"
   add_foreign_key "messages", "chatrooms"
   add_foreign_key "messages", "users"
   add_foreign_key "trades", "users"
