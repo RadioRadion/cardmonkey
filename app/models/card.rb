@@ -1,6 +1,6 @@
 class Card < ApplicationRecord
-  belongs_to :user
-  belongs_to :image
+  belongs_to :user, required: false
+  belongs_to :image, required: false
   has_many :card_trades
   has_many :trades, through: :card_trades
   has_many :matches, dependent: :destroy
@@ -9,7 +9,6 @@ class Card < ApplicationRecord
   validates :name, presence: true
   validates :quantity, presence: true
   validates :extension, presence: true
-  validates :foil, presence: true
 
   def self.getprices
     Card.all.each do |card|
