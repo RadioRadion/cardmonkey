@@ -6,12 +6,15 @@ class User < ApplicationRecord
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
-
-  has_many :cards
-  has_many :wants
   has_many :trades
   has_many :messages
   has_many :chatrooms, through: :messages
+
+  has_many :user_cards
+  has_many :cards, through: :user_cards
+
+  has_many :user_wanted_cards
+  has_many :wanted_cards, through: :user_wanted_cards, class_name: "Card", source: :card
 
   def want_cards_by_user
     matches = {}
