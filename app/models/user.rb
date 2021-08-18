@@ -13,10 +13,9 @@ class User < ApplicationRecord
   has_many :messages
   has_many :chatrooms, through: :messages
 
-  def want_cards_by_user
+  def want_cards_by_user(users)
     matches = {}
     result = []
-    users = User.near(self.address, self.area)
     self.wants.each do |want|
       want.cards.each do |card|
         if users.include?(card.user)

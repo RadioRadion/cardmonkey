@@ -1,9 +1,12 @@
 <h1>Pages#home</h1>
 <p>Find me in app/views/pages/home.html.erb</p>
 
-<% @search_matches.each do |match| %>
-  <%= link_to "créer un trade", user_path(match[:user_id]) %>
-  <p>Username : <%= match[:username] %></p>
-  <p>Nombre de cartes recherchées : <%= match[:cards].length %></p>
-<% end %>
+<% if current_user %>
 
+  <% @search_matches.each do |match| %>
+    <%= link_to "créer un trade", user_path(match[:user_id]) %>
+    <p>Username : <%= match[:username] %></p>
+    <p>Nombre de cartes recherchées : <%= match[:cards].length %></p>
+  <% end %>
+
+<% end %>
