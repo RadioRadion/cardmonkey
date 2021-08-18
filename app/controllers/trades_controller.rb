@@ -54,15 +54,16 @@ class TradesController < ApplicationController
     else
       @other_cards_trade = @trade.cards.joins(:user).where(user_id: @trade.user_id)
     end
+    users = User.near(current_user.address, current_user.area)
     @trade.user_id == current_user.id ? @other_user = User.find(@trade.user_id_invit) : @other_user = User.find(@trade.user_id)
-    cards_id_wants = want_cards_id_by_user(current_user, @other_user)
+    cards_id_wants = want_cards_id_by_user(current_user, @other_user, users)
     # On prend les instances de ces cartes
     @cards_i_wants = Card.find(cards_id_wants - @other_cards_trade.ids)
     # les autres cards
     @other_cards = @other_user.cards.where.not(id: cards_id_wants + @other_cards_trade.ids)
 
     # Inversement
-    cards_id_other_wants = want_cards_id_by_user(@other_user, current_user)
+    cards_id_other_wants = want_cards_id_by_user(@other_user, current_user, users)
     # cards_id_other_wants.reject { |id| @cards_trade.ids.include?(id) }
     @cards_other_wants = Card.find(cards_id_other_wants - @cards_trade.ids)
     @my_cards = current_user.cards.where.not(id: cards_id_other_wants + @cards_trade.ids)
@@ -110,9 +111,9 @@ class TradesController < ApplicationController
     total_price
   end
 
-  def want_cards_id_by_user(user, other_user)
+  def want_cards_id_by_user(user, other_user, users)
     # format avant {user_id: [card_id, card_id], user_id: ......}
-    user.want_cards_by_user.select { |user_cards| user_cards[:user_id] == other_user.id }[0][:cards]
+    user.want_cards_by_user(users).select { |user_cards| user_cards[:user_id] == other_user.id }[0][:cards]
     # format apres [card_id, card_id]
   end
 end
