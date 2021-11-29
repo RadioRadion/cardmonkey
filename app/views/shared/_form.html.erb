@@ -1,4 +1,5 @@
 <form class="simple_form new_trade" id="new_trade" action="<%= @path %>" method="post" name="sneackyValue">
+  <input type="hidden" name="_method" value="put" />
   <input id="one" type="hidden" >
     <div class="form-group text optional offer">
       <textarea class="form-control text optional" name="trade[offer]" id="offer"></textarea>
@@ -7,5 +8,5 @@
     <div class="form-group text optional target">
       <textarea class="form-control text optional" name="trade[target]" id="target"></textarea>
     </div>
-  <input type="submit" name="commit" value="Create Trade" class="btn btn-warning" data-disable-with="Create Trade">
+  <input type="submit" name="commit" value="Update Trade" class="btn btn-warning" data-disable-with="Update Trade">
 </form>

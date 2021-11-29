@@ -1,0 +1,9 @@
+<div class="container">
+  <%= simple_form_for([current_user, @user_card], method: :patch) do |f| %>
+      <%= f.input :condition, collection: UserCard.conditions %>
+      <%= f.input :foil %>
+      <%= f.input :language, collection: UserCard.languages %>
+      <%= f.input :quantity, collection: 1...30 %>
+      <%= f.submit "Save card", class: "btn btn-success" %>
+  <% end %>
+ </div>

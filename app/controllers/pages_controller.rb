@@ -3,8 +3,8 @@ class PagesController < ApplicationController
 
   def home
     if current_user
-      users = User.near(current_user.address, current_user.area)
-      @search_matches = current_user.want_cards_by_user(users)
+      @users = User.near(current_user.address, current_user.area)
+      # @search_matches = current_user.want_cards_by_user(users)
     end
   end
 end

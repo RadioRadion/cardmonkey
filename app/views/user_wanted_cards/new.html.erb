@@ -1,0 +1,10 @@
+<div class="container">
+    <%= simple_form_for [current_user, @user_wanted_card] do |f| %>
+      <%= f.association :card, collection: @cards %>
+      <%= f.input :min_condition, collection: UserWantedCard.min_conditions %>
+      <%= f.input :foil %>
+      <%= f.input :language, collection: UserWantedCard.languages %>
+      <%= f.input :quantity, collection: 1...30 %>
+      <%= f.submit "Save card", class: "btn btn-success" %>
+    <% end %>
+<div>

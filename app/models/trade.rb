@@ -1,7 +1,7 @@
 class Trade < ApplicationRecord
   belongs_to :user
-  has_many :card_trades
-  has_many :cards, through: :card_trades
+  has_many :trade_user_cards, dependent: :destroy
+  has_many :user_cards, through: :trade_user_cards
 
   scope :pending, -> { where(status: "pending") }
   scope :accepted, -> { where(status: "accepted") }
@@ -16,9 +16,8 @@ class Trade < ApplicationRecord
     elsif !second_chat.nil?
       Message.new(content: content, user_id: current_user_id, chatroom_id: second_chat.id).save!
     else
-      chatroom = Chatroom.new(user_id: current_user_id, user_id_invit: other_user_id)
-      chatroom.save!
-      Message.new(content: content, user_id: current_user_id, chatroom_id: @chatroom.id).save!
+      chatroom = Chatroom.create!(user_id: current_user_id, user_id_invit: other_user_id)
+      Message.create!(content: content, user_id: current_user_id, chatroom_id: @chatroom.id)
     end
   end
 end

@@ -7,25 +7,25 @@
 
     <% classes = "#{locals[:side]} card-product" %>
 
-    <% locals[:cards].each do |card| %>
-    <div class="container-symb" data-img-id="<%= card.id%>">
-      <%= image_tag ("cards/#{card.image[:api_id]}.jpg"), class: "card-absolute" %>
+    <% locals[:cards].each do |user_card| %>
+    <div class="container-symb" data-img-id="<%= user_card.id%>">
+      <%= image_tag ("cards/#{user_card.card.extension}/#{user_card.card.scryfall_id}.jpg"), class: "card-absolute" %>
     </div>
-    <div class="<%= classes %>" data-id="<%= card.id%>" data-price="<%= card.image.price%>" >
+    <div class="<%= classes %>" data-id="<%= user_card.id%>" data-price="<%= user_card.card.price%>" >
       <div class="card-product-infos">
-        <%= card.user.id %>
-          <h2><%= card.name %></h2>
-          <h2><%= card.image.price %></h2>
+        <%= user_card.user.id %>
+          <h2><%= user_card.card.name %></h2>
+          <h2><%= user_card.card.price %></h2>
           <% if locals[:view] == "wants" %>
             <div class="card-buttons">
-              <%= link_to "Del", user_want_path(current_user, card), method: :delete, class: "btn btn-warning"%>
-              <%= link_to "edit", edit_user_want_path(current_user, card), class: "btn btn-warning"%>
+              <%= link_to "Del", user_user_wanted_card_path(current_user, user_card), method: :delete, class: "btn btn-warning"%>
+              <%= link_to "edit", edit_user_user_wanted_card_path(current_user, user_card), class: "btn btn-warning"%>
             </div>
           <% end %>
           <% if locals[:view] == "cards" %>
             <div class="card-buttons">
-              <%= link_to "Del", user_card_path(current_user, card), method: :delete, class: "btn btn-warning"%>
-              <%= link_to "edit", edit_user_card_path(current_user, card), class: "btn btn-warning"%>
+              <%= link_to "Del", user_user_card_path(current_user, user_card), method: :delete, class: "btn btn-warning"%>
+              <%= link_to "edit", edit_user_user_card_path(current_user, user_card), class: "btn btn-warning"%>
             </div>
           <% end %>
       </div>

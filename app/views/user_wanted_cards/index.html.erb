@@ -1,0 +1,13 @@
+<div class="container">
+
+  <%= render "shared/card", locals: {
+  title: "Mes wants",
+  # total_price: @total_price,
+  cards: @user_wanted_cards,
+  side: "card-offer",
+  view: "wants"}  %>
+
+  <div>
+    <%= link_to "Add card", new_user_user_wanted_card_path, class: 'btn btn-secondary' %>
+  </div>
+</div>
