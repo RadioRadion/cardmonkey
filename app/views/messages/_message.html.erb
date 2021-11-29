@@ -7,12 +7,25 @@
          <div class="message-content">
           <!-- Code pour chopper le lien du trade via actioncable,
             ne marche que si il y +link_to -->
-          <% pattern = /(?<intro>Un nouveau trade est arrivé !) (?<link>\d+)$/
-          match_data = message.content.match(pattern)
-          trade = Trade.find(match_data[:link]) if match_data
+          <% pattern_new = /(?<intro>Un nouveau trade est arrivé !) (?<link>\d+)$/
+          match_data_new = message.content.match(pattern_new)
+          pattern_edit = /(?<intro>Trade modifié !) (?<link>\d+)$/
+          match_data_edit = message.content.match(pattern_edit)
+          trade = Trade.find_by(id: match_data_new[:link]) if match_data_new
+          trade = Trade.find_by(id: match_data_edit[:link]) if match_data_edit
           %>
-          <p><%= match_data[:intro] if match_data %> </p>
-          <p><%= !match_data.nil? ? link_to("Valider ici", user_trade_path(trade.user_id, trade.id)) : message.content %></p>
+
+          <% if match_data_new.blank? && match_data_edit.blank? %>
+            <p><%= message.content%> </p>
+          <% end %>
+
+          <% [match_data_new, match_data_edit].each do |match_data| %>
+            <% if match_data %>
+              <p><%= match_data[:intro] %> </p>
+              <p><%= link_to("Valider ici", user_trade_path(trade.user_id, trade.id)) if !match_data.nil? && trade.present?  %></p>
+              <p><%= "Cette proposition de trade n'existe plus" if trade.blank? && !match_data.nil? %></p>
+            <% end %>
+          <% end %>
 
           <small><%= message.created_at.strftime("%a %b %e at %l:%M%p") %></small>
         </div>

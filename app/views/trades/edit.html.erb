@@ -7,10 +7,10 @@
 
   <div class="row justify-content-between">
     <%= render "shared/card", locals: {title: "Mes cartes trade",
-      cards: @cards_trade,
+      cards: @trade_user_cards,
       side: "card-offer"}  %>
     <%= render "shared/card", locals: {title: "Ses cartes trade",
-      cards: @other_cards_trade,
+      cards: @trade_user_wanted_cards,
       side: "card-target"}  %>
   </div>
 
