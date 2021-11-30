@@ -13,7 +13,7 @@ class User < ApplicationRecord
   has_many :cards, through: :user_cards
   has_many :user_wanted_cards
 
-  accepts_nested_attributes_for :user_cards
+  # accepts_nested_attributes_for :user_cards
 
   # def want_cards_by_user(users)
   #   matches = {}

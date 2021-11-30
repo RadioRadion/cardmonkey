@@ -2,7 +2,7 @@ class UserCard < ApplicationRecord
   belongs_to :user
   belongs_to :card
 
-  accepts_nested_attributes_for :card
+  # accepts_nested_attributes_for :card
 
   enum condition: { mint: "0", near_mint: "1", excellent: "2", good: "3",
     light_played: "4", played: "5", poor: "6" }
