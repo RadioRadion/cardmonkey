@@ -10,36 +10,31 @@ class CardsController < ApplicationController
     @cards = current_user.cards
   end
 
-  def new
-    require 'csv'
-    @card = Card.new
+  # def new
+  #   require 'csv'
+  #   @card = Card.new
 
-    @cards = []
-    @names = []
-    filepath = 'lib/datas/cards.csv'
-    CSV.foreach(filepath, headers: :first_row, liberal_parsing: true, :row_sep => :auto, :col_sep => ";") do |row|
+  #   @cards = []
+  #   @names = []
+  #   filepath = 'lib/datas/cards.csv'
+  #   CSV.foreach(filepath, headers: :first_row, liberal_parsing: true, :row_sep => :auto, :col_sep => ";") do |row|
 
-    # Here, row is an array of columns. 46 => name, 59 => setCode, 68 uuid
-      @cards << [row[9], row[12]]
-      @names << row[9]
-    end
-    @uniqs_name = @names.uniq.sort
-  end
+  #   # Here, row is an array of columns. 46 => name, 59 => setCode, 68 uuid
+  #     @cards << [row[9], row[12]]
+  #     @names << row[9]
+  #   end
+  #   @uniqs_name = @names.uniq.sort
+  # end
 
-  def create
-    @card = Card.new(cards_params)
-    fetch_image
-    search_image
-    save_image if @image.nil?
-    @card.image = @image
-    @card.user = current_user
-    if @card.save!
-      redirect_to user_cards_path
-    else
-      render :new
-    end
-  end
-
+  # def create
+  #   @card = Card.new(cards_params)
+  #   @card.user = current_user
+  #   if @card.save!
+  #     redirect_to user_cards_path
+  #   else
+  #     render :new
+  #   end
+  # end
 
   def edit
     @card = Card.find(params[:id])
@@ -58,7 +53,6 @@ class CardsController < ApplicationController
   def destroy
     @card = Card.find(params[:id])
     @card.destroy
-    check_destroy_image
     redirect_to user_cards_path(current_user)
   end
 
@@ -87,17 +81,4 @@ class CardsController < ApplicationController
     @image = Image.find_by(api_id: @api_id)
   end
 
-  def save_image
-    @image = Image.new(api_id: @api_id, img_path: "./app/assets/images/cards/#{@api_id}.jpg")
-    tempfile = Down.download(@img_path)
-    FileUtils.mv(tempfile.path, "./app/assets/images/cards/#{@api_id}.jpg")
-  end
-
-  def check_destroy_image
-    if Card.find_by(image_id: @card.image_id).nil? && Want.find_by(image_id: @want.image_id).nil?
-      image = Image.find(@card.image_id)
-      FileUtils.rm("./app/assets/images/cards/#{image.api_id}.jpg")
-      image.destroy
-    end
-  end
 end
