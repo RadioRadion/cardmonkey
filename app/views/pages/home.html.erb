@@ -1,12 +1,18 @@
-<h1>Pages#home</h1>
-<p>Find me in app/views/pages/home.html.erb</p>
+<div class="container">
+  <h1>Pages#home</h1>
 
+  <% if current_user %>
 
-<%# if current_user %>
+    <% @results_sorted.each do |result| %>
 
-  <%# @search_matches.each do |match| %>
-    <%#= link_to "créer un trade", user_path(match[:user_id]) %>
-   <!--  <p>Username : <%#= match[:cards].length %></p> -->
-  <%# end %>
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title"><%= result[:user].username %></h5>
+        <p class="card-text">Nombre de matches : <%= result[:total] %></p>
+        <%= link_to "Faire un trade", user_path(result[:user].id), class: "btn btn-primary" %>
+      </div>
+    </div>
+    <% end %>
 
-<%# end %>
+  <% end %>
+</div>
