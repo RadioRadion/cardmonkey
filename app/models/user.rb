@@ -12,27 +12,21 @@ class User < ApplicationRecord
   has_many :user_cards
   has_many :cards, through: :user_cards
   has_many :user_wanted_cards
+  has_many :matches
 
   accepts_nested_attributes_for :user_cards
 
-  # def want_cards_by_user(users)
-  #   matches = {}
-  #   result = []
-  #   self.wants.each do |want|
-  #     want.cards.each do |card|
-  #       if users.include?(card.user)
-  #         matches[card.user.id] ? matches[card.user.id] << card.id : matches[card.user.id] = [card.id]
-  #       end
-  #     end
-  #   end
-  #   matches.each do |user_id, total_cards|
-  #     result << {
-  #       username: User.find(user_id).username,
-  #       user_id: user_id,
-  #       cards: total_cards
-  #     }
-  #   end
-  #   result
-  # end
+  def group_matches
+    users = User.near(address, area)
+      results = []
+      users.each do |user|
+        matches = Match
+                    .where(user_id: id, user_id_target: user.id)
+                    .or(Match.where(user_id: user.id, user_id_target: id))
+        total = matches.count
+        results << {total: total, matches: matches, user: user} if user.id != id
+      end
+      results.sort_by { |i| i[:total] }.reverse
+  end
 
 end
