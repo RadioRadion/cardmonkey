@@ -1,8 +1,7 @@
 <div class="container">
 
-  <%= render "shared/card", locals: {
+  <%= render "shared/cards/cards_for_collection", locals: {
   title: "Ma collection",
-  # total_price: @total_price,
   cards: @user_cards,
   side: "card-offer",
   view: "cards"}  %>

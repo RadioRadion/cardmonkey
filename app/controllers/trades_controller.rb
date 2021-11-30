@@ -46,13 +46,13 @@ class TradesController < ApplicationController
     @trade = Trade.find(params[:id])
     @path = "/users/#{@user.id}/trades/#{@trade.id}"
 
-    @trade_user_cards = @trade.user_cards.joins(:user).where(user_id: current_user)
+    @trade_user_cards = @trade.user_cards.joins(:user).where(user_id: current_user).uniq
     if current_user.id == @trade.user_id
       other_user = User.find(@trade.user_id_invit)
-      @trade_user_wanted_cards = @trade.user_cards.joins(:user).where(user_id: @trade.user_id_invit)
+      @trade_user_wanted_cards = @trade.user_cards.joins(:user).where(user_id: @trade.user_id_invit).uniq
     else
       other_user = User.find(@trade.user_id)
-      @trade_user_wanted_cards = @trade.user_cards.joins(:user).where(user_id: @trade.user_id)
+      @trade_user_wanted_cards = @trade.user_cards.joins(:user).where(user_id: @trade.user_id).uniq
     end
     cards_other_wants_ids = other_user.user_wanted_cards.map(&:card_id)
     @cards_other_wants = UserCard.where(user_id: current_user).where(card_id: cards_other_wants_ids) - @trade_user_cards
@@ -70,7 +70,7 @@ class TradesController < ApplicationController
       Une fois le trade terminé, n'oubliez pas de de valider !", "Trade validé !", "accepted")
     elsif params[:status] == "done"
       change_status_trade("Trade terminé bon jeu !", "Trade terminé !", "done")
-    elsif @trade.status == "pending"
+    elsif @trade.pending?
       @trade.trade_user_cards.destroy_all
       user_card_ids = params[:trade][:offer].split(",") + params[:trade][:target].split(",")
       user_card_ids.each { |user_card_id| @trade.trade_user_cards.create(user_card_id: user_card_id) }
@@ -100,7 +100,6 @@ class TradesController < ApplicationController
 
     @cards_target.each do |user_card_id|
       TradeUserCard.create!(user_card_id: user_card_id.to_i, trade_id: @trade.id)
-      # cards_target_names << Card.find(card).name
     end
   end
 
@@ -108,11 +107,5 @@ class TradesController < ApplicationController
     total_price = 0
     cards.each { |card| total_price += card.price.to_f }
     total_price
-  end
-
-  def want_cards_id_by_user(user, other_user, users)
-    # format avant {user_id: [card_id, card_id], user_id: ......}
-    user.want_cards_by_user(users).select { |user_cards| user_cards[:user_id] == other_user.id }[0][:cards]
-    # format apres [card_id, card_id]
   end
 end

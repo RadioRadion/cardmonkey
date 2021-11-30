@@ -1,0 +1,34 @@
+<div class="col-5">
+    <h2><%= locals[:title] %> </h2>
+
+    <% if locals[:total_price] %>
+      <h3>total : <%= locals[:total_price] %> €</h3>
+    <% end %>
+
+    <% classes = "#{locals[:side]} card-product" %>
+
+    <% locals[:cards].each do |user_card| %>
+      <div class="container-symb" data-img-id="<%= user_card.id%>">
+        <%= image_tag ("cards/#{user_card.card.extension}/#{user_card.card.scryfall_id}.jpg"), class: "card-absolute" %>
+      </div>
+      <div class="<%= classes %>" data-id="<%= user_card.id%>" data-price="<%= user_card.card.price%>" >
+        <div class="card-product-infos">
+          <%= user_card.user.id %>
+            <h2><%= user_card.card.name %></h2>
+            <h2><%= user_card.card.price %></h2>
+            <% if locals[:view] == "wants" %>
+              <div class="card-buttons">
+                <%= link_to "Del", user_user_wanted_card_path(current_user, user_card), method: :delete, class: "btn btn-warning"%>
+                <%= link_to "edit", edit_user_user_wanted_card_path(current_user, user_card), class: "btn btn-warning"%>
+              </div>
+            <% end %>
+            <% if locals[:view] == "cards" %>
+              <div class="card-buttons">
+                <%= link_to "Del", user_user_card_path(current_user, user_card), method: :delete, class: "btn btn-warning"%>
+                <%= link_to "edit", edit_user_user_card_path(current_user, user_card), class: "btn btn-warning"%>
+              </div>
+            <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
