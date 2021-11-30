@@ -7,6 +7,10 @@ class Trade < ApplicationRecord
   scope :accepted, -> { where(status: "accepted") }
   scope :done, -> { where(status: "done") }
 
+  validates :status, presence: true
+
+  enum status: { pending: "0", accepted: "1", done: "2" }
+
   def self.save_message(current_user_id, other_user_id, content)
     first_chat = Chatroom.where(user_id: current_user_id, user_id_invit: other_user_id).first
     second_chat = Chatroom.where(user_id: other_user_id, user_id_invit: current_user_id).first

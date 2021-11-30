@@ -14,8 +14,6 @@ class User < ApplicationRecord
   has_many :user_wanted_cards
   has_many :matches
 
-  accepts_nested_attributes_for :user_cards
-
   def group_matches
     users = User.near(address, area)
       results = []

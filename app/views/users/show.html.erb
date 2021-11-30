@@ -15,20 +15,20 @@
   </div>
 
   <div class="row justify-content-between">
-    <%= render "shared/card", locals: {title: "Cartes qu'il recherche",
+    <%= render "shared/cards/cards_for_trade", locals: {title: "Cartes qu'il recherche",
       cards: @cards_other_wants,
       side: "card-offer"}  %>
-    <%= render "shared/card", locals: {title: "Cartes que je recherche",
+    <%= render "shared/cards/cards_for_trade", locals: {title: "Cartes que je recherche",
       cards: @cards_i_wants,
       side: "card-target"}  %>
   </div>
 
 
   <div class="row justify-content-between">
-    <%= render "shared/card", locals: {title: "Ma collection",
+    <%= render "shared/cards/cards_for_trade", locals: {title: "Ma collection",
       cards: @my_cards,
       side: "card-offer"}  %>
-    <%= render "shared/card", locals: {title: "Sa collection",
+    <%= render "shared/cards/cards_for_trade", locals: {title: "Sa collection",
       cards: @other_cards,
       side: "card-target"}  %>
   </div>
