@@ -13,6 +13,7 @@ class User < ApplicationRecord
   has_many :cards, through: :user_cards
   has_many :user_wanted_cards
   has_many :matches
+  has_many :notifications
 
   def group_matches
     users = User.near(address, area)
