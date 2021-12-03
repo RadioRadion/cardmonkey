@@ -18,6 +18,7 @@ class TradesController < ApplicationController
 
     if @trade.save!
       save_card_trades
+      Notification.create_notification(@trade.user_id_invit, "Nouveau trade !")
       content = "Un nouveau trade est arrivé ! #{@trade.id}"
       Trade.save_message(current_user.id, other_user_id, content)
 
@@ -65,18 +66,23 @@ class TradesController < ApplicationController
 
   def update
     @trade = Trade.find(params[:id])
+    current_user.id == @trade.user_id ? other_user_id = @trade.user_id_invit : other_user_id = @trade.user_id
     if params[:status] == "accepted"
       change_status_trade("Trade accepté ! Discutez-ici pour vous donner rendez-vous et procéder à l'échange.
       Une fois le trade terminé, n'oubliez pas de de valider !", "Trade validé !", "accepted")
+      Notification.create_notification(other_user_id, "Trade accepté !")
     elsif params[:status] == "done"
       change_status_trade("Trade terminé bon jeu !", "Trade terminé !", "done")
+      Notification.create_notification(other_user_id, "Trade réalisé !")
     elsif @trade.pending?
       @trade.trade_user_cards.destroy_all
       user_card_ids = params[:trade][:offer].split(",") + params[:trade][:target].split(",")
       user_card_ids.each { |user_card_id| @trade.trade_user_cards.create(user_card_id: user_card_id) }
       content = "Trade modifié ! #{@trade.id}"
       change_status_trade(content, "Trade modifié !", "pending")
+      Notification.create_notification(other_user_id, "Trade modifié !")
     end
+    redirect_to user_trade_path(@trade.user_id, @trade)
   end
 
   private
@@ -86,7 +92,6 @@ class TradesController < ApplicationController
     @trade.user_id == current_user.id ? other_user_id = @trade.user_id_invit : other_user_id = @trade.user_id
     Trade.save_message(current_user.id, other_user_id, content)
     flash[flash] = flash
-    redirect_to user_trade_path(@trade.user_id, @trade)
   end
 
   def trade_params
