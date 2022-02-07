@@ -1,6 +1,9 @@
 class ChatroomsController < ApplicationController
   def index
-    @chatrooms = Chatroom.where(user_id: current_user).or(Chatroom.where(user_id_invit: current_user))
+    @chatrooms = Chatroom.chatrooms_ordered(current_user)
+    @first_chatroom = @chatrooms.first
+    @message = Message.new
+    mark_messages_as_read(@first_chatroom)
   end
 
   def new
@@ -19,9 +22,10 @@ class ChatroomsController < ApplicationController
   end
 
   def show
-    @chatrooms = Chatroom.where(user_id: current_user).or(Chatroom.where(user_id_invit: current_user))
+    @chatrooms = Chatroom.chatrooms_ordered(current_user)
     @chatroom = Chatroom.find(params[:id])
     @message = Message.new
+    mark_messages_as_read(@chatroom)
   end
 
   def destroy
@@ -34,5 +38,11 @@ class ChatroomsController < ApplicationController
 
   def chatroom_params
     params.require(:chatroom).permit(:name)
+  end
+
+  def mark_messages_as_read(chatroom)
+    chatroom.messages
+      .where(is_new: true)
+      .update_all(is_new: false, read_date: DateTime.now)
   end
 end

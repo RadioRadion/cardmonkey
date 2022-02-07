@@ -25,6 +25,7 @@ require("channels")
 // External imports
 import "bootstrap";
 import "../channels/index.js";
+import "stylesheets/application.scss";
 import { initChatroomCable } from "../channels/chatroom_channel.js";
 import { displayImage } from "../cards/trigger.js";
 import { triggerForm } from "../forms/trigger_form.js";

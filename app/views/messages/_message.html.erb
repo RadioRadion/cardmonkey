@@ -1,34 +1,30 @@
-<div class="col-6 <%= current_user.id == message.user_id ? "messageLeft" : "messageRight" %>">
-  <div class="message-container" id="message-<%= message.id %>">
-        <i class="author">
-          <%= image_tag "https://kitt.lewagon.com/placeholder/users/#{current_user.username}", class: "avatar" %>
-          <span><%= message.user.username %></span>
-        </i>
-         <div class="message-content">
-          <!-- Code pour chopper le lien du trade via actioncable,
-            ne marche que si il y +link_to -->
-          <% pattern_new = /(?<intro>Un nouveau trade est arrivé !) (?<link>\d+)$/
-          match_data_new = message.content.match(pattern_new)
-          pattern_edit = /(?<intro>Trade modifié !) (?<link>\d+)$/
-          match_data_edit = message.content.match(pattern_edit)
-          trade = Trade.find_by(id: match_data_new[:link]) if match_data_new
-          trade = Trade.find_by(id: match_data_edit[:link]) if match_data_edit
-          %>
-
-          <% if match_data_new.blank? && match_data_edit.blank? %>
-            <p><%= message.content%> </p>
-          <% end %>
-
-          <% [match_data_new, match_data_edit].each do |match_data| %>
-            <% if match_data %>
-              <p><%= match_data[:intro] %> </p>
-              <p><%= link_to("Valider ici", user_trade_path(trade.user_id, trade.id)) if !match_data.nil? && trade.present?  %></p>
-              <p><%= "Cette proposition de trade n'existe plus" if trade.blank? && !match_data.nil? %></p>
-            <% end %>
-          <% end %>
-
-          <small><%= message.created_at.strftime("%a %b %e at %l:%M%p") %></small>
-        </div>
-  </div>
+<div class="<%= current_user.id == message.user_id ? "message-data" : "message-data text-right" %>">
+  <span class="message-data-time"><%= message.created_at.strftime("%m-%d, %A, %Hh%M") %></span>
+  <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
 </div>
+<div class="<%= current_user.id == message.user_id ? "message my-message" : "message other-message float-right" %>" id="message-<%= message.id %>">
+       <div>
+        <!-- Code pour chopper le lien du trade via actioncable,
+          ne marche que si il y +link_to -->
+        <% pattern_new = /(?<intro>Un nouveau trade est arrivé !) (?<link>\d+)$/
+        match_data_new = message.content.match(pattern_new)
+        pattern_edit = /(?<intro>Trade modifié !) (?<link>\d+)$/
+        match_data_edit = message.content.match(pattern_edit)
+        trade = Trade.find_by(id: match_data_new[:link]) if match_data_new
+        trade = Trade.find_by(id: match_data_edit[:link]) if match_data_edit
+        %>
 
+        <% if match_data_new.blank? && match_data_edit.blank? %>
+          <p><%= message.content%> </p>
+        <% end %>
+
+        <% [match_data_new, match_data_edit].each do |match_data| %>
+          <% if match_data %>
+            <p><%= match_data[:intro] %> </p>
+            <p><%= link_to("Valider ici", user_trade_path(trade.user_id, trade.id)) if !match_data.nil? && trade.present?  %></p>
+            <p><%= "Cette proposition de trade n'existe plus" if trade.blank? && !match_data.nil? %></p>
+          <% end %>
+        <% end %>
+
+      </div>
+</div>

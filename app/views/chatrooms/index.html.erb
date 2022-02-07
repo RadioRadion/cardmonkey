@@ -1,36 +1,84 @@
-<div class="container">
-  <div class="chat_container">
-    <div class="row">
-      <div class="col-sm-3">
-        <div class="dropdown all_conversation">
-          <button class="dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="far fa-comments" aria-hidden="true"></i>
-            Messagerie
-            <span class="caret pull-right"></span>
-          </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-              <li><%= link_to "New Message", new_user_chatroom_path, class: 'far fa-edit' %></li>
-            </ul>
-        </div>
-        <div class="member_list">
-          <%  @chatrooms.each do |chatroom| %>
-            <ul class="list-unstyled">
-              <li class="left clearfix">
-                <span class="chat-img pull-left">
-                  <% if current_user.id == chatroom.user_id %>
-                    <% user = User.find(chatroom.user_id_invit) %>
-                    <%=  link_to user.username, user_chatroom_path(current_user, chatroom) %>
-                  <%  else  %>
-                    <% user = User.find(chatroom.user_id) %>
-                    <%=  link_to user.username, user_chatroom_path(current_user, chatroom) %>
+<div class="row clearfix">
+    <div class="col-lg-12">
+        <div class="card-chat chat-app">
+            <div id="plist" class="people-list">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-search"></i></span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Search...">
+                </div>
+                <ul class="list-unstyled chat-list mt-2 mb-0">
+                  <% @chatrooms.each do |chatroom| %>
+
+                    <% if current_user.id == chatroom.user_id %>
+                      <% @user = User.find(chatroom.user_id_invit) %>
+                    <% else %>
+                      <% @user = User.find(chatroom.user_id) %>
+                    <% end %>
+
+                    <% if @first_chatroom.id == chatroom.id || chatroom.new_messages(current_user.id).blank? %>
+                      <% classes = "clearfix active" %>
+                    <% else %>
+                      <% classes = "clearfix" %>
+                    <% end %>
+
+                      <li class="<%= classes %>">
+                      <%= link_to user_chatroom_path(current_user, chatroom) do %>
+                          <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
+                          <div class="about">
+                              <div class="name"><%= @user.username %></div>
+                              <div class="status"> <i class="fa fa-circle online"></i> online </div>
+                          </div>
+                      <% end %>
+                      </li>
+
                   <% end %>
-                </span>
-              </li>
-            </ul>
-          <% end %>
+                </ul>
+            </div>
+            <div class="chat">
+                <div class="chat-header clearfix">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
+                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
+                            </a>
+                            <div class="chat-about">
+                                <h6 class="m-b-0"><%= @user.username %></h6>
+                                <small>Last seen: 2 hours ago</small>
+                            </div>
+                        </div>
+<!--                         <div class="col-lg-6 hidden-sm text-right">
+                            <a href="javascript:void(0);" class="btn btn-outline-secondary"><i class="fa fa-camera"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-primary"><i class="fa fa-image"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-info"><i class="fa fa-cogs"></i></a>
+                            <a href="javascript:void(0);" class="btn btn-outline-warning"><i class="fa fa-question"></i></a>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="chat-history">
+                    <ul id="messages" data-chatroom-id="<%= @first_chatroom.id %>" class="m-b-0">
+                      <% @first_chatroom.messages.each do |message| %>
+                        <li class="clearfix">
+                            <%= render "messages/message", message: message %>
+                        </li>
+                      <% end %>
+                    </ul>
+                </div>
+                <div class="chat-message clearfix">
+                    <div class="input-group mb-0">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-send"></i></span>
+                        </div>
+                        <%= simple_form_for [ current_user, @first_chatroom, @message ], remote: true do |f| %>
+                          <%= f.input :content, label: false, placeholder: "Enter text there..."%>
+                          <%= f.submit "SUBMIT" %>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-  </div>
 </div>
 
 
