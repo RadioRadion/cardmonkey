@@ -19,7 +19,16 @@ set :output, "/path/to/my/cron_log.log"
 
 # Learn more: http://github.com/javan/whenever
 
-every 1.day, at: '11:30 am' do
-  rake "data:fetchCards"
-  rake "data:fetchWants"
+#every 1.day, at: '11:30 am' do
+#  rake "data:fetchCards"
+ # rake "data:fetchWants"
+#end
+
+every 1.day, at: '2:45 am' do
+  command "wget -O /Users/valentinlassartesse/code/RadioRadion/cardmonkey/tmp/scryfall/all-cards.json https://data.scryfall.io/all-cards/all-cards-20240108221542.json"
 end
+
+every 1.day, at: '3:00 am' do
+  runner "UpdatePricesTask.perform"
+end
+

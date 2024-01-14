@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_02_150810) do
+ActiveRecord::Schema.define(version: 2024_01_10_124615) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,10 +21,11 @@ ActiveRecord::Schema.define(version: 2021_12_02_150810) do
     t.string "extension"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "name"
     t.float "price"
     t.string "img_path"
     t.string "scryfall_id"
+    t.string "name_en"
+    t.string "name_fr"
   end
 
   create_table "chatrooms", force: :cascade do |t|
@@ -124,6 +125,7 @@ ActiveRecord::Schema.define(version: 2021_12_02_150810) do
     t.float "longitude"
     t.string "address"
     t.integer "area"
+    t.integer "preference", default: 0
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

@@ -15,22 +15,29 @@ class UserCard < ApplicationRecord
     card.price
   end
 
-  def name
-    card.name
-  end
-
   def check_matches
     matches.destroy_all
     user_wanted_cards = UserWantedCard.where.not(user_id: user.id)
+  
     user_wanted_cards.each do |user_wanted_card|
-      if user_wanted_card.name == name && UserCard.conditions[condition].to_i >= UserCard.conditions[user_wanted_card.min_condition].to_i
+      # Assumons que la langue de la UserWantedCard est la langue préférée pour la comparaison
+      preferred_language = user_wanted_card.language.to_sym # Convertit en symbole si nécessaire
+  
+      # Obtenez la carte associée à cette UserWantedCard et comparez les noms
+      wanted_card = user_wanted_card.card
+      my_card = card  # La carte associée à cette UserCard
+  
+      if wanted_card.name(preferred_language) == my_card.name(preferred_language) && 
+         UserCard.conditions[condition].to_i >= UserCard.conditions[user_wanted_card.min_condition].to_i
         Match.create!(
           user_card_id: id,
           user_wanted_card_id: user_wanted_card.id,
           user_id: user.id,
           user_id_target: user_wanted_card.user.id
-          )
+        )
       end
     end
   end
+  
+  
 end

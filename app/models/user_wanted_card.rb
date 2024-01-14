@@ -12,7 +12,11 @@ class UserWantedCard < ApplicationRecord
     card.price
   end
 
-  def name
-    card.name
+  def name_en
+    card.name_en
+  end
+
+  def name_fr
+    card.name_fr
   end
 end
