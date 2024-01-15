@@ -4,24 +4,21 @@ require "net/http"
 
 class Card < ApplicationRecord
 
-  belongs_to :user, required: false
-  has_many :matches, dependent: :destroy
   has_many :user_cards
   has_many :user_wanted_cards
 
-  validates :name, presence: true
   validates :extension, presence: true
 
-  # def self.getprices
-  #   Card.all.each do |card|
-  #     image = Image.find(card.image_id)
-  #     url = 'https://api.scryfall.com/cards/' + image.api_id
-  #     card_serialized = open(url).read
-  #     card = JSON.parse(card_serialized)
-  #     price = card["prices"]["eur"]
-  #     image.update(price: price)
-  #   end
-  # end
+  def name(preferred_language = :en)
+    case preferred_language
+    when :en
+      name_en
+    when :fr
+      name_fr
+    else
+      name_en
+    end
+  end
 
 ##Méthode pour fetch dans le seed.rb
   def self.fetch_cards(extension)
