@@ -54,7 +54,7 @@ function complete(name) {
 const wholeForm = () => {
   const form =[`<option value=''>--Please choose an extension--</option>`];
   extensions[0].split(',').map((extension) => {
-    form.push(`<option value='${extension}'>${extension}</option>`);
+    form.push(`<option value='${extension}'>${extension}</option>`);        
   });
   nextForm.innerHTML = (`<div class="form-group string optional card_extension">
     <label class="string optional" for="card_extension">Extension :</label>

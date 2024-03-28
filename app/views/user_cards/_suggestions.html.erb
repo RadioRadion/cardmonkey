@@ -1,0 +1,8 @@
+<ul>
+  <% suggestions.each do |suggestion| %>
+    <li data-action="click->user-card#selectCard">
+      <%= suggestion.name %>
+      <!-- Autres détails de la carte ici -->
+    </li>
+  <% end %>
+</ul>

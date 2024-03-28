@@ -6,8 +6,7 @@ class Card < ApplicationRecord
 
   has_many :user_cards
   has_many :user_wanted_cards
-
-  validates :extension, presence: true
+  has_many :card_versions
 
   def name(preferred_language = :en)
     case preferred_language

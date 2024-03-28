@@ -12,16 +12,16 @@ module UpdatePricesTask
     updated_cards = Set.new
 
     cards_data.each do |card_data|
-      scryfall_oracle_id = card_data['oracle_id']
-
-      next if updated_cards.include?(scryfall_oracle_id)
-
+      scryfall_id = card_data['id']
       price_eur = card_data['prices']['eur']
 
-      if card = Card.find_by(scryfall_oracle_id: scryfall_oracle_id)
-        card.update(price: price_eur)
-        updated_cards.add(scryfall_oracle_id)
+      # Nous utilisons scryfall_id pour identifier de manière unique chaque CardVersion
+      if card_version = CardVersion.find_by(scryfall_id: scryfall_id)
+        card_version.update(price: price_eur)
+        updated_cards.add(scryfall_id)
       end
     end
+
+    puts "#{updated_cards.size} card versions prices updated."
   end
 end
