@@ -1,7 +1,7 @@
 class UserCard < ApplicationRecord
   require 'pry-byebug'
   belongs_to :user
-  belongs_to :card
+  belongs_to :card_version
   has_many :matches
 
   enum condition: { poor: "0", played: "1", light_played: "2", good: "3",
@@ -9,7 +9,7 @@ class UserCard < ApplicationRecord
   enum language: { français: "0", anglais: "1", allemand: "2", italien: "3", chinois_s: "4",
     chinois_t: "5", japonais: "6", portuguais: "7", russe: "8", corréen: "9" }
 
-  after_save :check_matches
+  # after_save :check_matches
 
   def price
     card.price

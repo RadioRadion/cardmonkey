@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   devise_for :users
-  root to: 'cards#index'
+  root to: 'user_cards#index'
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
   resources :users, only: [:show, :edit, :update] do
@@ -11,6 +11,11 @@ Rails.application.routes.draw do
       resources :messages, only: [:create]
     end
   end
+
+  get 'cards/search', to: 'cards#search', defaults: { format: 'json' }
+  get 'cards/versions', to: 'cards#versions', defaults: { format: 'json' }
+
+
 end
 
 
