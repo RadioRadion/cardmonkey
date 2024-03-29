@@ -27,6 +27,8 @@ gem 'redis', '~> 4.0'
 
 gem 'stimulus-rails'
 
+gem "tailwindcss-rails"
+
 gem 'hotwire-rails'
 
 gem 'rspec-rails'

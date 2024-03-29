@@ -1,16 +1,32 @@
 <%= link_to 'Ajouter une nouvelle carte', new_user_user_card_path(@user), class: "btn btn-primary" %>
 
-
-
-<%# <div class="container">
-
-  <%= render "shared/cards/cards_for_collection", locals: {
-  title: "Ma collection",
-  cards: @user_cards,
-  side: "card-offer",
-  view: "cards"}  %>
-
-  <%# <div>
-    <%= link_to "Add card", new_user_user_card_path(user_id: current_user.id), class: 'btn btn-secondary' %>
-  <%# </div> %>
-<%# </div> %> 
+<div class="grid grid-cols-1 gap-4">
+  <% @user_cards.each do |user_card| %>
+    <div class="p-4 border border-gray-200 rounded-lg shadow bg-white" data-controller="user-card"
+    data-user-card-id="<%= user_card.id %>"
+    data-user-id="<%= user_card.user_id %>">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4 flex-1">
+          <div class="text-lg font-semibold flex-none">
+            <%= user_card.card_version.card.name_en %>
+          </div>
+          <div class="flex-none">Condition: <%= user_card.condition %></div>
+          <div class="flex-none">Langue: <%= user_card.language %></div>
+          <div class="flex-none">Foil: <%= user_card.foil ? "Oui" : "Non" %></div>
+          <div class="flex-none">Quantité: <%= user_card.quantity %></div>
+          <div class="flex-none">Prix: <%= number_to_currency(user_card.card_version.price, unit: "€") %></div>
+        </div>
+        <div class="ml-4 flex-shrink-0 relative group">
+          <i class="fas fa-eye cursor-pointer"></i>
+          <div class="absolute hidden group-hover:block w-52 h-72 -translate-y-full translate-x-[-50%] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-10">
+            <%= image_tag user_card.card_version.img_uri, alt: user_card.card_version.card.name_en, class: "w-full h-full object-cover" %>
+          </div>
+        </div>
+       <div>
+        <!-- Votre contenu ici, incluant le bouton de suppression -->
+        <button data-action="user-card#delete" class="btn btn-danger">Supprimer</button>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

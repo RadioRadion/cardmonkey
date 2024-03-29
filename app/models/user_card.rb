@@ -4,6 +4,8 @@ class UserCard < ApplicationRecord
   belongs_to :card_version
   has_many :matches
 
+  validates :quantity, presence: true
+
   enum condition: { poor: "0", played: "1", light_played: "2", good: "3",
     excellent: "4", near_mint: "5", mint: "6" }
   enum language: { français: "0", anglais: "1", allemand: "2", italien: "3", chinois_s: "4",

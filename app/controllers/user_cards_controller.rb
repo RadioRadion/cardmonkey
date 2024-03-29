@@ -1,9 +1,9 @@
 class UserCardsController < ApplicationController
   before_action :set_user, only: [:new, :index, :create]
 
-  # def index
-  #   @user_cards = @user.user_cards
-  # end
+  def index
+    @user_cards = @user.user_cards
+  end
 
   def new
     @user_card = UserCard.new
@@ -47,11 +47,23 @@ class UserCardsController < ApplicationController
   #   end
   # end
 
-  # def destroy
-  #   @user_card = UserCard.find(params[:id])
-  #   @user_card.destroy
-  #   redirect_to user_user_cards_path(current_user)
-  # end
+  def destroy
+    @user_card = current_user.user_cards.find(params[:id])
+    if @user_card.destroy
+      respond_to do |format|
+        format.html { redirect_to user_user_cards_url(current_user), notice: 'La carte a été supprimée avec succès.' }
+        format.json { head :no_content } # Pour AJAX, renvoie un statut 204 sans contenu.
+      end
+    else
+      # Gérer le cas où la suppression échoue, par exemple, en renvoyant un statut d'erreur.
+    end
+  rescue ActiveRecord::RecordNotFound => e
+    respond_to do |format|
+      format.html { redirect_to user_user_cards_url(current_user), alert: 'La carte n\'a pas été trouvée.' }
+      format.json { render json: { error: e.message }, status: :not_found }
+    end
+  end
+  
 
   def search
     if params[:query].present?
@@ -125,4 +137,4 @@ end
 
 # def user_cards_params
 #   params.require(:user_card).permit(:condition, :foil, :language, :quantity, :card_id)
-# end
+# endrails
