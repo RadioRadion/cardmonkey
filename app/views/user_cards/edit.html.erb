@@ -1,9 +1,12 @@
-<div class="container">
-  <%= simple_form_for([current_user, @user_card], method: :patch) do |f| %>
-      <%= f.input :condition, collection: UserCard.conditions %>
-      <%= f.input :foil %>
-      <%= f.input :language, collection: UserCard.languages %>
-      <%= f.input :quantity, collection: 1...30 %>
-      <%= f.submit "Save card", class: "btn btn-success" %>
-  <% end %>
- </div>
+<h1>Modifier la carte</h1>
+
+<%= simple_form_for([@user_card.user, @user_card], html: { data: { controller: "autocomplete" } }) do |f| %>
+  <div class="form-group">
+    <%= f.label :card_version_id, "Version de la carte" %>
+    <%= f.input :card_version_id, collection: @versions, label_method: ->(cv) { cv.extension }, value_method: :id, label: 'Extension de la carte', include_blank: false, selected: @user_card.card_version_id %>  <%= f.input :condition, as: :select, collection: UserCard.conditions.keys.map { |condition| [condition.humanize, condition] }, include_blank: false %>
+  <%= f.input :foil, as: :boolean %>
+  <%= f.input :language, as: :select, collection: UserCard.languages.keys.map { |language| [language.humanize, language] }, include_blank: false %>
+  <%= f.input :quantity, as: :integer %>
+  
+  <%= f.button :submit, "Enregistrer les modifications" %>
+<% end %>

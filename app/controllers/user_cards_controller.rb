@@ -34,18 +34,28 @@ class UserCardsController < ApplicationController
     end
   end
 
-  # def edit
-  #   @user_card = UserCard.find(params[:id])
-  # end
+  def edit
+    @user = User.find(params[:user_id])
+    @user_card = @user.user_cards.find(params[:id])
+    @card = @user_card.card_version.card
+    # Récupérer toutes les versions basées sur le scryfall_oracle_id
+    @versions = CardVersion.joins(:card).where(cards: { scryfall_oracle_id: @card.scryfall_oracle_id })
+  end
 
-  # def update
-  #   @user_card = UserCard.find(params[:id])
-  #   if @user_card.update(user_cards_params)
-  #     redirect_to user_user_cards_path
-  #   else
-  #     render :new
-  #   end
-  # end
+  def update
+    @user = User.find(params[:user_id])
+    @user_card = @user.user_cards.find(params[:id])
+  
+    # Mise à jour de la UserCard avec les nouveaux paramètres, y compris la nouvelle CardVersion
+    if @user_card.update(user_card_params)
+      redirect_to user_user_cards_path(@user), notice: 'La carte a été mise à jour dans votre collection.'
+    else
+      # S'il y a des erreurs de validation ou autres, afficher à nouveau le formulaire avec les messages d'erreur.
+      @card = @user_card.card_version.card
+      @versions = CardVersion.joins(:card).where(cards: { scryfall_oracle_id: @card.scryfall_oracle_id })
+      render :edit, status: :unprocessable_entity
+    end
+  end  
 
   def destroy
     @user_card = current_user.user_cards.find(params[:id])
@@ -75,8 +85,6 @@ class UserCardsController < ApplicationController
     render json: @cards.map{|card| { id: card.id, name: card.name }}
   end
   
-  
-
   private
 
   def set_user
