@@ -5,6 +5,9 @@ class UserCard < ApplicationRecord
   has_many :matches
 
   validates :quantity, presence: true
+  validates :condition, presence: true
+  validates :language, presence: true
+  validates :foil, presence: true
 
   enum condition: { poor: "0", played: "1", light_played: "2", good: "3",
     excellent: "4", near_mint: "5", mint: "6" }
