@@ -2,6 +2,7 @@ class UserWantedCard < ApplicationRecord
   belongs_to :user
   belongs_to :card
   has_many :matches
+  validates :scryfall_oracle_id, presence: true
 
   enum min_condition: { poor: "0", played: "1", light_played: "2", good: "3",
     excellent: "4", near_mint: "5", mint: "6", unimportant: "7" }

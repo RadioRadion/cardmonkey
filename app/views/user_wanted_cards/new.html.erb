@@ -1,10 +1,21 @@
-<div class="container">
-    <%= simple_form_for [current_user, @user_wanted_card] do |f| %>
-      <%= f.association :card, collection: @cards %>
-      <%= f.input :min_condition, collection: UserWantedCard.min_conditions %>
-      <%= f.input :foil %>
-      <%= f.input :language, collection: UserWantedCard.languages %>
-      <%= f.input :quantity, collection: 1...30 %>
-      <%= f.submit "Save card", class: "btn btn-success" %>
-    <% end %>
-<div>
+<%= simple_form_for([current_user, @user_wanted_card], html: { data: { controller: "autocomplete" } }) do |f| %>
+  <div class="form-input">
+    <label for="card_name">Nom de la carte</label>
+    <input type="text" id="card_name" name="card_name" data-action="keyup->autocomplete#search" data-autocomplete-target="input">
+  </div>
+
+  <div id="card-suggestions" data-autocomplete-target="suggestions">
+    <!-- Les suggestions de cartes seront insérées ici -->
+  </div>
+
+  <div class="form-input">
+    <label for="card_version_id">Extension</label>
+    <select id="card_version_id" name="user_card[card_version_id]" data-autocomplete-target="extension"></select>
+  </div>
+
+  <%= f.input :min_condition, collection: UserWantedCard.min_conditions.keys %>
+  <%= f.input :foil, as: :boolean %>
+  <%= f.input :language, collection: UserWantedCard.languages.keys %>
+  <%= f.input :quantity %>
+  <%= f.button :submit, "Add to wishlist" %>
+<% end %>

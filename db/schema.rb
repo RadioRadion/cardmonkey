@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_28_085205) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_02_151450) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -113,6 +113,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_28_085205) do
     t.boolean "foil"
     t.string "language"
     t.integer "quantity"
+    t.string "scryfall_oracle_id"
+    t.string "extension_name"
     t.index ["card_id"], name: "index_user_wanted_cards_on_card_id"
     t.index ["user_id"], name: "index_user_wanted_cards_on_user_id"
   end

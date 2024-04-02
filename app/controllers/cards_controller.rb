@@ -25,9 +25,9 @@ class CardsController < ApplicationController
 
   def search
     query = params[:query]
-    cards = Card.where('name_fr LIKE :query OR name_en LIKE :query', query: "%#{query}%")
+    cards = Card.where('name_fr ILIKE :query OR name_en ILIKE :query', query: "%#{query}%")
                 .select(:scryfall_oracle_id, :name_fr, :name_en)
-                Card.where('name_fr LIKE :query OR name_en LIKE :query', query: "%unterspel%")
+                .limit(5)
     cards = cards.map do |card|
       {
         oracle_id: card.scryfall_oracle_id,
@@ -35,7 +35,6 @@ class CardsController < ApplicationController
         name_en: card.name_en
       }
     end
-  
     render json: cards
   end
 

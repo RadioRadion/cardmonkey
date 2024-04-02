@@ -1,12 +1,26 @@
-<div class="container">
+<%= link_to 'Ajouter une carte recherchée', new_user_user_wanted_card_path(@user), class: "btn btn-primary" %>
 
-  <%= render "shared/cards/cards_for_collection", locals: {
-  title: "Mes wants",
-  cards: @user_wanted_cards,
-  side: "card-offer",
-  view: "wants"}  %>
-
-  <div>
-    <%= link_to "Add card", new_user_user_wanted_card_path, class: 'btn btn-secondary' %>
-  </div>
+<div class="grid grid-cols-1 gap-4 mt-4">
+  <% @user_wanted_cards.each do |user_wanted_card| %>
+    <div class="p-4 border border-gray-200 rounded-lg shadow bg-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">
+            <%= user_wanted_card.card.name_en %>
+            <% if user_wanted_card.card.name_fr.present? %>
+              / <%= user_wanted_card.card.name_fr %>
+            <% end %>
+          </h3>
+          <p>Condition minimale: <%= user_wanted_card.min_condition&.humanize %></p>
+          <p>Langue: <%= user_wanted_card.language&.humanize %></p>
+          <p>Foil: <%= user_wanted_card.foil ? "Oui" : "Non" %></p>
+          <p>Quantité: <%= user_wanted_card.quantity %></p>
+        </div>
+        <div>
+          <%= link_to 'Modifier', edit_user_user_wanted_card_path(@user, user_wanted_card), class: "btn btn-warning" %>
+          <%= link_to 'Supprimer', user_user_wanted_card_path(@user, user_wanted_card), method: :delete, data: { confirm: 'Êtes-vous sûr ?' }, class: "btn btn-danger" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </div>

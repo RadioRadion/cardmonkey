@@ -75,15 +75,15 @@ class UserCardsController < ApplicationController
   end
   
 
-  def search
-    if params[:query].present?
-      @cards = Card.where("name ILIKE ?", "%#{params[:query]}%").limit(5)
-    else
-      @cards = Card.none
-    end
+  # def search
+  #   if params[:query].present?
+  #     @cards = Card.where("name ILIKE ?", "%#{params[:query]}%").limit(5)
+  #   else
+  #     @cards = Card.none
+  #   end
   
-    render json: @cards.map{|card| { id: card.id, name: card.name }}
-  end
+  #   render json: @cards.map{|card| { id: card.id, name: card.name }}
+  # end
   
   private
 
