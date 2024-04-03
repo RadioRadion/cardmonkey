@@ -7,12 +7,12 @@
         <li><%= link_to "Collection", user_user_cards_path(current_user), class: "py-4 px-2 hover:text-gray-400" %></li>
         <li><%= link_to "Trades", user_trades_path(current_user), class: "py-4 px-2 hover:text-gray-400" %></li>
         <li><%= link_to "Messages", user_chatrooms_path(current_user), class: "py-4 px-2 hover:text-gray-400" %></li>
-        <!-- Menu utilisateur -->
+        <!-- User Menu -->
         <li class="relative">
           <%= image_tag "https://via.placeholder.com/64", class: "h-8 w-8 rounded-full" %>
-          <ul class="absolute hidden text-gray-700 pt-1 group-hover:block">
-            <li class=""><%= link_to "Profil", user_path(current_user), class: "rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap" %></li>
-            <li class=""><%= link_to "Log out", destroy_user_session_path, method: :delete, class: "rounded-b bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap" %></li>
+          <ul class="absolute hidden text-gray-700 pt-1 group-hover:block z-10">
+            <li><%= link_to "Profil", user_path(current_user), class: "rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-nowrap" %></li>
+            <li><%= link_to "Log out", destroy_user_session_path, method: :delete, class: "rounded-b bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-nowrap" %></li>
           </ul>
         </li>
       <% else %>
