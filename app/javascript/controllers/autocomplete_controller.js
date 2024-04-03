@@ -28,8 +28,8 @@ export default class extends Controller {
   
       // Assurez-vous d'assigner correctement nameFr et nameEn au dataset
       suggestionElement.dataset.oracleId = item.oracle_id;
-      suggestionElement.dataset.nameFr = item.name_fr; // Ajoutez cette ligne
-      suggestionElement.dataset.nameEn = item.name_en; // Ajoutez cette ligne
+      suggestionElement.dataset.nameFr = item.name_fr; 
+      suggestionElement.dataset.nameEn = item.name_en; 
       suggestionElement.dataset.action = 'click->autocomplete#select';
       this.suggestionsTarget.appendChild(suggestionElement);
     });

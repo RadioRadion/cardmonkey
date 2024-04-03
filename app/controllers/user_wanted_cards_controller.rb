@@ -12,18 +12,26 @@ class UserWantedCardsController < ApplicationController
 
   def create
     @user = User.find(params[:user_id])
-    # Plus besoin de trouver la carte par oracle_id, car l'oracle_id est directement associé à UserWantedCard
-    @user_wanted_card = @user.user_wanted_cards.new(user_wanted_card_params)
+    
+    # Trouver la version de la carte basée sur l'identifiant Scryfall reçu
+    card_version = CardVersion.find_by(scryfall_id: params[:user_wanted_card][:scryfall_id])
   
-    if @user_wanted_card.save
-      redirect_to user_user_wanted_cards_path(@user), notice: 'Wanted card was successfully created.'
+    if card_version
+      # Préparer les paramètres en incluant card_version_id
+      wanted_card_params = user_wanted_card_params.except(:scryfall_id).merge(card_version_id: card_version.id, card_id: card_version.card.id)
+      @user_wanted_card = @user.user_wanted_cards.new(wanted_card_params)
+    
+      if @user_wanted_card.save!
+        redirect_to user_user_wanted_cards_path(@user), notice: 'Wanted card was successfully created.'
+      else
+        render :new, status: :unprocessable_entity
+      end
     else
+      flash.now[:alert] = 'Card version not found.'
       render :new, status: :unprocessable_entity
     end
   end
   
-  
-
   def edit
     @user_wanted_card = UserWantedCard.find(params[:id])
   end
@@ -46,7 +54,7 @@ class UserWantedCardsController < ApplicationController
   private
 
   def user_wanted_card_params
-    params.require(:user_wanted_card).permit(:min_condition, :foil, :language, :quantity, :card_id, :scryfall_oracle_id)
+    params.require(:user_wanted_card).permit(:min_condition, :foil, :language, :quantity, :card_id, :scryfall_id)
   end
 
   def set_user

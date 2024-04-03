@@ -9,8 +9,8 @@
   </div>
 
   <div class="form-input">
-    <label for="card_version_id">Extension</label>
-    <select id="card_version_id" name="user_card[card_version_id]" data-autocomplete-target="extension"></select>
+    <label for="scryfall_id">Extension</label>
+    <select id="scryfall_id" name="user_wanted_card[scryfall_id]" data-autocomplete-target="extension"></select>
   </div>
 
   <%= f.input :min_condition, collection: UserWantedCard.min_conditions.keys %>

@@ -11,24 +11,23 @@ class UserCardsController < ApplicationController
 
   def create
     @user = User.find(params[:user_id])
-    # Utiliser directement le scryfall_id reçu dans card_version_id
-    scryfall_id = params[:user_card][:card_version_id]
+    # Récupérer le scryfall_id à partir des nouveaux paramètres
+    scryfall_id = params[:user_card][:scryfall_id]
     # Trouver la CardVersion basée sur le scryfall_id
     card_version = CardVersion.find_by(scryfall_id: scryfall_id)
   
     if card_version
-      # Créer la nouvelle UserCard avec les paramètres reçus, à l'exception de card_version_id
-      @user_card = @user.user_cards.new(user_card_params)
-      # Associer la CardVersion trouvée à la UserCard
-      @user_card.card_version = card_version
-  
+      # Initialiser la nouvelle UserCard avec les paramètres reçus, mais sans scryfall_id
+      # Assurez-vous que les attributs passés à user_card_params sont ceux attendus par le modèle UserCard
+      @user_card = @user.user_cards.new(user_card_params.except(:scryfall_id).merge(card_version_id: card_version.id))
+    
       if @user_card.save
         redirect_to user_user_cards_path(@user), notice: 'La carte a été ajoutée à votre collection.'
       else
         render :new, status: :unprocessable_entity
       end
     else
-      @user_card = @user.user_cards.build(user_card_params)
+      @user_card = @user.user_cards.build(user_card_params.except(:scryfall_id))
       flash.now[:alert] = 'Version de carte invalide.'
       render :new, status: :unprocessable_entity
     end
@@ -92,7 +91,7 @@ class UserCardsController < ApplicationController
   end
 
   def user_card_params
-    params.require(:user_card).permit(:card_version_id, :condition, :foil, :language, :quantity)
+    params.require(:user_card).permit(:scryfall_id, :condition, :foil, :language, :quantity)
   end
   
 end

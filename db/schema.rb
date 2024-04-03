@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_02_151450) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_03_073805) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -113,9 +113,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_02_151450) do
     t.boolean "foil"
     t.string "language"
     t.integer "quantity"
-    t.string "scryfall_oracle_id"
-    t.string "extension_name"
+    t.bigint "card_version_id"
     t.index ["card_id"], name: "index_user_wanted_cards_on_card_id"
+    t.index ["card_version_id"], name: "index_user_wanted_cards_on_card_version_id"
     t.index ["user_id"], name: "index_user_wanted_cards_on_user_id"
   end
 
@@ -147,6 +147,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_02_151450) do
   add_foreign_key "trades", "users"
   add_foreign_key "user_cards", "card_versions"
   add_foreign_key "user_cards", "users"
+  add_foreign_key "user_wanted_cards", "card_versions"
   add_foreign_key "user_wanted_cards", "cards"
   add_foreign_key "user_wanted_cards", "users"
 end
