@@ -46,9 +46,20 @@ class UserWantedCardsController < ApplicationController
   end
 
   def destroy
-    @user_wanted_card = UserWantedCard.find(params[:id])
-    @user_wanted_card.destroy
-    redirect_to user_user_wanted_cards_path(current_user)
+    @user_wanted_card = current_user.user_wanted_cards.find(params[:id])
+    if @user_wanted_card.destroy
+      respond_to do |format|
+        format.html { redirect_to user_user_wanted_cards_path(current_user), notice: 'La carte recherchée a été supprimée avec succès.' }
+        format.json { head :no_content } # Pour AJAX, renvoie un statut 204 sans contenu.
+      end
+    else
+      # Gérer le cas où la suppression échoue, par exemple, en renvoyant un statut d'erreur.
+    end
+  rescue ActiveRecord::RecordNotFound => e
+    respond_to do |format|
+      format.html { redirect_to user_user_wanted_cards_path(current_user), alert: 'La carte n\'a pas été trouvée.' }
+      format.json { render json: { error: e.message }, status: :not_found }
+    end
   end
 
   private
