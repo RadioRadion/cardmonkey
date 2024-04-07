@@ -1,5 +1,6 @@
 // app/javascript/application.js
 import { Application } from "@hotwired/stimulus"
+import 'flowbite';
 
 // Importez chaque contrôleur spécifiquement
 import HelloController from "./controllers/hello_controller"
