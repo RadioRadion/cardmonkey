@@ -1,6 +1,4 @@
-<%= link_to 'Ajouter une nouvelle carte', new_user_user_card_path(@user), class: "btn btn-primary" %>
-
-
+<%= link_to 'Ajouter une nouvelle carte', new_user_user_card_path(@user), class: "text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2" %>
 
 <section class="flex flex-col justify-center antialiased bg-gray-100 text-gray-600 min-h-screen p-4">
   <div class="h-full">
@@ -55,8 +53,8 @@
                     </div>
                   </td>
                   <td class="p-2 whitespace-nowrap text-right">
-                    <%= link_to 'Modifier', edit_user_user_card_path(user_card.user, user_card), class: "text-indigo-600 hover:text-indigo-900" %>
-                    <button data-action="user-card#delete" class="text-red-600 hover:text-red-900 ml-4">Supprimer</button>
+                    <%= link_to 'Modifier', edit_user_user_card_path(user_card.user, user_card), class: "text-indigo-600 hover:text-indigo-900 mr-2" %>
+                    <%= link_to 'Supprimer', user_user_card_path(user_card.user, user_card), method: :delete, data: { confirm: 'Êtes-vous sûr ?', action: 'user-card#delete' }, class: "text-red-600 hover:text-red-900" %>
                   </td>
                 </tr>
               <% end %>

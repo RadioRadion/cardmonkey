@@ -1,24 +1,22 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Cardmonkey</title>
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+<head>
+  <title>Cardmonkey</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_importmap_tags %>
-    <script src="https://unpkg.com/tailwindcss-jit-cdn"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-  </head>
-
-  <body>
-    <%= render 'shared/navbar' %>
-    <%= render 'shared/flashes' %>
-    <div class="container">
-      <%= yield %>
-    </div>
-  </body>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%= javascript_importmap_tags %>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+</head>
+<body class="bg-gray-50"> <!-- Tailwind CSS pour un fond léger -->
+  <%= render 'shared/navbar' %> <!-- Assurez-vous que votre navbar utilise également Tailwind CSS -->
+  <%= render 'shared/flashes' %> <!-- Convertissez également les alertes/flashes pour utiliser Tailwind CSS -->
+  <div class="container mx-auto px-4"> <!-- Utilisation de Tailwind CSS pour le conteneur central -->
+    <%= yield %>
+  </div>
+  <%= render 'shared/footer' %> <!-- Assurez-vous que votre pied de page utilise également Tailwind CSS -->
+</body>
 </html>
