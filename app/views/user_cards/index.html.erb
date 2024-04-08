@@ -1,67 +1,54 @@
 <%= link_to 'Ajouter une nouvelle carte', new_user_user_card_path(@user), class: "text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2" %>
 
-<section class="flex flex-col justify-center antialiased bg-gray-100 text-gray-600 min-h-screen p-4">
-  <div class="h-full">
-    <div class="w-full max-full mx-auto bg-white shadow-lg rounded-sm border border-gray-200">
-      <header class="px-5 py-4 border-b border-gray-100">
-        <h2 class="font-semibold text-gray-800">Ma Collection</h2>
-      </header>
-      <div class="p-3">
-        <div>
-          <table class="table-auto w-full">
-            <thead class="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
-              <tr>
-                <th class="p-2">Carte</th>
-                <th class="p-2">Condition</th>
-                <th class="p-2">Langue</th>
-                <th class="p-2">Foil</th>
-                <th class="p-2">Quantité</th>
-                <th class="p-2">Prix</th>
-                <th class="p-2">Scan</th>
-                <th class="p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="text-sm divide-y divide-gray-100">
-              <% @user_cards.each do |user_card| %>
-                <tr data-controller="user-card" 
-                data-user-card-id="<%= user_card.id %>"
-                data-user-id="<%= user_card.user_id %>">
-                  <td class="p-2 whitespace-nowrap">
-                    <%= user_card.card_version.card.name_en %>
-                  </td>
-                  <td class="p-2 whitespace-nowrap">
-                    <%= user_card.condition %>
-                  </td>
-                  <td class="p-2 whitespace-nowrap">
-                    <%= user_card.language %>
-                  </td>
-                  <td class="p-2 whitespace-nowrap">
-                    <%= user_card.foil ? 'Oui' : 'Non' %>
-                  </td>
-                  <td class="p-2 whitespace-nowrap">
-                    <%= user_card.quantity %>
-                  </td>
-                  <td class="p-2 whitespace-nowrap">
-                    <%= number_to_currency(user_card.card_version.price, unit: "€") %>
-                  </td>
-                  <td class="p-2 whitespace-nowrap">
-                    <div class="relative flex justify-center group">
-                      <i class="fas fa-eye cursor-pointer"></i>
-                      <div class="absolute hidden group-hover:block w-52 h-72 -translate-y-full translate-x-[-50%] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-10">
-                        <%= image_tag user_card.card_version.img_uri, alt: user_card.card_version.card.name_en, class: "w-full h-full object-cover" %>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="p-2 whitespace-nowrap text-right">
-                    <%= link_to 'Modifier', edit_user_user_card_path(user_card.user, user_card), class: "text-indigo-600 hover:text-indigo-900 mr-2" %>
-                    <%= link_to 'Supprimer', user_user_card_path(user_card.user, user_card), method: :delete, data: { confirm: 'Êtes-vous sûr ?', action: 'user-card#delete' }, class: "text-red-600 hover:text-red-900" %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<div class="relative shadow-md sm:rounded-lg">
+  <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+      <tr>
+        <th scope="col" class="px-6 py-3">Carte</th>
+        <th scope="col" class="px-6 py-3">Condition</th>
+        <th scope="col" class="px-6 py-3">Langue</th>
+        <th scope="col" class="px-6 py-3">Foil</th>
+        <th scope="col" class="px-6 py-3">Quantité</th>
+        <th scope="col" class="px-6 py-3">Prix</th>
+        <th scope="col" class="px-6 py-3">Scan</th>
+        <th scope="col" class="px-6 py-3">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @user_cards.each do |user_card| %>
+        <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700" data-controller="user-card" data-user-card-id="<%= user_card.id %>" data-user-id="<%= user_card.user_id %>">
+          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            <%= user_card.card_version.card.name_en %>
+          </th>
+          <td class="px-6 py-4">
+            <%= user_card.condition %>
+          </td>
+          <td class="px-6 py-4">
+            <%= user_card.language %>
+          </td>
+          <td class="px-6 py-4">
+            <%= user_card.foil ? 'Oui' : 'Non' %>
+          </td>
+          <td class="px-6 py-4">
+            <%= user_card.quantity %>
+          </td>
+          <td class="px-6 py-4">
+            <%= number_to_currency(user_card.card_version.price, unit: "€") %>
+          </td>
+          <td class="px-6 py-4 text-right">
+            <div class="relative flex justify-center group">
+              <i class="fas fa-eye cursor-pointer"></i>
+              <div class="absolute hidden group-hover:block w-52 h-72 -translate-y-full translate-x-[-50%] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-10">
+                <%= image_tag user_card.card_version.img_uri, alt: user_card.card_version.card.name_en, class: "w-full h-full object-cover" %>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4 text-right">
+            <%= link_to 'Modifier', edit_user_user_card_path(user_card.user, user_card), class: "text-indigo-600 hover:text-indigo-900 mr-2" %>
+            <button data-action="user-card#delete" class="text-red-600 hover:text-red-900 ml-4">Supprimer</button>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

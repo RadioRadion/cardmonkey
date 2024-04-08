@@ -11,12 +11,14 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 </head>
-<body class="bg-gray-50"> <!-- Tailwind CSS pour un fond léger -->
-  <%= render 'shared/navbar' %> <!-- Assurez-vous que votre navbar utilise également Tailwind CSS -->
-  <%= render 'shared/flashes' %> <!-- Convertissez également les alertes/flashes pour utiliser Tailwind CSS -->
-  <div class="container mx-auto px-4"> <!-- Utilisation de Tailwind CSS pour le conteneur central -->
-    <%= yield %>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+  <div class="flex-grow">
+    <%= render 'shared/navbar' %> 
+    <%= render 'shared/flashes' %> 
+    <div class="container mx-auto px-4"> 
+      <%= yield %>
+    </div>
   </div>
-  <%= render 'shared/footer' %> <!-- Assurez-vous que votre pied de page utilise également Tailwind CSS -->
+  <%= render 'shared/footer' %> 
 </body>
 </html>
