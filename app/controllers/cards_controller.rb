@@ -40,25 +40,37 @@ class CardsController < ApplicationController
 
   def versions
     oracle_id = params[:oracle_id]
-
+  
     # Trouver la carte par oracle_id
     card = Card.find_by(scryfall_oracle_id: oracle_id)
-
-    # Récupérer toutes les versions de cette carte
-    versions = card.card_versions.select(:id, :extension, :scryfall_id, :img_uri, :price).map do |version|
-      {
-        id: version.id,
-        scryfall_id: version.scryfall_id,
-        extension: version.extension,
-        img_uri: version.img_uri,
-        price: version.price
-      }
+  
+    if card
+      # Récupérer toutes les versions de cette carte, incluant les informations de l'extension
+      versions = card.card_versions.includes(:extension).select(:id, :scryfall_id, :img_uri, :price, :extension_id).map do |version|
+        {
+          id: version.id,
+          scryfall_id: version.scryfall_id,
+          extension: {
+            code: version.extension.code,
+            name: version.extension.name,
+            icon_uri: version.extension.icon_uri
+          },
+          img_uri: version.img_uri,
+          price: version.price
+        }
+        
+      end
+  
+      # Tri par le nom de l'extension
+      sorted_versions = versions.sort_by { |version| version[:extension][:name] }
+  
+      render json: sorted_versions
+    else
+      render json: { error: "Card not found" }, status: :not_found
     end
-
-    render json: versions
   rescue => e
-    render json: { error: e.message }, status: :not_found
-  end
+    render json: { error: e.message }, status: :internal_server_error
+  end  
   
   private
 

@@ -1,4 +1,4 @@
-class AddExtensionToCardVersions < ActiveRecord::Migration[7.1]
+class AddExtension < ActiveRecord::Migration[7.1]
   
   def change
     create_table :extensions do |t|
@@ -8,6 +8,8 @@ class AddExtensionToCardVersions < ActiveRecord::Migration[7.1]
       t.string :icon_uri
 
       t.timestamps
+
+    end
 
     add_index :extensions, :code, unique: true
 

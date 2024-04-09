@@ -10,6 +10,8 @@
         <th scope="col" class="px-6 py-3">Foil</th>
         <th scope="col" class="px-6 py-3">Quantité</th>
         <th scope="col" class="px-6 py-3">Prix</th>
+        <th scope="col" class="px-6 py-3">N° Collection</th>
+        <th scope="col" class="px-6 py-3">Rareté</th>
         <th scope="col" class="px-6 py-3">Scan</th>
         <th scope="col" class="px-6 py-3">Actions</th>
       </tr>
@@ -35,10 +37,17 @@
           <td class="px-6 py-4">
             <%= number_to_currency(user_card.card_version.price, unit: "€") %>
           </td>
+          <td class="px-6 py-4">
+            <%= user_card.card_version.collector_number %>
+          </td>
+          <td class="px-6 py-4">
+            <span class="inline-block w-4 h-4 rounded-full <%= rarity_color(user_card.card_version.rarity) %>"></span>
+          </td>
           <td class="px-6 py-4 text-right">
             <div class="relative flex justify-center group">
               <i class="fas fa-eye cursor-pointer"></i>
-              <div class="absolute hidden group-hover:block w-52 h-72 -translate-y-full translate-x-[-50%] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-10">
+              <!-- Ajustement ici : retirer -translate-y-full et ajuster translate-x pour centrer -->
+              <div class="absolute hidden group-hover:block w-52 h-72 translate-y-8 translate-x-[-50%] bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-10">
                 <%= image_tag user_card.card_version.img_uri, alt: user_card.card_version.card.name_en, class: "w-full h-full object-cover" %>
               </div>
             </div>

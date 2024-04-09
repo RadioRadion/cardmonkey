@@ -65,10 +65,12 @@ export default class extends Controller {
   
     versions.forEach(version => {
       const option = document.createElement('option');
-      option.value = version.scryfall_id; // Utilisez scryfall_id ou un identifiant unique pour cette version
-      option.text = `${version.extension}`;
+      option.value = version.scryfall_id;
+      // Utilisez innerHTML pour inclure des éléments HTML comme les images
+      console.log(version.name)
+      option.text = `${version.extension.name}`; 
       select.appendChild(option);
     });
-  }
+  }  
   
 }
