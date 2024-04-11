@@ -32,7 +32,12 @@
             <%= user_card.foil ? 'Oui' : 'Non' %>
           </td>
           <td class="px-6 py-4">
-            <%= user_card.quantity %>
+            <div class="flex items-center" data-controller="user-card" data-user-card-url-value="<%= user_user_card_path(user_card.user, user_card) %>" data-user-card-user-id-value="<%= user_card.user_id %>"
+            data-user-card-user-card-id-value="<%= user_card.id %>">
+              <button data-action="user-card#decrement" class="inline-flex items-center justify-center p-1 me-3 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">-</button>
+              <input type="number" data-user-card-target="quantity" class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value="<%= user_card.quantity %>" readonly />
+              <button data-action="user-card#increment" class="inline-flex items-center justify-center h-6 w-6 p-1 ms-3 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">+</button>
+            </div>
           </td>
           <td class="px-6 py-4">
             <%= number_to_currency(user_card.card_version.price, unit: "€") %>

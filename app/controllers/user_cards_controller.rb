@@ -45,14 +45,24 @@ class UserCardsController < ApplicationController
     @user = User.find(params[:user_id])
     @user_card = @user.user_cards.find(params[:id])
   
-    # Mise à jour de la UserCard avec les nouveaux paramètres, y compris la nouvelle CardVersion
     if @user_card.update(user_card_params)
-      redirect_to user_user_cards_path(@user), notice: 'La carte a été mise à jour dans votre collection.'
+      if request.xhr?
+        # Traitement pour une requête AJAX
+        render json: { message: 'La carte a été mise à jour dans votre collection.', quantity: @user_card.quantity }, status: :ok
+      else
+        # Traitement pour une requête HTTP classique
+        redirect_to user_user_cards_path(@user), notice: 'La carte a été mise à jour dans votre collection.'
+      end
     else
-      # S'il y a des erreurs de validation ou autres, afficher à nouveau le formulaire avec les messages d'erreur.
-      @card = @user_card.card_version.card
-      @versions = CardVersion.joins(:card).where(cards: { scryfall_oracle_id: @card.scryfall_oracle_id })
-      render :edit, status: :unprocessable_entity
+      if request.xhr?
+        # Traitement d'erreur pour une requête AJAX
+        render json: { errors: @user_card.errors.full_messages }, status: :unprocessable_entity
+      else
+        # Traitement d'erreur pour une requête HTTP classique
+        @card = @user_card.card_version.card
+        @versions = CardVersion.joins(:card).where(cards: { scryfall_oracle_id: @card.scryfall_oracle_id })
+        render :edit, status: :unprocessable_entity
+      end
     end
   end  
 
