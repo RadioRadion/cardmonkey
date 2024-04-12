@@ -37,9 +37,12 @@ class UserCardsController < ApplicationController
     @user = User.find(params[:user_id])
     @user_card = @user.user_cards.find(params[:id])
     @card = @user_card.card_version.card
-    # Récupérer toutes les versions basées sur le scryfall_oracle_id
-    @versions = CardVersion.joins(:card).where(cards: { scryfall_oracle_id: @card.scryfall_oracle_id })
+    # Récupérer toutes les versions basées sur le scryfall_oracle_id et trier par le nom de l'extension
+    @versions = CardVersion.joins(:card, :extension)
+                           .where(cards: { scryfall_oracle_id: @card.scryfall_oracle_id })
+                           .order('extensions.name ASC')
   end
+  
 
   def update
     @user = User.find(params[:user_id])
@@ -82,18 +85,7 @@ class UserCardsController < ApplicationController
       format.json { render json: { error: e.message }, status: :not_found }
     end
   end
-  
 
-  # def search
-  #   if params[:query].present?
-  #     @cards = Card.where("name ILIKE ?", "%#{params[:query]}%").limit(5)
-  #   else
-  #     @cards = Card.none
-  #   end
-  
-  #   render json: @cards.map{|card| { id: card.id, name: card.name }}
-  # end
-  
   private
 
   def set_user
@@ -101,57 +93,7 @@ class UserCardsController < ApplicationController
   end
 
   def user_card_params
-    params.require(:user_card).permit(:scryfall_id, :condition, :foil, :language, :quantity)
+    params.require(:user_card).permit(:scryfall_id, :condition, :foil, :language, :quantity, :card_version_id)
   end
   
 end
-
-
-# def new
-#   @user_card = UserCard.new
-#   @cards = Card
-#             .pluck(:id, :name, :extension)
-#             .sort_by { |a| a[1] }
-#             .map { |a| ["#{a[1]} - #{a[2]}", a[0]]}
-# end
-
-# def suggestions
-#   # Logique pour trouver des cartes correspondant à la saisie de l'utilisateur
-#   @suggestions = Card.search(params[:query])
-#   render partial: "suggestions", locals: { suggestions: @suggestions }
-# end
-
-# def create
-#   @user_card = UserCard.new(user_cards_params)
-#   @user_card.user = current_user
-#   if @user_card.save!
-#     redirect_to user_user_cards_path
-#   else
-#     render :new
-#   end
-# end
-
-# def edit
-#   @user_card = UserCard.find(params[:id])
-# end
-
-# def update
-#   @user_card = UserCard.find(params[:id])
-#   if @user_card.update(user_cards_params)
-#     redirect_to user_user_cards_path
-#   else
-#     render :new
-#   end
-# end
-
-# def destroy
-#   @user_card = UserCard.find(params[:id])
-#   @user_card.destroy
-#   redirect_to user_user_cards_path(current_user)
-# end
-
-# private
-
-# def user_cards_params
-#   params.require(:user_card).permit(:condition, :foil, :language, :quantity, :card_id)
-# endrails
