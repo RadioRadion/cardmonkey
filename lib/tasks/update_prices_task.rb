@@ -17,9 +17,13 @@ module UpdatePricesTask
 
       # Nous utilisons scryfall_id pour identifier de manière unique chaque CardVersion
       if card_version = CardVersion.find_by(scryfall_id: scryfall_id)
-        card_version.update(price: price_eur)
+        card_version.update(
+            eur_price: price_eur, 
+            eur_foil_price: foil_price_eur  
+        )
         updated_cards.add(scryfall_id)
-      end
+    end
+    
     end
 
     puts "#{updated_cards.size} card versions prices updated."

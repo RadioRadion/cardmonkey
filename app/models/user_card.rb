@@ -15,10 +15,6 @@ class UserCard < ApplicationRecord
 
   # after_save :check_matches
 
-  def price
-    card.price
-  end
-
   def check_matches
     matches.destroy_all
     user_wanted_cards = UserWantedCard.where.not(user_id: user.id)

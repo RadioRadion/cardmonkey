@@ -1,54 +1,61 @@
-<%= link_to 'Ajouter une nouvelle carte', new_user_user_card_path(@user), class: "text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2" %>
+<%= link_to 'Ajouter une nouvelle carte', new_user_user_card_path(@user), class: "text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-xs px-5 py-2.5 text-center me-2 mb-2" %>
 
 <div class="relative shadow-md sm:rounded-lg">
-  <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+  <table class="w-full text-xs text-left rtl:text-right text-gray-500 dark:text-gray-400">
     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
       <tr>
-        <th scope="col" class="px-6 py-3">Carte</th>
-        <th scope="col" class="px-6 py-3">Condition</th>
-        <th scope="col" class="px-6 py-3">Langue</th>
-        <th scope="col" class="px-6 py-3">Foil</th>
-        <th scope="col" class="px-6 py-3">Quantité</th>
-        <th scope="col" class="px-6 py-3">Prix</th>
-        <th scope="col" class="px-6 py-3">N° Collection</th>
-        <th scope="col" class="px-6 py-3">Rareté</th>
-        <th scope="col" class="px-6 py-3">Scan</th>
-        <th scope="col" class="px-6 py-3">Actions</th>
+        <th scope="col" class="px-4 py-2">Carte</th>
+        <th scope="col" class="px-4 py-2">Condition</th>
+        <th scope="col" class="px-4 py-2">Extension</th>
+        <th scope="col" class="px-4 py-2">Langue</th>
+        <th scope="col" class="px-4 py-2">Foil</th>
+        <th scope="col" class="px-4 py-2">Quantité</th>
+        <th scope="col" class="px-4 py-2">Prix</th>
+        <th scope="col" class="px-4 py-2">N° Collection</th>
+        <th scope="col" class="px-4 py-2">Rareté</th>
+        <th scope="col" class="px-4 py-2">Scan</th>
+        <th scope="col" class="px-4 py-2">Actions</th>
       </tr>
     </thead>
     <tbody>
       <% @user_cards.each do |user_card| %>
         <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700" data-controller="user-card" data-user-card-id="<%= user_card.id %>" data-user-id="<%= user_card.user_id %>">
-          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+          <th scope="row" class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
             <%= user_card.card_version.card.name_en %>
           </th>
-          <td class="px-6 py-4">
-            <%= user_card.condition %>
+          <td class="px-4 py-2">
+            <%= condition(user_card.condition) %>
           </td>
-          <td class="px-6 py-4">
-            <%= user_card.language %>
+          <td class="px-4 py-2">
+            <% if user_card.card_version.extension.icon_uri.present? %>
+              <%= image_tag user_card.card_version.extension.icon_uri, alt: user_card.card_version.extension.name, class: "w-8 h-8" %>
+            <% end %>
           </td>
-          <td class="px-6 py-4">
-            <%= user_card.foil ? 'Oui' : 'Non' %>
+          <td class="px-4 py-2">
+            <%= flag_for_language(user_card.language) %>
           </td>
-          <td class="px-6 py-4">
-            <div class="flex items-center" data-controller="user-card" data-user-card-url-value="<%= user_user_card_path(user_card.user, user_card) %>" data-user-card-user-id-value="<%= user_card.user_id %>"
-            data-user-card-user-card-id-value="<%= user_card.id %>">
-              <button data-action="user-card#decrement" class="inline-flex items-center justify-center p-1 me-3 text-sm font-medium h-6 w-6 text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">-</button>
-              <input type="number" data-user-card-target="quantity" class="bg-gray-50 w-14 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-2.5 py-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value="<%= user_card.quantity %>" readonly />
-              <button data-action="user-card#increment" class="inline-flex items-center justify-center h-6 w-6 p-1 ms-3 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-full focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">+</button>
-            </div>
+          <td class="px-4 py-2">
+            <% if user_card.foil %>
+              <img src="https://www.svgrepo.com/show/13695/star.svg" alt="Foil Star" class="w-6 h-6">
+            <% end %>
           </td>
-          <td class="px-6 py-4">
-            <%= number_to_currency(user_card.card_version.price, unit: "€") %>
+          <td class="px-4 py-2">
+            <%= user_card.quantity %>
           </td>
-          <td class="px-6 py-4">
+          <td class="px-4 py-2">
+            <% if user_card.foil %>
+              <%= number_to_currency(user_card.card_version.eur_foil_price, unit: " €", format: "%n%u") %>
+            <% else %>
+              <%= number_to_currency(user_card.card_version.eur_price, unit: " €", format: "%n%u") %>
+            <% end %>
+          </td>
+          <td class="px-4 py-2">
             <%= user_card.card_version.collector_number %>
           </td>
-          <td class="px-6 py-4">
+          <td class="px-4 py-2">
             <span class="inline-block w-4 h-4 rounded-full <%= rarity_color(user_card.card_version.rarity) %>"></span>
           </td>
-          <td class="px-6 py-4 text-right">
+          <td class="px-4 py-2 text-right">
             <div class="relative flex justify-center group">
               <i class="fas fa-eye cursor-pointer"></i>
               <!-- Ajustement ici : retirer -translate-y-full et ajuster translate-x pour centrer -->
@@ -57,7 +64,7 @@
               </div>
             </div>
           </td>
-          <td class="px-6 py-4 text-right">
+          <td class="px-4 py-2 text-right">
             <%= link_to 'Modifier', edit_user_user_card_path(user_card.user, user_card), class: "text-indigo-600 hover:text-indigo-900 mr-2" %>
             <button data-action="user-card#delete" class="text-red-600 hover:text-red-900 ml-4">Supprimer</button>
           </td>

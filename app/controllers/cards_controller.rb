@@ -46,7 +46,7 @@ class CardsController < ApplicationController
   
     if card
       # Récupérer toutes les versions de cette carte, incluant les informations de l'extension
-      versions = card.card_versions.includes(:extension).select(:id, :scryfall_id, :img_uri, :price, :extension_id).map do |version|
+      versions = card.card_versions.includes(:extension).select(:id, :scryfall_id, :img_uri, :eur_price, :eur_foil_price, :extension_id).map do |version|
         {
           id: version.id,
           scryfall_id: version.scryfall_id,
@@ -56,9 +56,9 @@ class CardsController < ApplicationController
             icon_uri: version.extension.icon_uri
           },
           img_uri: version.img_uri,
-          price: version.price
+          eur_price: version.eur_price,
+          eur_foil_price: version.eur_foil_price
         }
-        
       end
   
       # Tri par le nom de l'extension

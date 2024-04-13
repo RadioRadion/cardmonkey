@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_09_073432) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_12_202620) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -18,7 +18,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_09_073432) do
     t.bigint "card_id", null: false
     t.string "scryfall_id"
     t.string "img_uri"
-    t.decimal "price"
+    t.decimal "eur_price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "extension_id"
@@ -26,6 +26,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_09_073432) do
     t.string "frame"
     t.string "collector_number"
     t.string "rarity"
+    t.decimal "eur_foil_price", precision: 10, scale: 2
     t.index ["card_id"], name: "index_card_versions_on_card_id"
     t.index ["extension_id"], name: "index_card_versions_on_extension_id"
   end
