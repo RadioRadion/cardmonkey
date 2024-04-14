@@ -20,6 +20,7 @@ class UserCardsController < ApplicationController
       # Initialiser la nouvelle UserCard avec les paramètres reçus, mais sans scryfall_id
       # Assurez-vous que les attributs passés à user_card_params sont ceux attendus par le modèle UserCard
       @user_card = @user.user_cards.new(user_card_params.except(:scryfall_id).merge(card_version_id: card_version.id))
+      set_foil_automatically
     
       if @user_card.save
         redirect_to user_user_cards_path(@user), notice: 'La carte a été ajoutée à votre collection.'
@@ -47,6 +48,7 @@ class UserCardsController < ApplicationController
   def update
     @user = User.find(params[:user_id])
     @user_card = @user.user_cards.find(params[:id])
+    set_foil_automatically
   
     if @user_card.update(user_card_params)
       if request.xhr?
@@ -94,6 +96,13 @@ class UserCardsController < ApplicationController
 
   def user_card_params
     params.require(:user_card).permit(:scryfall_id, :condition, :foil, :language, :quantity, :card_version_id)
+  end
+  
+  def set_foil_automatically
+    if @user_card.card_version.eur_price.nil? && @user_card.card_version.eur_foil_price.present?
+      @user_card.foil = true
+      @user_card.save
+    end
   end
   
 end
