@@ -26,7 +26,7 @@ module InitializeCardsTask
       CardVersion.find_or_create_by(card: card, scryfall_id: card_data['id']) do |cv|
         cv.extension = card_data['set']
         cv.img_uri = card_data.dig('image_uris', 'normal')
-        cv.price = card_data.dig('prices', 'eur')
+        cv.eur_price = card_data.dig('prices', 'eur')
       end
     end
 

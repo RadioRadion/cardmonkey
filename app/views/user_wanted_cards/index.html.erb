@@ -1,12 +1,72 @@
-<div class="container">
+<%= link_to 'Ajouter une carte recherchée', new_user_user_wanted_card_path(@user), class: "btn btn-primary" %>
 
-  <%= render "shared/cards/cards_for_collection", locals: {
-  title: "Mes wants",
-  cards: @user_wanted_cards,
-  side: "card-offer",
-  view: "wants"}  %>
-
-  <div>
-    <%= link_to "Add card", new_user_user_wanted_card_path, class: 'btn btn-secondary' %>
-  </div>
-</div>
+<!-- Snippet -->
+<section class="flex flex-col justify-center antialiased bg-gray-100 text-gray-600 min-h-screen p-4">
+    <div class="h-full">
+        <!-- Table -->
+        <div class="w-full w-full mx-4 bg-white shadow-lg rounded-sm border border-gray-200">
+            <header class="px-5 py-4 border-b border-gray-100">
+                <h2 class="font-semibold text-gray-800">Ma Wishlist</h2>
+            </header>
+            <div class="p-3">
+                <div class="overflow-x-auto">
+                    <table class="table-auto w-full">
+                        <thead class="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
+                            <tr>
+                                <th class="p-2 whitespace-nowrap">
+                                    <div class="font-semibold text-left">Nom de la Carte</div>
+                                </th>
+                                <th class="p-2 whitespace-nowrap">
+                                    <div class="font-semibold text-left">Condition Minimale</div>
+                                </th>
+                                <th class="p-2 whitespace-nowrap">
+                                    <div class="font-semibold text-left">Langue</div>
+                                </th>
+                                <th class="p-2 whitespace-nowrap">
+                                    <div class="font-semibold text-left">Foil</div>
+                                </th>
+                                <th class="p-2 whitespace-nowrap">
+                                    <div class="font-semibold text-left">Quantité</div>
+                                </th>
+                                <th class="p-2 whitespace-nowrap">
+                                    <div class="font-semibold text-center">Actions</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-gray-100">
+                            <% @user_wanted_cards.each do |user_wanted_card| %>
+                                <tr data-controller="user-wanted-card" 
+                                data-user-wanted-card-id="<%= user_wanted_card.id %>"
+                                data-user-id="<%= user_wanted_card.user_id %>">
+                                    <td class="p-2 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="font-medium text-gray-800"><%= user_wanted_card.card.name_en %> / <%= user_wanted_card.card.name_fr %></div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2 whitespace-nowrap">
+                                        <div class="text-left"><%= user_wanted_card.min_condition&.humanize %></div>
+                                    </td>
+                                    <td class="p-2 whitespace-nowrap">
+                                        <div class="text-left"><%= user_wanted_card.language.humanize %></div>
+                                    </td>
+                                    <td class="p-2 whitespace-nowrap">
+                                        <div class="text-left"><%= user_wanted_card.foil ? 'Oui' : 'Non' %></div>
+                                    </td>
+                                    <td class="p-2 whitespace-nowrap">
+                                        <div class="text-left"><%= user_wanted_card.quantity %></div>
+                                    </td>
+                                    <td class="p-2 whitespace-nowrap">
+                                        <div class="text-center">
+                                            <%= link_to 'Modifier', edit_user_user_wanted_card_path(@user, user_wanted_card), class: "text-blue-600 hover:text-blue-900" %>
+                                            <button data-action="user-wanted-card#delete" class="text-red-600 hover:text-red-900 ml-4">Supprimer</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
