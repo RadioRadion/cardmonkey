@@ -1,33 +1,44 @@
 class UserWantedCardsController < ApplicationController
+  before_action :set_user, only: [:new, :index, :create]
+
   def index
-    @user_wanted_cards = current_user.user_wanted_cards
+    # Assurez-vous que @user est l'utilisateur actuellement connecté ou un utilisateur dont vous avez le droit de voir les cartes recherchées
+    @user_wanted_cards = @user.user_wanted_cards.includes(:card)
   end
 
   def new
-    @user_wanted_card = UserWantedCard.new
-    @cards = Card
-              .pluck(:id, :name, :extension)
-              .sort_by { |a| a[1] }
-              .map { |a| ["#{a[1]} - #{a[2]}", a[0]]}
+    @user_wanted_card = @user.user_wanted_cards.build
   end
 
   def create
-    @user_wanted_card = UserWantedCard.new(user_wanted_cards_params)
-    @user_wanted_card.user = current_user
-    if @user_wanted_card.save!
-      redirect_to user_user_wanted_cards_path
+    @user = User.find(params[:user_id])
+    
+    # Trouver la version de la carte basée sur l'identifiant Scryfall reçu
+    card_version = CardVersion.find_by(scryfall_id: params[:user_wanted_card][:scryfall_id])
+  
+    if card_version
+      # Préparer les paramètres en incluant card_version_id
+      wanted_card_params = user_wanted_card_params.except(:scryfall_id).merge(card_version_id: card_version.id, card_id: card_version.card.id)
+      @user_wanted_card = @user.user_wanted_cards.new(wanted_card_params)
+    
+      if @user_wanted_card.save!
+        redirect_to user_user_wanted_cards_path(@user), notice: 'Wanted card was successfully created.'
+      else
+        render :new, status: :unprocessable_entity
+      end
     else
-      render :new
+      flash.now[:alert] = 'Card version not found.'
+      render :new, status: :unprocessable_entity
     end
   end
-
+  
   def edit
     @user_wanted_card = UserWantedCard.find(params[:id])
   end
 
   def update
     @user_wanted_card = UserWantedCard.find(params[:id])
-    if @user_wanted_card.update(user_wanted_cards_params)
+    if @user_wanted_card.update(user_wanted_card_params)
       redirect_to user_user_wanted_cards_path
     else
       render :new
@@ -35,14 +46,29 @@ class UserWantedCardsController < ApplicationController
   end
 
   def destroy
-    @user_wanted_card = UserWantedCard.find(params[:id])
-    @user_wanted_card.destroy
-    redirect_to user_user_wanted_cards_path(current_user)
+    @user_wanted_card = current_user.user_wanted_cards.find(params[:id])
+    if @user_wanted_card.destroy
+      respond_to do |format|
+        format.html { redirect_to user_user_wanted_cards_path(current_user), notice: 'La carte recherchée a été supprimée avec succès.' }
+        format.json { head :no_content } # Pour AJAX, renvoie un statut 204 sans contenu.
+      end
+    else
+      # Gérer le cas où la suppression échoue, par exemple, en renvoyant un statut d'erreur.
+    end
+  rescue ActiveRecord::RecordNotFound => e
+    respond_to do |format|
+      format.html { redirect_to user_user_wanted_cards_path(current_user), alert: 'La carte n\'a pas été trouvée.' }
+      format.json { render json: { error: e.message }, status: :not_found }
+    end
   end
 
   private
 
-  def user_wanted_cards_params
-    params.require(:user_wanted_card).permit(:min_condition, :foil, :language, :quantity, :card_id)
+  def user_wanted_card_params
+    params.require(:user_wanted_card).permit(:min_condition, :foil, :language, :quantity, :card_id, :scryfall_id)
+  end
+
+  def set_user
+    @user = current_user
   end
 end

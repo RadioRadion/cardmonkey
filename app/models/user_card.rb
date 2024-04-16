@@ -4,16 +4,16 @@ class UserCard < ApplicationRecord
   belongs_to :card_version
   has_many :matches
 
+  validates :quantity, presence: true
+  validates :condition, presence: true
+  validates :language, presence: true
+
   enum condition: { poor: "0", played: "1", light_played: "2", good: "3",
     excellent: "4", near_mint: "5", mint: "6" }
   enum language: { français: "0", anglais: "1", allemand: "2", italien: "3", chinois_s: "4",
     chinois_t: "5", japonais: "6", portuguais: "7", russe: "8", corréen: "9" }
 
   # after_save :check_matches
-
-  def price
-    card.price
-  end
 
   def check_matches
     matches.destroy_all

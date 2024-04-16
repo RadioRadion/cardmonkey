@@ -10,19 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_28_085205) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_12_202620) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "card_versions", force: :cascade do |t|
     t.bigint "card_id", null: false
-    t.string "extension"
     t.string "scryfall_id"
     t.string "img_uri"
-    t.decimal "price"
+    t.decimal "eur_price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "extension_id"
+    t.string "border_color"
+    t.string "frame"
+    t.string "collector_number"
+    t.string "rarity"
+    t.decimal "eur_foil_price", precision: 10, scale: 2
     t.index ["card_id"], name: "index_card_versions_on_card_id"
+    t.index ["extension_id"], name: "index_card_versions_on_extension_id"
   end
 
   create_table "cards", force: :cascade do |t|
@@ -40,6 +46,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_28_085205) do
     t.bigint "user_id"
     t.integer "user_id_invit"
     t.index ["user_id"], name: "index_chatrooms_on_user_id"
+  end
+
+  create_table "extensions", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "name"
+    t.date "release_date"
+    t.string "icon_uri"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_extensions_on_code", unique: true
   end
 
   create_table "matches", force: :cascade do |t|
@@ -113,7 +129,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_28_085205) do
     t.boolean "foil"
     t.string "language"
     t.integer "quantity"
+    t.bigint "card_version_id"
     t.index ["card_id"], name: "index_user_wanted_cards_on_card_id"
+    t.index ["card_version_id"], name: "index_user_wanted_cards_on_card_version_id"
     t.index ["user_id"], name: "index_user_wanted_cards_on_user_id"
   end
 
@@ -136,6 +154,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_28_085205) do
   end
 
   add_foreign_key "card_versions", "cards"
+  add_foreign_key "card_versions", "extensions"
   add_foreign_key "chatrooms", "users"
   add_foreign_key "messages", "chatrooms"
   add_foreign_key "messages", "users"
@@ -145,6 +164,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_28_085205) do
   add_foreign_key "trades", "users"
   add_foreign_key "user_cards", "card_versions"
   add_foreign_key "user_cards", "users"
+  add_foreign_key "user_wanted_cards", "card_versions"
   add_foreign_key "user_wanted_cards", "cards"
   add_foreign_key "user_wanted_cards", "users"
 end
