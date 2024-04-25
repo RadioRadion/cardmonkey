@@ -1,25 +1,28 @@
-# spec/models/card_spec.rb
-
-require 'rails_helper'
-
 RSpec.describe Card, type: :model do
-  context 'validations' do
-    it 'is valid with valid attributes' do
-      card = Card.new(name_en: 'Black Lotus', name_fr: 'Lotus Noir', extension: 'Alpha')
-      expect(card).to be_valid
-    end
+  let(:card) { FactoryBot.create(:card) }
 
-    it 'is not valid without an extension' do
-      card = Card.new(name_en: 'Black Lotus', name_fr: 'Lotus Noir')
-      expect(card).not_to be_valid
-    end
-  end
-
-  context 'associations' do
-    it { should have_many(:user_cards) }
+  describe 'associations' do
     it { should have_many(:user_wanted_cards) }
+    it { should have_many(:card_versions) }
   end
 
-  # Autres tests, y compris pour la méthode de classe fetch_cards
-  # ...
+  describe '#name' do
+    context 'when preferred language is English' do
+      it 'returns the English name' do
+        expect(card.name(:en)).to eq(card.name_en)
+      end
+    end
+
+    context 'when preferred language is French' do
+      it 'returns the French name' do
+        expect(card.name(:fr)).to eq(card.name_fr)
+      end
+    end
+
+    context 'when no preferred language is specified' do
+      it 'defaults to English' do
+        expect(card.name).to eq(card.name_en)
+      end
+    end
+  end
 end

@@ -1,9 +1,31 @@
-<div class="container">
-  <%= simple_form_for([current_user, @user_wanted_card], method: :patch) do |f| %>
-      <%= f.input :min_condition, collection: UserWantedCard.min_conditions %>
-      <%= f.input :foil %>
-      <%= f.input :language, collection: UserWantedCard.languages %>
-      <%= f.input :quantity, collection: 1...30 %>
-      <%= f.submit "Save card", class: "btn btn-success" %>
-  <% end %>
- </div>
+<h1 class="text-xl font-bold text-center mb-6">Modifier la recherche de carte</h1>
+
+<%= simple_form_for([current_user, @user_wanted_card], html: { class: "max-w-lg mx-auto", data: { controller: "autocomplete" } }, url: user_user_wanted_card_path(current_user, @user_wanted_card), method: :patch) do |f| %>
+
+  <div class="mb-5">
+    <label for="scryfall_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Extension</label>
+    <select id="scryfall_id" name="user_wanted_card[card_version_id]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+      <option value="">Toutes les versions</option>
+      <% @versions&.each do |version| %>
+        <option value="<%= version.id %>" <%= 'selected' if version.id == @user_wanted_card.card_version_id %>><%= version.extension.name %></option>
+      <% end %>
+    </select>
+  </div>
+
+    <div class="mb-5">
+      <%= f.input :min_condition, as: :select, collection: UserWantedCard.min_conditions.keys, selected: @user_wanted_card.min_condition, include_blank: false, input_html: { class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" } %>
+    </div>
+
+    <%= f.input :foil, as: :boolean, checked: @user_wanted_card.foil, wrapper_html: { class: "mb-5 flex items-start" }, label_html: { class: "ms-2 text-sm font-medium text-gray-900 dark:text-gray-300" }, input_html: { class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600" } %>
+
+    <div class="mb-5">
+      <%= f.input :language, as: :select, collection: UserWantedCard.languages.keys, selected: @user_wanted_card.language, include_blank: false, input_html: { class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" } %>
+    </div>
+
+    <div class="mb-5">
+      <%= f.input :quantity, as: :integer, input_html: { value: @user_wanted_card.quantity, min: 1, class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" } %>
+    </div>
+
+    <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Mettre à jour la liste de souhaits</button>
+  </div>
+<% end %>

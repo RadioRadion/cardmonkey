@@ -7,12 +7,18 @@
   <div id="card-suggestions" data-autocomplete-target="suggestions" class="mb-5">
     <!-- Les suggestions de cartes seront insérées ici -->
   </div>
+  
 
   <div data-autocomplete-target="formFields" class="hidden">
     <div class="mb-5">
       <label for="scryfall_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Extension</label>
-      <select id="scryfall_id" name="user_wanted_card[scryfall_id]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" data-autocomplete-target="extension"></select>
+      <select id="scryfall_id" name="user_wanted_card[card_version_id]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" data-autocomplete-target="extension" data-extension-required="false">
+        <option value="">Toutes les versions</option>
+        <!-- Les autres options seront ajoutées ici par JavaScript -->
+      </select>
     </div>
+
+    <input type="hidden" name="user_wanted_card[scryfall_oracle_id]" value="" data-autocomplete-target="scryfallOracleId">
 
     <div class="mb-5">
       <%= f.input :min_condition, as: :select, collection: UserWantedCard.min_conditions.keys, include_blank: false, input_html: { class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" } %>

@@ -1,5 +1,5 @@
 class UserWantedCardsController < ApplicationController
-  before_action :set_user, only: [:new, :index, :create]
+  before_action :set_user, only: [:new, :index, :create, :update]
 
   def index
     # Assurez-vous que @user est l'utilisateur actuellement connecté ou un utilisateur dont vous avez le droit de voir les cartes recherchées
@@ -11,39 +11,70 @@ class UserWantedCardsController < ApplicationController
   end
 
   def create
-    @user = User.find(params[:user_id])
-    
-    # Trouver la version de la carte basée sur l'identifiant Scryfall reçu
-    card_version = CardVersion.find_by(scryfall_id: params[:user_wanted_card][:scryfall_id])
-  
-    if card_version
-      # Préparer les paramètres en incluant card_version_id
-      wanted_card_params = user_wanted_card_params.except(:scryfall_id).merge(card_version_id: card_version.id, card_id: card_version.card.id)
-      @user_wanted_card = @user.user_wanted_cards.new(wanted_card_params)
-    
-      if @user_wanted_card.save!
-        redirect_to user_user_wanted_cards_path(@user), notice: 'Wanted card was successfully created.'
-      else
-        render :new, status: :unprocessable_entity
-      end
+  @user_wanted_card = @user.user_wanted_cards.new(user_wanted_card_params)
+
+  # Récupérer toujours la carte générale basée sur l'oracle_id
+  card = Card.find_by(scryfall_oracle_id: params[:user_wanted_card][:scryfall_oracle_id])
+  if card
+    @user_wanted_card.card = card
+
+    # Associer la version spécifique de la carte si une est choisie
+    if params[:user_wanted_card][:card_version_id].present?
+      card_version = CardVersion.find_by(scryfall_id: params[:user_wanted_card][:card_version_id])
+      @user_wanted_card.card_version = card_version if card_version
+    end
+
+    if @user_wanted_card.save
+      redirect_to user_user_wanted_cards_path(@user), notice: 'Wanted card was successfully created.'
     else
-      flash.now[:alert] = 'Card version not found.'
       render :new, status: :unprocessable_entity
     end
+  else
+    flash.now[:alert] = 'Card not found.'
+    render :new, status: :unprocessable_entity
   end
+  rescue ActiveRecord::RecordNotFound
+    flash.now[:alert] = 'Card version not found.'
+    render :new, status: :unprocessable_entity
+  end
+
   
   def edit
     @user_wanted_card = UserWantedCard.find(params[:id])
-  end
+    @card = @user_wanted_card.card || (@user_wanted_card.card_version&.card if @user_wanted_card.card_version_id.present?)
+  
+    # Récupérer toutes les versions de cette carte et trier par le nom de l'extension, si la carte existe
+    @versions = CardVersion.joins(:extension)
+                           .where(card_id: @card&.id)
+                           .order('extensions.name ASC') if @card
+  end  
 
   def update
     @user_wanted_card = UserWantedCard.find(params[:id])
-    if @user_wanted_card.update(user_wanted_card_params)
-      redirect_to user_user_wanted_cards_path
+    
+    # Déterminez si une version spécifique de la carte a été sélectionnée
+    if params[:user_wanted_card][:card_version_id].present?
+      card_version = CardVersion.find_by(id: params[:user_wanted_card][:card_version_id])
+      if card_version
+        # Mettez à jour card_version_id et conservez le card_id existant
+        update_params = user_wanted_card_params.merge(card_version_id: card_version.id)
+      else
+        # Si la version de la carte n'est pas trouvée, retournez une erreur
+        flash[:alert] = "Specific card version not found."
+        render :edit and return
+      end
     else
-      render :new
+      # Si aucune version spécifique n'est choisie, réinitialisez card_version_id mais ne changez pas card_id
+      update_params = user_wanted_card_params.merge(card_version_id: nil)
+    end
+  
+    if @user_wanted_card.update(update_params)
+      redirect_to user_user_wanted_cards_path(@user), notice: 'Wanted card was successfully updated.'
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
+  
 
   def destroy
     @user_wanted_card = current_user.user_wanted_cards.find(params[:id])
@@ -66,7 +97,7 @@ class UserWantedCardsController < ApplicationController
 
   def user_wanted_card_params
     params.require(:user_wanted_card).permit(:min_condition, :foil, :language, :quantity, :card_id, :scryfall_id)
-  end
+  end  
 
   def set_user
     @user = current_user
