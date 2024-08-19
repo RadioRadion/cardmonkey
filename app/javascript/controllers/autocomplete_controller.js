@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["input", "suggestions", "cardId", "extension", "formFields"]
+  static targets = ["input", "suggestions", "cardId", "scryfallOracleId", "extension", "formFields"]
 
   search(event) {
     const query = this.inputTarget.value;
@@ -51,6 +51,8 @@ export default class extends Controller {
 
     //Afficher les autres champs du formulaire
     this.formFieldsTarget.classList.remove('hidden');
+
+    this.scryfallOracleIdTarget.value = oracleId;
   
     // Requête au serveur pour obtenir les versions de la carte
     fetch(`/cards/versions?oracle_id=${oracleId}`)
@@ -61,16 +63,20 @@ export default class extends Controller {
 
   fillExtensions(versions) {
     const select = this.extensionTarget;
-    select.innerHTML = ''; // Nettoyage des options existantes
+    const requireExtension = select.dataset.extensionRequired === 'true';
+  
+    select.innerHTML = ''; // Réinitialise les options
+    if (!requireExtension) {
+      select.innerHTML = '<option value="">Neutre</option>'; // Ajoutez cette option si l'extension n'est pas requise
+    }
   
     versions.forEach(version => {
       const option = document.createElement('option');
       option.value = version.scryfall_id;
-      // Utilisez innerHTML pour inclure des éléments HTML comme les images
-      console.log(version.name)
-      option.text = `${version.extension.name}`; 
+      option.textContent = `${version.extension.name} (${version.collector_number})`;
       select.appendChild(option);
     });
-  }  
+  }
+   
   
 }

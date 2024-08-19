@@ -9,12 +9,14 @@
       <!-- Les suggestions de cartes seront insérées ici -->
   </div>
 
+  <input type="hidden" name="user_wanted_card[scryfall_oracle_id]" value="" data-autocomplete-target="scryfallOracleId">
+
   <div data-autocomplete-target="formFields" class="hidden">
 
     <!-- Champ de sélection personnalisé pour la version de la carte -->
     <div class="mb-5">
       <label for="scryfall_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Extension</label>
-      <select id="scryfall_id" name="user_card[scryfall_id]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" data-autocomplete-target="extension"></select>
+      <select id="scryfall_id" name="user_card[scryfall_id]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" data-autocomplete-target="extension" data-extension-required="true"></select>
     </div>
 
     <!-- Utilisation de f.input pour les champs directement liés au modèle UserCard -->

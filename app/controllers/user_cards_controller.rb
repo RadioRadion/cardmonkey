@@ -18,7 +18,6 @@ class UserCardsController < ApplicationController
   
     if card_version
       # Initialiser la nouvelle UserCard avec les paramètres reçus, mais sans scryfall_id
-      # Assurez-vous que les attributs passés à user_card_params sont ceux attendus par le modèle UserCard
       @user_card = @user.user_cards.new(user_card_params.except(:scryfall_id).merge(card_version_id: card_version.id))
       set_foil_automatically
     
@@ -44,7 +43,6 @@ class UserCardsController < ApplicationController
                            .order('extensions.name ASC')
   end
   
-
   def update
     @user = User.find(params[:user_id])
     @user_card = @user.user_cards.find(params[:id])
@@ -66,10 +64,11 @@ class UserCardsController < ApplicationController
         # Traitement d'erreur pour une requête HTTP classique
         @card = @user_card.card_version.card
         @versions = CardVersion.joins(:card).where(cards: { scryfall_oracle_id: @card.scryfall_oracle_id })
+        flash.now[:alert] = 'Une erreur est survenue lors de la mise à jour de la carte.'  # Ajout d'un message flash d'erreur
         render :edit, status: :unprocessable_entity
       end
     end
-  end  
+  end
 
   def destroy
     @user_card = current_user.user_cards.find(params[:id])
@@ -95,7 +94,7 @@ class UserCardsController < ApplicationController
   end
 
   def user_card_params
-    params.require(:user_card).permit(:scryfall_id, :condition, :foil, :language, :quantity, :card_version_id)
+    params.require(:user_card).permit(:condition, :foil, :language, :quantity, :card_version_id)
   end
   
   def set_foil_automatically
