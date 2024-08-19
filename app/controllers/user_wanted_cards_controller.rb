@@ -52,29 +52,25 @@ class UserWantedCardsController < ApplicationController
   def update
     @user_wanted_card = UserWantedCard.find(params[:id])
     
-    # Déterminez si une version spécifique de la carte a été sélectionnée
     if params[:user_wanted_card][:card_version_id].present?
       card_version = CardVersion.find_by(id: params[:user_wanted_card][:card_version_id])
       if card_version
-        # Mettez à jour card_version_id et conservez le card_id existant
         update_params = user_wanted_card_params.merge(card_version_id: card_version.id)
       else
-        # Si la version de la carte n'est pas trouvée, retournez une erreur
         flash[:alert] = "Specific card version not found."
         render :edit and return
       end
     else
-      # Si aucune version spécifique n'est choisie, réinitialisez card_version_id mais ne changez pas card_id
       update_params = user_wanted_card_params.merge(card_version_id: nil)
     end
   
     if @user_wanted_card.update(update_params)
       redirect_to user_user_wanted_cards_path(@user), notice: 'Wanted card was successfully updated.'
     else
+      flash.now[:alert] = 'Failed to update the wanted card.'  # Ajout d'un message d'alerte pour échec de validation
       render :edit, status: :unprocessable_entity
     end
-  end
-  
+  end  
 
   def destroy
     @user_wanted_card = current_user.user_wanted_cards.find(params[:id])
