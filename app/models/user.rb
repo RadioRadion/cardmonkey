@@ -17,55 +17,69 @@ class User < ApplicationRecord
 
   enum preference: { value_based: 0, quantity_based: 1 }
 
-  # Trouver des correspondances pour les cartes souhaitées
-  def find_card_matches
-    # Récupérer la liste de souhaits de l'utilisateur
-    wanted_card_ids = user_wanted_cards.pluck(:card_id)
-
-    # Trouver les correspondances dans les collections d'autres utilisateurs
-    matches = UserCard.where(card_id: wanted_card_ids)
-                      .where.not(user_id: id)
-                      .includes(:user, :card)
-
-    # Filtrer les correspondances basées sur la préférence de l'utilisateur (nombre de cartes ou valeur totale)
-    matches = sort_matches(matches)
-
-    # Optionnel : Filtrer les correspondances basées sur la géolocalisation
-    # matches = filter_by_location(matches)
-
-    matches
+  def top_matching_users(limit = 10)
+    User.find_by_sql([<<-SQL, { user_id: id, limit: limit }])
+      WITH match_counts AS (
+        SELECT 
+          CASE 
+            WHEN user_id = :user_id THEN user_id_target
+            WHEN user_id_target = :user_id THEN user_id
+          END AS matched_user_id,
+          COUNT(*) as match_count
+        FROM matches
+        WHERE user_id = :user_id OR user_id_target = :user_id
+        GROUP BY 
+          CASE 
+            WHEN user_id = :user_id THEN user_id_target
+            WHEN user_id_target = :user_id THEN user_id
+          END
+      )
+      SELECT 
+        users.*,
+        match_counts.match_count,
+        (
+          SELECT COUNT(DISTINCT cards.id)
+          FROM matches
+          JOIN user_cards ON matches.user_card_id = user_cards.id
+          JOIN card_versions ON user_cards.card_version_id = card_versions.id
+          JOIN cards ON card_versions.card_id = cards.id
+          WHERE 
+            (matches.user_id = :user_id AND matches.user_id_target = users.id)
+            OR
+            (matches.user_id = users.id AND matches.user_id_target = :user_id)
+        ) as unique_cards_count
+      FROM users
+      JOIN match_counts ON users.id = match_counts.matched_user_id
+      ORDER BY match_count DESC, users.username
+      LIMIT :limit
+    SQL
   end
 
-  private
-
-  # Trier les correspondances en fonction de la préférence de l'utilisateur
-  def sort_matches(matches)
-    case preference
-    when 'value'
-      matches.sort_by { |match| -match.card.price }
-    when 'quantity'
-      matches.group_by(&:user_id).sort_by { |_, user_matches| -user_matches.count }
-    else
-      matches
-    end
+  # Trouve les cartes qui matchent avec un utilisateur spécifique
+  def matching_cards_with_user(other_user_id)
+    Match.joins(user_card: { card_version: :card })
+        .where(
+          '(matches.user_id = ? AND matches.user_id_target = ?) OR (matches.user_id = ? AND matches.user_id_target = ?)',
+          id, other_user_id, other_user_id, id
+        )
+        .select('cards.*, matches.*, user_cards.condition, user_cards.language')
+        .distinct
   end
 
-  # Filtrer les correspondances en fonction de la géolocalisation (si nécessaire)
-  def filter_by_location(matches)
-    # Implémentation dépend de la façon dont la localisation est gérée dans l'application
-  end
-
-  def group_matches
-    users = User.near(address, area)
-      results = []
-      users.each do |user|
-        matches = Match
-                    .where(user_id: id, user_id_target: user.id)
-                    .or(Match.where(user_id: user.id, user_id_target: id))
-        total = matches.count
-        results << {total: total, matches: matches, user: user} if user.id != id
-      end
-      results.sort_by { |i| i[:total] }.reverse
+  # Statistiques de matching
+  def matching_stats
+    {
+      total_matches: Match.where(user_id: id).or(Match.where(user_id_target: id)).count,
+      unique_matched_users: top_matching_users.size,
+      matches_by_condition: Match.joins(user_card: :card_version)
+                               .where(user_id: id)
+                               .group('user_cards.condition')
+                               .count,
+      matches_by_language: Match.joins(user_card: :card_version)
+                              .where(user_id: id)
+                              .group('user_cards.language')
+                              .count
+    }
   end
 
 end

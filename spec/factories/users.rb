@@ -1,17 +1,39 @@
 FactoryBot.define do
-    factory :user do
-      email { Faker::Internet.email }
-      password { 'password' }
-      password_confirmation { 'password' }
-      username { Faker::Internet.username }
-      latitude { Faker::Address.latitude }
-      longitude { Faker::Address.longitude }
-      address { Faker::Address.full_address }
-      area { 50 }  # Vous pouvez ajuster cette valeur selon vos besoins
-      preference { 'value_based' } # ou 'quantity_based', selon la préférence par défaut
-  
-      # Les attributs reset_password_token et reset_password_sent_at ne sont généralement pas nécessaires pour les tests de base.
-      # Si vous avez besoin de les définir pour certains tests, vous pouvez les surcharger dans les scénarios de test spécifiques.
+  factory :user do
+    sequence(:email) { |n| "user#{n}@example.com" }
+    sequence(:username) { |n| "user#{n}" }
+    password { 'password123' }
+    password_confirmation { 'password123' }
+    
+    trait :with_cards do
+      after(:create) do |user|
+        create_list(:user_card, 3, user: user)
+      end
+    end
+
+    trait :with_wanted_cards do
+      after(:create) do |user|
+        create_list(:user_wanted_card, 3, user: user)
+      end
+    end
+
+    trait :with_matches do
+      after(:create) do |user|
+        create_list(:match, 2, user: user)
+      end
+    end
+
+    trait :with_location do
+      address { '10 Rue de la Paix, Paris' }
+      after(:create, &:geocode)
+    end
+
+    trait :value_based do
+      preference { :value_based }
+    end
+
+    trait :quantity_based do
+      preference { :quantity_based }
     end
   end
-  
+end

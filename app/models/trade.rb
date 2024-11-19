@@ -6,6 +6,7 @@ class Trade < ApplicationRecord
   scope :pending, -> { where(status: "pending") }
   scope :accepted, -> { where(status: "accepted") }
   scope :done, -> { where(status: "done") }
+  scope :active, -> { where(status: ['pending', 'accepted']).where.not(accepted_at: nil) }
 
   validates :status, presence: true
 

@@ -1,0 +1,11 @@
+{
+    "cline.language": "ruby",
+    "cline.filePatterns": {
+      "ruby": ["**/*.rb", "**/*.rake", "Gemfile", "Rakefile"],
+    },
+    "[ruby]": {
+      "editor.tabSize": 2,
+      "editor.insertSpaces": true,
+      "editor.defaultFormatter": "rebornix.ruby"
+    }
+  }

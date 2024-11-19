@@ -1,116 +1,125 @@
 class TradesController < ApplicationController
-#ce skip permet de forcer le fake formulaire à ne pas nécessité d'authencitytoker
-  skip_before_action :verify_authenticity_token
+  before_action :set_trade, only: [:show, :edit, :update, :accept]
+  before_action :set_trade_participants, only: [:show, :edit]
 
   def index
-    @trades = Trade.where(user_id: current_user)
-    @trades_pending = Trade.pending.where(user_id: current_user).or(Trade.pending.where(user_id_invit: current_user)).uniq
-    @trades_done = Trade.done.where(user_id: current_user).or(Trade.done.where(user_id_invit: current_user)).uniq
-    @trades_accepted = Trade.accepted.where(user_id: current_user).or(Trade.accepted.where(user_id_invit: current_user)).uniq
-  end
-
-  def create
-    other_user_id = params[:user_id]
-    @trade = Trade.new(status: "pending", user_id_invit: other_user_id)
-    @trade.user = current_user
-    @cards_offer = params[:trade][:offer].split(",")
-    @cards_target = params[:trade][:target].split(",")
-
-    if @trade.save!
-      save_card_trades
-      Notification.create_notification(@trade.user_id_invit, "Nouveau trade !")
-      content = "Un nouveau trade est arrivé ! #{@trade.id}"
-      Trade.save_message(current_user.id, other_user_id, content)
-
-      flash[:alert] = "Proposition de trade envoyée !"
-      redirect_to user_path(current_user)
-    else
-      render 'users/show'
-    end
+    @trades = current_user.all_trades.includes(:user_cards, :trade_user_cards)
+      .group_by(&:status)
   end
 
   def show
-    @trade = Trade.find(params[:id])
-
-    @cards = @trade.user_cards.joins(:user).where(user_id: current_user)
-    if current_user.id == @trade.user_id
-      @other_cards = @trade.user_cards.joins(:user).where(user_id: @trade.user_id_invit)
-    else
-      @other_cards = @trade.user_cards.joins(:user).where(user_id: @trade.user_id)
-    end
-    @total_price = calculate_total_price(@cards).round(2)
-    @other_total_price = calculate_total_price(@other_cards).round(2)
+    @cards_by_user = @trade.user_cards
+      .includes(:card_version)
+      .group_by(&:user_id)
+      .transform_values { |cards| calculate_cards_info(cards) }
   end
 
   def edit
-    @user = User.find(params[:user_id])
-    @trade = Trade.find(params[:id])
-    @path = "/users/#{@user.id}/trades/#{@trade.id}"
+    @trade_data = TradeCardCollector.new(@trade, current_user).collect
+  end
 
-    @trade_user_cards = @trade.user_cards.joins(:user).where(user_id: current_user).uniq
-    if current_user.id == @trade.user_id
-      other_user = User.find(@trade.user_id_invit)
-      @trade_user_wanted_cards = @trade.user_cards.joins(:user).where(user_id: @trade.user_id_invit).uniq
+  def create
+    @trade = Trade.new(
+      user: current_user,
+      user_id_invit: params[:user_id],
+      status: "pending"
+    )
+
+    if @trade.save
+      handle_trade_creation
+      redirect_to user_path(current_user), notice: "Proposition de trade envoyée !"
     else
-      other_user = User.find(@trade.user_id)
-      @trade_user_wanted_cards = @trade.user_cards.joins(:user).where(user_id: @trade.user_id).uniq
+      redirect_back fallback_location: root_path, alert: "Erreur lors de la création du trade"
     end
-    cards_other_wants_ids = other_user.user_wanted_cards.map(&:card_id)
-    @cards_other_wants = UserCard.where(user_id: current_user).where(card_id: cards_other_wants_ids) - @trade_user_cards
-    cards_i_wants_ids = current_user.user_wanted_cards.map(&:card_id)
-    @cards_i_wants = UserCard.where(user_id: other_user).where(card_id: cards_i_wants_ids) - @trade_user_wanted_cards
-
-    @my_cards = current_user.user_cards.where.not(id: @trade_user_cards.map(&:id) + @cards_other_wants.map(&:id))
-    @other_cards = other_user.user_cards.where.not(id: @trade_user_wanted_cards.map(&:id) + @cards_i_wants.map(&:id))
   end
 
   def update
-    @trade = Trade.find(params[:id])
-    current_user.id == @trade.user_id ? other_user_id = @trade.user_id_invit : other_user_id = @trade.user_id
-    if params[:status] == "accepted"
-      change_status_trade("Trade accepté ! Discutez-ici pour vous donner rendez-vous et procéder à l'échange.
-      Une fois le trade terminé, n'oubliez pas de de valider !", "Trade validé !", "accepted")
-      Notification.create_notification(other_user_id, "Trade accepté !")
-    elsif params[:status] == "done"
-      change_status_trade("Trade terminé bon jeu !", "Trade terminé !", "done")
-      Notification.create_notification(other_user_id, "Trade réalisé !")
-    elsif @trade.pending?
-      @trade.trade_user_cards.destroy_all
-      user_card_ids = params[:trade][:offer].split(",") + params[:trade][:target].split(",")
-      user_card_ids.each { |user_card_id| @trade.trade_user_cards.create(user_card_id: user_card_id) }
-      content = "Trade modifié ! #{@trade.id}"
-      change_status_trade(content, "Trade modifié !", "pending")
-      Notification.create_notification(other_user_id, "Trade modifié !")
+    case params[:status]
+    when "accepted"
+      handle_trade_acceptance
+    when "done"
+      handle_trade_completion
+    else
+      handle_trade_modification
     end
+
     redirect_to user_trade_path(@trade.user_id, @trade)
   end
 
   private
 
-  def change_status_trade(content, flash, status)
-    @trade.update(status: status) if status != "pending"
-    @trade.user_id == current_user.id ? other_user_id = @trade.user_id_invit : other_user_id = @trade.user_id
-    Trade.save_message(current_user.id, other_user_id, content)
-    flash[flash] = flash
+  def set_trade
+    @trade = Trade.find(params[:id])
   end
 
-  def trade_params
-    params.require(:trade).permit(:offer, :target)
+  def set_trade_participants
+    @other_user = current_user.id == @trade.user_id ? 
+      User.find(@trade.user_id_invit) : 
+      User.find(@trade.user_id)
   end
 
-  def save_card_trades
-    @cards_offer.each do |user_card_id|
-      TradeUserCard.create!(user_card_id: user_card_id.to_i, trade_id: @trade.id)
+  def calculate_cards_info(cards)
+    {
+      cards: cards,
+      total_price: cards.sum { |card| card.price.to_f }.round(2)
+    }
+  end
+
+  def handle_trade_creation
+    process_trade_cards
+    notify_trade_creation
+  end
+
+  def process_trade_cards
+    offer_cards = params[:trade][:offer].to_s.split(",")
+    target_cards = params[:trade][:target].to_s.split(",")
+    
+    (offer_cards + target_cards).each do |card_id|
+      @trade.trade_user_cards.create!(user_card_id: card_id.to_i)
     end
+  end
 
-    @cards_target.each do |user_card_id|
-      TradeUserCard.create!(user_card_id: user_card_id.to_i, trade_id: @trade.id)
+  def notify_trade_creation
+    Notification.create_notification(@trade.user_id_invit, "Nouveau trade !")
+    Trade.save_message(
+      current_user.id, 
+      @trade.user_id_invit, 
+      "Un nouveau trade est arrivé ! #{@trade.id}"
+    )
+  end
+
+  def handle_trade_acceptance
+    @trade.update!(status: "accepted")
+    notify_trade_status_change(
+      "Trade accepté ! Discutez-ici pour vous donner rendez-vous.",
+      "Trade accepté !"
+    )
+  end
+
+  def handle_trade_completion
+    @trade.update!(status: "done")
+    notify_trade_status_change(
+      "Trade terminé, bon jeu !",
+      "Trade réalisé !"
+    )
+  end
+
+  def handle_trade_modification
+    return unless @trade.pending?
+
+    Trade.transaction do
+      @trade.trade_user_cards.destroy_all
+      process_trade_cards
+      notify_trade_status_change(
+        "Trade modifié ! #{@trade.id}",
+        "Trade modifié !"
+      )
     end
   end
 
-  def calculate_total_price(cards)
-    total_price = 0
-    cards.each { |card| total_price += card.price.to_f }
-    total_price
+  def notify_trade_status_change(message, notification_text)
+    other_user_id = @trade.other_user_id(current_user)
+    Trade.save_message(current_user.id, other_user_id, message)
+    Notification.create_notification(other_user_id, notification_text)
   end
 end
