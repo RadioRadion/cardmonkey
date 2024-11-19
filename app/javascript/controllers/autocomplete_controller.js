@@ -1,82 +1,94 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["input", "suggestions", "cardId", "scryfallOracleId", "extension", "formFields"]
+  static targets = ["input", "suggestions", "scryfallOracleId", "formFields", "extension"]
 
-  search(event) {
-    const query = this.inputTarget.value;
+  connect() {
+    this.suggestionsList = []
+    this.selectedCard = null
+
+    // Si nous sommes en mode édition, le formulaire est déjà visible
+    if (this.formFieldsTarget.classList.contains('hidden') === false) {
+      this.isEditing = true
+    }
+  }
+
+  async search(event) {
+    // Ne pas rechercher en mode édition
+    if (this.isEditing) return
+
+    const query = event.target.value
     if (query.length < 3) {
-      this.suggestionsTarget.innerHTML = '';
-      return;
+      this.hideSuggestions()
+      return
     }
 
-    fetch(`/cards/search?query=${query}`)
-      .then(response => response.json())
-      .then(data => this.displaySuggestions(data))
-      .catch(error => console.log(error));
-  }
-
-  displaySuggestions(data) {
-    this.suggestionsTarget.innerHTML = '';
-    data.forEach((item) => {
-        const suggestionElement = document.createElement('div');
-        suggestionElement.classList.add('p-4', 'mb-2', 'bg-gray-100', 'rounded-lg', 'shadow', 'cursor-pointer', 'hover:bg-gray-200');
-
-        const nameElement = document.createElement('p');
-        nameElement.textContent = `${item.name_fr} / ${item.name_en}`;
-        nameElement.classList.add('text-gray-600');
-
-        suggestionElement.appendChild(nameElement);
-
-        suggestionElement.dataset.oracleId = item.oracle_id;
-        suggestionElement.dataset.nameFr = item.name_fr;
-        suggestionElement.dataset.nameEn = item.name_en;
-        suggestionElement.dataset.action = 'click->autocomplete#select';
-
-        this.suggestionsTarget.appendChild(suggestionElement);
-    });
-  }
-  
-  select(event) {
-    const oracleId = event.currentTarget.dataset.oracleId;
-    const nameFr = event.currentTarget.dataset.nameFr;
-    const nameEn = event.currentTarget.dataset.nameEn;
-  
-    // Nettoyage du champ des suggestions
-    this.suggestionsTarget.innerHTML = '';
-  
-    // Remplir le champ de texte (inputTarget) avec le nom de la carte
-    // en français si disponible, sinon en anglais.
-    this.inputTarget.value = nameFr || nameEn; // Utilisation de nameFr si disponible, sinon nameEn
-
-    //Afficher les autres champs du formulaire
-    this.formFieldsTarget.classList.remove('hidden');
-
-    this.scryfallOracleIdTarget.value = oracleId;
-  
-    // Requête au serveur pour obtenir les versions de la carte
-    fetch(`/cards/versions?oracle_id=${oracleId}`)
-      .then(response => response.json())
-      .then(versions => this.fillExtensions(versions))
-      .catch(error => console.log(error));
-  }    
-
-  fillExtensions(versions) {
-    const select = this.extensionTarget;
-    const requireExtension = select.dataset.extensionRequired === 'true';
-  
-    select.innerHTML = ''; // Réinitialise les options
-    if (!requireExtension) {
-      select.innerHTML = '<option value="">Neutre</option>'; // Ajoutez cette option si l'extension n'est pas requise
+    try {
+      const response = await fetch(`/cards/search?query=${encodeURIComponent(query)}`)
+      this.suggestionsList = await response.json()
+      this.showSuggestions()
+    } catch (error) {
+      console.error("Erreur lors de la recherche:", error)
     }
-  
-    versions.forEach(version => {
-      const option = document.createElement('option');
-      option.value = version.scryfall_id;
-      option.textContent = `${version.extension.name} (${version.collector_number})`;
-      select.appendChild(option);
-    });
   }
-   
-  
+
+  showSuggestions() {
+    // Ne pas afficher les suggestions en mode édition
+    if (this.isEditing) return
+
+    this.suggestionsTarget.innerHTML = this.suggestionsList.map((card, index) => `
+      <div class="suggestion-item p-2 hover:bg-gray-100 cursor-pointer"
+           data-action="click->autocomplete#selectCard"
+           data-card-index="${index}">
+        ${card.name_fr} - ${card.name_en}
+      </div>
+    `).join('')
+    this.suggestionsTarget.classList.remove('hidden')
+  }
+
+  hideSuggestions() {
+    this.suggestionsTarget.innerHTML = ''
+    this.suggestionsTarget.classList.add('hidden')
+  }
+
+  async selectCard(event) {
+    // Ne pas gérer la sélection en mode édition
+    if (this.isEditing) return
+
+    const index = event.currentTarget.dataset.cardIndex
+    this.selectedCard = this.suggestionsList[index]
+    
+    // Mettre à jour l'input avec le nom de la carte
+    this.inputTarget.value = `${this.selectedCard.name_fr} - ${this.selectedCard.name_en}`
+    
+    // Récupérer les versions de la carte
+    try {
+      const response = await fetch(`/cards/versions?oracle_id=${this.selectedCard.oracle_id}`)
+      const versions = await response.json()
+      
+      if (versions && versions.length > 0) {
+        // Afficher le reste du formulaire
+        this.formFieldsTarget.classList.remove('hidden')
+        
+        // Mettre à jour les versions de carte dans le select
+        this.updateCardVersions(versions)
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des versions:", error)
+    }
+    
+    this.hideSuggestions()
+  }
+
+  updateCardVersions(versions) {
+    // Ne pas mettre à jour les versions en mode édition
+    if (this.isEditing) return
+
+    const select = this.extensionTarget
+    select.innerHTML = versions.map(version => `
+      <option value="${version.id}">
+        ${version.extension.name} - ${version.extension.code}
+      </option>
+    `).join('')
+  }
 }

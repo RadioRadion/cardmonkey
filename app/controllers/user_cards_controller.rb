@@ -1,90 +1,79 @@
+# app/controllers/user_cards_controller.rb
 class UserCardsController < ApplicationController
-  before_action :set_user, only: [:new, :index, :create]
+  before_action :set_user
+  before_action :set_user_card, only: [:edit, :update, :destroy]
 
   def index
-    @user_cards = @user.user_cards.includes(card_version: [:card, :extension])
+    @user_cards = @user.user_cards
+                      .includes(card_version: [:card, :extension])
+                      .order('cards.name_en')
   end
 
   def new
-    @user_card = UserCard.new
+    @form = Forms::UserCardForm.new(user_id: @user.id)
+    # Pour le debug
+    Rails.logger.debug "Form initialized with user_id: #{@user.id}"
+    Rails.logger.debug "Form object: #{@form.inspect}"
   end
-
   def create
-    @user = User.find(params[:user_id])
-    # Récupérer le scryfall_id à partir des nouveaux paramètres
-    scryfall_id = params[:user_card][:scryfall_id]
-    # Trouver la CardVersion basée sur le scryfall_id
-    card_version = CardVersion.find_by(scryfall_id: scryfall_id)
-  
-    if card_version
-      # Initialiser la nouvelle UserCard avec les paramètres reçus, mais sans scryfall_id
-      @user_card = @user.user_cards.new(user_card_params.except(:scryfall_id).merge(card_version_id: card_version.id))
-      set_foil_automatically
+    Rails.logger.debug "=== Create Action ==="
+    Rails.logger.debug "Params: #{params.inspect}"
     
-      if @user_card.save
-        redirect_to user_user_cards_path(@user), notice: 'La carte a été ajoutée à votre collection.'
-      else
-        render :new, status: :unprocessable_entity
-      end
+    @form = Forms::UserCardForm.new(user_card_form_params)
+    Rails.logger.debug "Form created with: #{user_card_form_params.inspect}"
+  
+    if @form.save
+      redirect_to user_user_cards_path(@user), 
+                  notice: t('.success', name: @form.card_name)
     else
-      @user_card = @user.user_cards.build(user_card_params.except(:scryfall_id))
-      flash.now[:alert] = 'Version de carte invalide.'
+      Rails.logger.debug "Form errors: #{@form.errors.full_messages}"
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
-    @user = User.find(params[:user_id])
-    @user_card = @user.user_cards.find(params[:id])
-    @card = @user_card.card_version.card
-    # Récupérer toutes les versions basées sur le scryfall_oracle_id et trier par le nom de l'extension
-    @versions = CardVersion.joins(:card, :extension)
-                           .where(cards: { scryfall_oracle_id: @card.scryfall_oracle_id })
-                           .order('extensions.name ASC')
+    load_card_versions
+    @form = Forms::UserCardForm.from_model(@user_card)
   end
-  
+
   def update
-    @user = User.find(params[:user_id])
-    @user_card = @user.user_cards.find(params[:id])
-    set_foil_automatically
-  
-    if @user_card.update(user_card_params)
-      if request.xhr?
-        # Traitement pour une requête AJAX
-        render json: { message: 'La carte a été mise à jour dans votre collection.', quantity: @user_card.quantity }, status: :ok
-      else
-        # Traitement pour une requête HTTP classique
-        redirect_to user_user_cards_path(@user), notice: 'La carte a été mise à jour dans votre collection.'
+    @form = Forms::UserCardForm.new(user_card_form_params.merge(id: @user_card.id))
+
+    if @form.save
+      respond_to do |format|
+        format.html { redirect_to user_user_cards_path(@user), notice: t('.success') }
+        format.json { render json: success_json_response }
       end
     else
-      if request.xhr?
-        # Traitement d'erreur pour une requête AJAX
-        render json: { errors: @user_card.errors.full_messages }, status: :unprocessable_entity
-      else
-        # Traitement d'erreur pour une requête HTTP classique
-        @card = @user_card.card_version.card
-        @versions = CardVersion.joins(:card).where(cards: { scryfall_oracle_id: @card.scryfall_oracle_id })
-        flash.now[:alert] = 'Une erreur est survenue lors de la mise à jour de la carte.'  # Ajout d'un message flash d'erreur
-        render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html do
+          load_card_versions
+          render :edit, status: :unprocessable_entity
+        end
+        format.json { render json: error_json_response, status: :unprocessable_entity }
       end
     end
   end
 
   def destroy
-    @user_card = current_user.user_cards.find(params[:id])
+    name = @user_card.card_version.card.name_en
+    
     if @user_card.destroy
       respond_to do |format|
-        format.html { redirect_to user_user_cards_url(current_user), notice: 'La carte a été supprimée avec succès.' }
-        format.json { head :no_content } # Pour AJAX, renvoie un statut 204 sans contenu.
+        format.html { 
+          redirect_to user_user_cards_path(@user), 
+                      notice: t('.success', name: name)
+        }
+        format.json { head :no_content }
       end
-    else
-      # Gérer le cas où la suppression échoue, par exemple, en renvoyant un statut d'erreur.
     end
   rescue ActiveRecord::RecordNotFound => e
-    respond_to do |format|
-      format.html { redirect_to user_user_cards_url(current_user), alert: 'La carte n\'a pas été trouvée.' }
-      format.json { render json: { error: e.message }, status: :not_found }
-    end
+    handle_destroy_error(e)
+  end
+
+  def search
+    results = Cards::SearchService.call(params[:query])
+    render json: results
   end
 
   private
@@ -93,15 +82,45 @@ class UserCardsController < ApplicationController
     @user = current_user
   end
 
-  def user_card_params
-    params.require(:user_card).permit(:condition, :foil, :language, :quantity, :card_version_id)
+  def set_user_card
+    @user_card = @user.user_cards.find(params[:id])
   end
-  
-  def set_foil_automatically
-    if @user_card.card_version.eur_price.nil? && @user_card.card_version.eur_foil_price.present?
-      @user_card.foil = true
-      @user_card.save
+
+  def load_card_versions
+    @card = @user_card.card_version.card
+    @versions = @card.card_versions
+                    .includes(:extension)
+                    .order('extensions.name ASC')
+  end
+
+  def user_card_form_params
+    params.require(:user_card)
+          .permit(:condition, :foil, :language, :quantity, 
+                 :card_version_id, :scryfall_id)
+          .merge(user_id: @user.id)
+  end
+
+  def success_json_response
+    {
+      message: t('.success'),
+      quantity: @user_card.quantity
+    }
+  end
+
+  def error_json_response
+    {
+      message: t('.error'),
+      errors: @form.errors.full_messages
+    }
+  end
+
+  def handle_destroy_error(error)
+    respond_to do |format|
+      format.html do
+        redirect_to user_user_cards_path(@user), 
+                    alert: t('.not_found')
+      end
+      format.json { render json: { error: error.message }, status: :not_found }
     end
   end
-  
 end
