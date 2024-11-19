@@ -1,0 +1,138 @@
+fr:
+  activerecord:
+    models:
+      user_card: "Carte de collection"
+      user_wanted_card: "Carte recherchée"
+    attributes:
+      user_card:
+        condition: "État"
+        language: "Langue"
+        quantity: "Quantité"
+        foil: "Foil"
+    enums:
+      user_card:
+        condition:
+          poor: "Mauvais"
+          played: "Joué"
+          light_played: "Légèrement joué"
+          good: "Bon"
+          excellent: "Excellent"
+          near_mint: "Quasi neuf"
+          mint: "Neuf"
+        language:
+          french: "Français"
+          english: "Anglais"
+          german: "Allemand"
+          italian: "Italien"
+          simplified_chinese: "Chinois simplifié"
+          traditional_chinese: "Chinois traditionnel"
+          japanese: "Japonais"
+          portuguese: "Portugais"
+          russian: "Russe"
+          korean: "Coréen"
+      wants:
+        collection:
+          add_card: "Ajouter une carte recherchée"
+        table:
+          headers:
+            card: "Carte"
+            min_condition: "État minimum"
+            extension: "Extension"
+            language: "Langue"
+            foil: "Foil"
+            quantity: "Quantité"
+            matches: "Matches"
+            scan: "Scan"
+            actions: "Actions"
+          actions:
+            edit: "Modifier"
+            delete: "Supprimer"
+        conditions:
+          unimportant: "Sans importance"
+        languages:
+          any: "Toutes"
+        attributes:
+          foil: "Foil"
+
+  cards:
+    conditions:
+      poor: "Mauvais"
+      played: "Joué"
+      light_played: "Légèrement joué"
+      good: "Bon"
+      excellent: "Excellent"
+      near_mint: "Quasi neuf"
+      mint: "Neuf"
+    languages:
+      flags:
+        fr: "🇫🇷"
+        en: "🇬🇧"
+        de: "🇩🇪"
+        it: "🇮🇹"
+        zhs: "🇨🇳"
+        zht: "🇹🇼"
+        ja: "🇯🇵"
+        pt: "🇵🇹"
+        ru: "🇷🇺"
+        ko: "🇰🇷"
+    rarity:
+      common: "Commune"
+      uncommon: "Peu commune"
+      rare: "Rare"
+      mythic: "Mythique"
+    collection:
+      add_card: "Ajouter une nouvelle carte"
+      update_success: "La carte a été mise à jour dans votre collection."
+      create_success: "La carte a été ajoutée à votre collection."
+      delete_success: "La carte a été supprimée avec succès."
+      card_not_found: "La carte n'a pas été trouvée."
+    table:
+      headers:
+        card: "Carte"
+        condition: "État"
+        extension: "Extension"
+        language: "Langue"
+        foil: "Foil"
+        quantity: "Quantité"
+        price: "Prix"
+        collector_number: "N° Collection"
+        rarity: "Rareté"
+        scan: "Scan"
+        actions: "Actions"
+      actions:
+        edit: "Modifier"
+        delete: "Supprimer"
+
+# config/locales/en.yml
+en:
+  activerecord:
+    models:
+      user_card: "Collection Card"
+      user_wanted_card: "Wanted Card"
+    attributes:
+      user_card:
+        condition: "Condition"
+        language: "Language"
+        quantity: "Quantity"
+        foil: "Foil"
+    enums:
+      user_card:
+        condition:
+          poor: "Poor"
+          played: "Played"
+          light_played: "Light Played"
+          good: "Good"
+          excellent: "Excellent"
+          near_mint: "Near Mint"
+          mint: "Mint"
+        language:
+          french: "French"
+          english: "English"
+          german: "German"
+          italian: "Italian"
+          simplified_chinese: "Simplified Chinese"
+          traditional_chinese: "Traditional Chinese"
+          japanese: "Japanese"
+          portuguese: "Portuguese"
+          russian: "Russian"
+          korean: "Korean"

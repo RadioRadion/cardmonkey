@@ -2,7 +2,7 @@ class UserCardsController < ApplicationController
   before_action :set_user, only: [:new, :index, :create]
 
   def index
-    @user_cards = @user.user_cards
+    @user_cards = @user.user_cards.includes(card_version: [:card, :extension])
   end
 
   def new

@@ -9,5 +9,4 @@ class CardVersion < ApplicationRecord
   validates :frame, presence: true
   validates :border_color, presence: true
   validates :extension_id, presence: true
-
 end

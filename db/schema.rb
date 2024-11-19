@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_12_202620) do
+ActiveRecord::Schema[7.1].define(version: 2024_11_18_090420) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "card_legalities", force: :cascade do |t|
+    t.bigint "card_id", null: false
+    t.string "format", null: false
+    t.string "status", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["card_id", "format"], name: "index_card_legalities_on_card_id_and_format", unique: true
+    t.index ["card_id"], name: "index_card_legalities_on_card_id"
+    t.check_constraint "status::text = ANY (ARRAY['legal'::character varying, 'not_legal'::character varying, 'restricted'::character varying, 'banned'::character varying]::text[])", name: "check_legality_status"
+  end
 
   create_table "card_versions", force: :cascade do |t|
     t.bigint "card_id", null: false
@@ -27,8 +38,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_12_202620) do
     t.string "collector_number"
     t.string "rarity"
     t.decimal "eur_foil_price", precision: 10, scale: 2
+    t.index ["card_id", "extension_id"], name: "index_card_versions_on_card_and_extension"
     t.index ["card_id"], name: "index_card_versions_on_card_id"
     t.index ["extension_id"], name: "index_card_versions_on_extension_id"
+    t.index ["scryfall_id"], name: "index_card_versions_on_scryfall_id"
   end
 
   create_table "cards", force: :cascade do |t|
@@ -66,7 +79,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_12_202620) do
     t.bigint "user_id"
     t.integer "user_id_target", null: false
     t.index ["user_card_id"], name: "index_matches_on_user_card_id"
+    t.index ["user_id", "user_id_target"], name: "index_matches_on_user_and_target"
     t.index ["user_id"], name: "index_matches_on_user_id"
+    t.index ["user_id_target", "user_id"], name: "index_matches_on_target_and_user"
     t.index ["user_wanted_card_id"], name: "index_matches_on_user_wanted_card_id"
   end
 
@@ -89,6 +104,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_12_202620) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
+  create_table "supported_languages", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "name", null: false
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_supported_languages_on_code", unique: true
+  end
+
   create_table "trade_user_cards", force: :cascade do |t|
     t.bigint "user_card_id", null: false
     t.bigint "trade_id", null: false
@@ -104,6 +128,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_12_202620) do
     t.integer "user_id_invit"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "accepted_at"
+    t.datetime "completed_at"
+    t.index ["user_id", "user_id_invit"], name: "index_trades_on_user_and_invit"
     t.index ["user_id"], name: "index_trades_on_user_id"
   end
 
@@ -117,6 +144,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_12_202620) do
     t.integer "quantity"
     t.bigint "card_version_id", null: false
     t.index ["card_version_id"], name: "index_user_cards_on_card_version_id"
+    t.index ["user_id", "card_version_id"], name: "index_user_cards_on_user_and_card_version"
     t.index ["user_id"], name: "index_user_cards_on_user_id"
   end
 
@@ -132,6 +160,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_12_202620) do
     t.bigint "card_version_id"
     t.index ["card_id"], name: "index_user_wanted_cards_on_card_id"
     t.index ["card_version_id"], name: "index_user_wanted_cards_on_card_version_id"
+    t.index ["user_id", "card_id", "card_version_id"], name: "index_user_wanted_cards_on_user_card_and_version"
     t.index ["user_id"], name: "index_user_wanted_cards_on_user_id"
   end
 
@@ -150,9 +179,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_12_202620) do
     t.integer "area"
     t.integer "preference", default: 0
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["latitude", "longitude"], name: "index_users_on_coordinates"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "card_legalities", "cards"
   add_foreign_key "card_versions", "cards"
   add_foreign_key "card_versions", "extensions"
   add_foreign_key "chatrooms", "users"

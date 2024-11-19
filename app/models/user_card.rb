@@ -1,44 +1,85 @@
 class UserCard < ApplicationRecord
-  require 'pry-byebug'
+  include CardConditionManagement
+  
   belongs_to :user
   belongs_to :card_version
-  has_many :matches
+  has_many :matches, dependent: :destroy
 
-  validates :quantity, presence: true
-  validates :condition, presence: true
-  validates :language, presence: true
+  # Validations
+  validates :quantity, :condition, :language, presence: true
   validates :foil, inclusion: { in: [true, false], message: "can't be blank" }
 
-  enum condition: { poor: "0", played: "1", light_played: "2", good: "3",
-    excellent: "4", near_mint: "5", mint: "6" }
-  enum language: { français: "0", anglais: "1", allemand: "2", italien: "3", chinois_s: "4",
-    chinois_t: "5", japonais: "6", portuguais: "7", russe: "8", corréen: "9" }
+  # Énumérations
+  enum condition: {
+    poor: 'poor',
+    played: 'played',
+    light_played: 'light_played',
+    good: 'good',
+    excellent: 'excellent',
+    near_mint: 'near_mint',
+    mint: 'mint'
+  }, _default: 'good'
 
-  # after_save :check_matches
+  enum language: {
+    french: 'fr',
+    english: 'en',
+    german: 'de',
+    italian: 'it',
+    simplified_chinese: 'zhs',
+    traditional_chinese: 'zht',
+    japanese: 'ja',
+    portuguese: 'pt',
+    russian: 'ru',
+    korean: 'ko'
+  }, _default: 'en'
 
-  def check_matches
+  # Callbacks
+  after_create :create_matches
+  after_update :update_matches, if: :relevant_attributes_changed?
+
+  private
+
+  def create_matches
+    potential_matches = find_potential_matches
+    return if potential_matches.empty?
+
+    matches_to_create = build_matches(potential_matches)
+    Match.insert_all(matches_to_create) if matches_to_create.any?
+  end
+
+  def update_matches
     matches.destroy_all
-    user_wanted_cards = UserWantedCard.where.not(user_id: user.id)
-  
-    user_wanted_cards.each do |user_wanted_card|
-      # Assumons que la langue de la UserWantedCard est la langue préférée pour la comparaison
-      preferred_language = user_wanted_card.language.to_sym # Convertit en symbole si nécessaire
-  
-      # Obtenez la carte associée à cette UserWantedCard et comparez les noms
-      wanted_card = user_wanted_card.card
-      my_card = card  # La carte associée à cette UserCard
-  
-      if wanted_card.name(preferred_language) == my_card.name(preferred_language) && 
-         UserCard.conditions[condition].to_i >= UserCard.conditions[user_wanted_card.min_condition].to_i
-        Match.create!(
-          user_card_id: id,
-          user_wanted_card_id: user_wanted_card.id,
-          user_id: user.id,
-          user_id_target: user_wanted_card.user.id
-        )
-      end
+    create_matches
+  end
+
+  def relevant_attributes_changed?
+    saved_change_to_condition? || 
+    saved_change_to_language? || 
+    saved_change_to_card_version_id?
+  end
+
+  def find_potential_matches
+    UserWantedCard
+      .joins(:card)
+      .where.not(user_id: user_id)
+      .where(card_id: card_version.card_id)
+      .where("user_wanted_cards.language = ? OR user_wanted_cards.language IS NULL", language)
+      .where("? >= COALESCE(user_wanted_cards.min_condition, 'poor')", condition)
+      .select(:id, :user_id)
+  end
+
+  def build_matches(potential_matches)
+    current_time = Time.current
+    
+    potential_matches.map do |wanted_card|
+      {
+        user_card_id: id,
+        user_wanted_card_id: wanted_card.id,
+        user_id: user_id,
+        user_id_target: wanted_card.user_id,
+        created_at: current_time,
+        updated_at: current_time
+      }
     end
   end
-  
-  
 end

@@ -1,0 +1,79 @@
+# .clinerc
+model: claude-3-opus-20240229
+temperature: 0.7
+system_prompt: |
+  Tu es un expert Ruby on Rails qui suit les bonnes pratiques :
+  - Convention over Configuration
+  - DRY (Don't Repeat Yourself)
+  - RESTful design
+  - Test-Driven Development
+  - Utilisation appropriée des gems standards
+  
+  Format de code préféré :
+  - Indentation : 2 espaces
+  - Guillemets simples pour les strings sauf interpolation
+  - Utilisation de la nouvelle syntaxe Ruby quand pertinent
+  - Commentaires en anglais
+  - Noms de variables/méthodes en snake_case
+
+contexts:
+  - pattern: "app/**/*.rb"
+    prompt: |
+      Pour ce fichier Ruby/Rails :
+      - Suggère des améliorations basées sur les bonnes pratiques Rails 7
+      - Identifie les potentiels problèmes de performance
+      - Propose des tests appropriés si nécessaire
+  
+  - pattern: "spec/**/*_spec.rb"
+    prompt: |
+      Pour ce fichier de test :
+      - Vérifie la couverture des cas limites
+      - Suggère des tests manquants importants
+      - Propose des améliorations de lisibilité
+  
+  - pattern: "config/**/*.rb"
+    prompt: |
+      Pour ce fichier de configuration :
+      - Vérifie la sécurité des paramètres
+      - Suggère des optimisations possibles
+      - Identifie les configurations manquantes courantes
+
+snippets:
+  - name: "rails_model"
+    prefix: "rmodel"
+    description: "Génère un modèle Rails complet"
+    body: |
+      class ${1:ModelName} < ApplicationRecord
+        # Relations
+        ${2}
+        
+        # Validations
+        ${3}
+        
+        # Scopes
+        ${4}
+        
+        # Methods
+        ${5}
+      end
+  
+  - name: "rails_controller"
+    prefix: "rcontroller"
+    description: "Génère un controller RESTful"
+    body: |
+      class ${1:ResourceName}Controller < ApplicationController
+        before_action :set_${2:resource}, only: [:show, :edit, :update, :destroy]
+        
+        def index
+          @${2:resource}s = ${3:ModelName}.all
+        end
+        
+        def show
+        end
+        
+        def new
+          @${2:resource} = ${3:ModelName}.new
+        end
+        
+        # [...]
+      end
