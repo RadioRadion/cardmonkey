@@ -52,31 +52,38 @@ export default class extends Controller {
   }
 
   async selectCard(event) {
-    // Ne pas gérer la sélection en mode édition
     if (this.isEditing) return
-
     const index = event.currentTarget.dataset.cardIndex
     this.selectedCard = this.suggestionsList[index]
     
     // Mettre à jour l'input avec le nom de la carte
     this.inputTarget.value = `${this.selectedCard.name_fr} - ${this.selectedCard.name_en}`
     
-    // Récupérer les versions de la carte
-    try {
-      const response = await fetch(`/cards/versions?oracle_id=${this.selectedCard.oracle_id}`)
-      const versions = await response.json()
-      
-      if (versions && versions.length > 0) {
-        // Afficher le reste du formulaire
-        this.formFieldsTarget.classList.remove('hidden')
-        
-        // Mettre à jour les versions de carte dans le select
-        this.updateCardVersions(versions)
-      }
-    } catch (error) {
-      console.error("Erreur lors de la récupération des versions:", error)
+    // Déterminer le type de formulaire
+    const formType = this.element.dataset.autocompleteTypeValue
+  
+    // Gérer différemment selon le type de formulaire
+    if (formType === 'wanted') {
+      // Pour user_wanted_card, on utilise l'oracle_id
+      this.scryfallOracleIdTarget.value = this.selectedCard.oracle_id
     }
-    
+  
+    // Ne récupérer les versions que pour le formulaire de collection
+    if (formType === 'collection' && this.hasExtensionTarget) {
+      try {
+        const response = await fetch(`/cards/versions?oracle_id=${this.selectedCard.oracle_id}`)
+        const versions = await response.json()
+        if (versions && versions.length > 0) {
+          this.updateCardVersions(versions)
+          // Pour user_card, on utilise le scryfall_id de la version
+          this.scryfallOracleIdTarget.value = versions[0].scryfall_id
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des versions:", error)
+      }
+    }
+  
+    this.formFieldsTarget.classList.remove('hidden')
     this.hideSuggestions()
   }
 

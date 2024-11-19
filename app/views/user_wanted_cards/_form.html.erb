@@ -1,0 +1,85 @@
+<%= simple_form_for(@form,
+                   as: :user_wanted_card,
+                   url: form_url,
+                   method: editing ? :patch : :post,
+                   html: {
+                     class: "max-w-sm mx-auto mt-6",
+                     data: {
+                       controller: "autocomplete",
+                       autocomplete_type_value: "wanted"
+                     }
+                   }) do |f| %>
+ <%= f.input :card_id, as: :hidden %>
+ <%= f.input :scryfall_id, as: :hidden,
+             input_html: {
+               data: { autocomplete_target: "scryfallOracleId" }
+             } %>
+
+ <% if @form.errors.any? %>
+   <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+     <strong class="font-bold">Erreurs :</strong>
+     <ul class="mt-2">
+       <% @form.errors.full_messages.each do |message| %>
+         <li><%= message %></li>
+       <% end %>
+     </ul>
+   </div>
+ <% end %>
+
+ <% unless editing %>
+   <div class="mb-5">
+     <label for="card_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+       Nom de la carte
+     </label>
+     <input type="text"
+            id="card_name"
+            name="card_name"
+            value="<%= @form.card_name %>"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            data-action="keyup->autocomplete#search"
+            data-autocomplete-target="input">
+   </div>
+   <div id="card-suggestions"
+        data-autocomplete-target="suggestions"
+        class="suggestions-list">
+   </div>
+ <% end %>
+
+ <div data-autocomplete-target="formFields" class="<%= editing ? '' : 'hidden' %>">
+   <%= f.input :min_condition,
+               collection: UserCard.conditions.keys,
+               include_blank: true,
+               prompt: "N'importe quelle condition",
+               input_html: {
+                 class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+               } %>
+
+   <%= f.input :language,
+               collection: UserCard.languages.keys,
+               include_blank: true,
+               prompt: "N'importe quelle langue",
+               input_html: {
+                 class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+               } %>
+
+   <%= f.input :foil,
+               as: :boolean,
+               wrapper_html: { class: "mb-5 flex items-start" },
+               label_html: { class: "ms-2 text-sm font-medium text-gray-900" },
+               input_html: {
+                 class: "w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
+               } %>
+
+   <%= f.input :quantity,
+               as: :integer,
+               input_html: {
+                 min: 1,
+                 class: "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+               } %>
+
+   <button type="submit"
+           class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center">
+     <%= editing ? "Enregistrer les modifications" : "Soumettre" %>
+   </button>
+ </div>
+<% end %>
