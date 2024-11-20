@@ -4,7 +4,7 @@ class UserWantedCardsController < ApplicationController
 
   def index
     @user_wanted_cards = @user.user_wanted_cards
-      .includes(:card)
+      .includes(:card, card_version: :extension)
       .order('cards.name_en')
   end
 
@@ -29,6 +29,9 @@ class UserWantedCardsController < ApplicationController
   end
 
   def edit
+    @user_wanted_card = @user.user_wanted_cards.find(params[:id])
+    # Charger les versions de la carte pour le select
+    @versions = @user_wanted_card.card.card_versions.includes(:extension).order('extensions.name ASC')
     @form = Forms::UserWantedCardForm.from_model(@user_wanted_card)
   end
 
@@ -90,7 +93,7 @@ class UserWantedCardsController < ApplicationController
   def user_wanted_card_form_params
     params.require(:user_wanted_card)
           .permit(:min_condition, :foil, :language, :quantity, 
-                 :scryfall_id, :card_id) # Ajout de card_id
+                  :scryfall_id, :card_id, :card_version_id)  # Ajout de card_version_id
           .merge(user_id: @user.id)
   end
 

@@ -31,6 +31,8 @@ fr:
           russian: "Russe"
           korean: "Coréen"
       wants:
+        extensions:
+          any: "N'importe quelle extension"
         collection:
           add_card: "Ajouter une carte recherchée"
         table:

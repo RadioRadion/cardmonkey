@@ -36,10 +36,17 @@
           </td>
           
           <td class="px-4 py-2">
-            <% if wanted_card.card_version&.extension&.icon_uri.present? %>
-              <%= image_tag wanted_card.card_version.extension.icon_uri, 
-                          alt: wanted_card.card_version.extension.name, 
-                          class: "w-8 h-8" %>
+            <% if wanted_card.card_version_id.present? %>
+              <% if wanted_card.card_version&.extension&.icon_uri.present? %>
+                <%= image_tag wanted_card.card_version.extension.icon_uri, 
+                              alt: wanted_card.card_version.extension.name, 
+                              class: "w-8 h-8",
+                              title: "#{wanted_card.card_version.extension.name} - #{wanted_card.card_version.extension.code}" %>
+              <% else %>
+                <%= "#{wanted_card.card_version.extension.name} - #{wanted_card.card_version.extension.code}" %>
+              <% end %>
+            <% else %>
+              <%= t('wants.extensions.any') %>
             <% end %>
           </td>
           

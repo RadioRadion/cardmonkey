@@ -8,6 +8,7 @@ module Forms
     attribute :user_id, :integer
     attribute :scryfall_id, :string
     attribute :card_id, :string
+    attribute :card_version_id, :integer 
     attribute :min_condition, :string
     attribute :language, :string
     attribute :quantity, :integer
@@ -25,6 +26,7 @@ module Forms
         id: user_wanted_card.id,
         user_id: user_wanted_card.user_id,
         card_id: user_wanted_card.card_id,
+        card_version_id: user_wanted_card.card_version_id,
         min_condition: user_wanted_card.min_condition,
         language: user_wanted_card.language,
         quantity: user_wanted_card.quantity,
@@ -74,7 +76,8 @@ module Forms
       Rails.logger.debug "Found card: #{card.inspect}"
       
       user.user_wanted_cards.create!(
-        card: card,
+        card: find_card,
+        card_version_id: card_version_id, 
         min_condition: min_condition,
         language: language,
         quantity: quantity.to_i,
@@ -86,6 +89,7 @@ module Forms
       user_wanted_card = user.user_wanted_cards.find(id)
       user_wanted_card.update!(
         card: find_card,
+        card_version_id: card_version_id,  # Ajout de card_version_id ici
         min_condition: min_condition,
         language: language,
         quantity: quantity.to_i,

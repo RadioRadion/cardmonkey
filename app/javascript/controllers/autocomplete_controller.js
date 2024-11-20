@@ -1,12 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
-
 export default class extends Controller {
   static targets = ["input", "suggestions", "scryfallOracleId", "formFields", "extension"]
-
+  
   connect() {
     this.suggestionsList = []
     this.selectedCard = null
-
     // Si nous sommes en mode édition, le formulaire est déjà visible
     if (this.formFieldsTarget.classList.contains('hidden') === false) {
       this.isEditing = true
@@ -16,13 +14,11 @@ export default class extends Controller {
   async search(event) {
     // Ne pas rechercher en mode édition
     if (this.isEditing) return
-
     const query = event.target.value
     if (query.length < 3) {
       this.hideSuggestions()
       return
     }
-
     try {
       const response = await fetch(`/cards/search?query=${encodeURIComponent(query)}`)
       this.suggestionsList = await response.json()
@@ -35,7 +31,6 @@ export default class extends Controller {
   showSuggestions() {
     // Ne pas afficher les suggestions en mode édition
     if (this.isEditing) return
-
     this.suggestionsTarget.innerHTML = this.suggestionsList.map((card, index) => `
       <div class="suggestion-item p-2 hover:bg-gray-100 cursor-pointer"
            data-action="click->autocomplete#selectCard"
@@ -61,13 +56,26 @@ export default class extends Controller {
     
     // Déterminer le type de formulaire
     const formType = this.element.dataset.autocompleteTypeValue
-  
+    
     // Gérer différemment selon le type de formulaire
     if (formType === 'wanted') {
       // Pour user_wanted_card, on utilise l'oracle_id
       this.scryfallOracleIdTarget.value = this.selectedCard.oracle_id
+      
+      // Charger les versions
+      if (this.hasExtensionTarget) {
+        try {
+          const response = await fetch(`/cards/versions?oracle_id=${this.selectedCard.oracle_id}`)
+          const versions = await response.json()
+          if (versions && versions.length > 0) {
+            this.updateWantedVersions(versions)
+          }
+        } catch (error) {
+          console.error("Erreur lors de la récupération des versions:", error)
+        }
+      }
     }
-  
+
     // Ne récupérer les versions que pour le formulaire de collection
     if (formType === 'collection' && this.hasExtensionTarget) {
       try {
@@ -82,7 +90,7 @@ export default class extends Controller {
         console.error("Erreur lors de la récupération des versions:", error)
       }
     }
-  
+
     this.formFieldsTarget.classList.remove('hidden')
     this.hideSuggestions()
   }
@@ -90,12 +98,25 @@ export default class extends Controller {
   updateCardVersions(versions) {
     // Ne pas mettre à jour les versions en mode édition
     if (this.isEditing) return
-
     const select = this.extensionTarget
     select.innerHTML = versions.map(version => `
       <option value="${version.id}">
         ${version.extension.name} - ${version.extension.code}
       </option>
     `).join('')
+  }
+
+  updateWantedVersions(versions) {
+    // Ne pas mettre à jour les versions en mode édition
+    if (this.isEditing) return
+    const select = this.extensionTarget
+    select.innerHTML = `
+      <option value="">N'importe quelle extension</option>
+      ${versions.map(version => `
+        <option value="${version.id}">
+          ${version.extension.name} - ${version.extension.code}
+        </option>
+      `).join('')}
+    `
   }
 }
