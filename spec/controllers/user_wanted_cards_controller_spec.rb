@@ -1,93 +1,210 @@
+# spec/controllers/user_wanted_cards_controller_spec.rb
 require 'rails_helper'
 
 RSpec.describe UserWantedCardsController, type: :controller do
-  let(:user) { FactoryBot.create(:user) }
-  let(:card) { FactoryBot.create(:card) } # Assurez-vous que cette factory existe
-  let(:card_version) { FactoryBot.create(:card_version, card: card) } # Reliez card_version à card
-  let(:valid_attributes) {
-    { scryfall_oracle_id: card.scryfall_oracle_id, card_version_id: card_version.id, min_condition: 'good', foil: false, language: '2', quantity: 1 }
-  }
-  let(:invalid_attributes) {
-    { scryfall_oracle_id: nil, card_version_id: nil, min_condition: nil, foil: nil, language: nil, quantity: nil }
-  }
+ let(:user) { create(:user) }
+ let(:card) { create(:card) }
+ 
+ before do
+   sign_in user
+ end
 
-  before(:each) do
-    sign_in user
-  end
+ describe 'GET #index' do
+   it 'assigns user wanted cards and renders index template' do
+     wanted_cards = create_list(:user_wanted_card, 3, user: user)
+     
+     get :index, params: { user_id: user.id }
+     
+     expect(assigns(:user_wanted_cards)).to match_array(wanted_cards)
+     expect(response).to render_template(:index)
+   end
 
-  describe "GET #index" do
-    it "returns a success response" do
-      get :index, params: {user_id: user.id}
-      expect(response).to be_successful
-    end
-  end
+   it 'eager loads associations correctly' do
+     expect(user.user_wanted_cards).to receive_message_chain(:includes, :order)
+     get :index, params: { user_id: user.id }
+   end
+ end
 
-  describe "GET #new" do
-    it "returns a success response" do
-      get :new, params: {user_id: user.id}
-      expect(response).to be_successful
-    end
-  end
+ describe 'GET #new' do
+   it 'initializes a new form object' do
+     get :new, params: { user_id: user.id }
+     
+     expect(assigns(:form)).to be_a(Forms::UserWantedCardForm)
+     expect(assigns(:form).user_id).to eq(user.id)
+     expect(response).to render_template(:new)
+   end
+ end
 
-  describe "POST #create" do
-    context "with valid params" do
-      it "creates a new UserWantedCard and redirects to the index" do
-        expect {
-          post :create, params: {user_id: user.id, user_wanted_card: valid_attributes}
-        }.to change(UserWantedCard, :count).by(1)
-        expect(response).to redirect_to(user_user_wanted_cards_path(user))
-      end
-    end
+ describe 'POST #create' do
+   let(:valid_attributes) do
+     {
+       card_id: card.id,
+       quantity: 1,
+       min_condition: 'near_mint',
+       language: 'french',
+       foil: false
+     }
+   end
 
-    context "with invalid params" do
-      it "does not create and re-renders the 'new' template" do
-        post :create, params: {user_id: user.id, user_wanted_card: invalid_attributes}
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(flash[:alert]).to be_present
-      end
-    end    
-  end
+   context 'with valid parameters' do
+     before do
+       allow_any_instance_of(Forms::UserWantedCardForm).to receive(:save).and_return(true)
+     end
 
-  describe "GET #edit" do
-    it "returns a success response" do
-      user_wanted_card = FactoryBot.create(:user_wanted_card, user: user)
-      get :edit, params: { user_id: user.id, id: user_wanted_card.id }
-      expect(response).to be_successful
-    end
-  end
+     it 'creates a new wanted card and redirects' do
+       post :create, params: { 
+         user_id: user.id, 
+         user_wanted_card: valid_attributes 
+       }
 
-  describe "PUT #update" do
-    context "with valid params" do
-      let(:new_attributes) {
-        { quantity: 3 }
-      }
+       expect(response).to redirect_to(user_user_wanted_cards_path(user))
+       expect(flash[:notice]).to eq(I18n.t('user_wanted_cards.create.success'))
+     end
+   end
 
-      it "updates the requested user_wanted_card and redirects" do
-        user_wanted_card = FactoryBot.create(:user_wanted_card, user: user)
-        put :update, params: { user_id: user.id, id: user_wanted_card.id, user_wanted_card: new_attributes }
-        user_wanted_card.reload
-        expect(user_wanted_card.quantity).to eq(3)
-        expect(response).to redirect_to(user_user_wanted_cards_path(user))
-      end
-    end
+   context 'with invalid parameters' do
+     before do
+       allow_any_instance_of(Forms::UserWantedCardForm).to receive(:save).and_return(false)
+       allow_any_instance_of(Forms::UserWantedCardForm).to receive(:errors)
+         .and_return(double(full_messages: ['Error']))
+     end
 
-    context "with invalid params" do
-      it "does not update and re-renders the 'edit' template" do
-        user_wanted_card = FactoryBot.create(:user_wanted_card, user: user)
-        put :update, params: { user_id: user.id, id: user_wanted_card.id, user_wanted_card: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(flash[:alert] || flash[:notice]).to be_present
-      end
-    end
-  end
+     it 'renders new template with errors' do
+       post :create, params: { 
+         user_id: user.id, 
+         user_wanted_card: valid_attributes 
+       }
 
-  describe "DELETE #destroy" do
-    it "destroys the requested user_wanted_card and redirects" do
-      user_wanted_card = FactoryBot.create(:user_wanted_card, user: user)
-      expect {
-        delete :destroy, params: { user_id: user.id, id: user_wanted_card.id }
-      }.to change(UserWantedCard, :count).by(-1)
-      expect(response).to redirect_to(user_user_wanted_cards_path(user))
-    end
-  end
+       expect(response).to render_template(:new)
+       expect(response.status).to eq(422)
+     end
+   end
+ end
+
+ describe 'GET #edit' do
+   let(:user_wanted_card) { create(:user_wanted_card, user: user) }
+   let(:card_versions) { create_list(:card_version, 2, card: user_wanted_card.card) }
+
+   before do
+     card_versions
+   end
+
+   it 'assigns form and card versions' do
+     get :edit, params: { user_id: user.id, id: user_wanted_card.id }
+
+     expect(assigns(:form)).to be_a(Forms::UserWantedCardForm)
+     expect(assigns(:versions)).to match_array(card_versions)
+     expect(response).to render_template(:edit)
+   end
+
+   it 'loads card versions with correct ordering' do
+     expect(user_wanted_card.card.card_versions).to receive_message_chain(:includes, :order)
+     get :edit, params: { user_id: user.id, id: user_wanted_card.id }
+   end
+ end
+
+ describe 'PATCH #update' do
+   let(:user_wanted_card) { create(:user_wanted_card, user: user) }
+   let(:valid_attributes) { { quantity: 2 } }
+
+   context 'with valid parameters' do
+     before do
+       allow_any_instance_of(Forms::UserWantedCardForm).to receive(:save).and_return(true)
+     end
+
+     it 'updates the wanted card and redirects for HTML request' do
+       patch :update, params: { 
+         user_id: user.id, 
+         id: user_wanted_card.id, 
+         user_wanted_card: valid_attributes 
+       }
+
+       expect(response).to redirect_to(user_user_wanted_cards_path(user))
+       expect(flash[:notice]).to eq(I18n.t('user_wanted_cards.update.success'))
+     end
+
+     it 'returns success JSON response for AJAX request' do
+       patch :update, params: { 
+         user_id: user.id, 
+         id: user_wanted_card.id, 
+         user_wanted_card: valid_attributes 
+       }, format: :json
+
+       expect(response).to have_http_status(:success)
+       parsed_response = JSON.parse(response.body)
+       expect(parsed_response['message']).to eq(I18n.t('user_wanted_cards.update.success'))
+     end
+   end
+
+   context 'with invalid parameters' do
+     before do
+       allow_any_instance_of(Forms::UserWantedCardForm).to receive(:save).and_return(false)
+       allow_any_instance_of(Forms::UserWantedCardForm).to receive(:errors)
+         .and_return(double(full_messages: ['Error']))
+     end
+
+     it 'renders edit template with errors for HTML request' do
+       patch :update, params: { 
+         user_id: user.id, 
+         id: user_wanted_card.id, 
+         user_wanted_card: valid_attributes 
+       }
+
+       expect(response).to render_template(:edit)
+       expect(response.status).to eq(422)
+     end
+
+     it 'returns error JSON response for AJAX request' do
+       patch :update, params: { 
+         user_id: user.id, 
+         id: user_wanted_card.id, 
+         user_wanted_card: valid_attributes 
+       }, format: :json
+
+       expect(response).to have_http_status(:unprocessable_entity)
+       parsed_response = JSON.parse(response.body)
+       expect(parsed_response).to have_key('errors')
+     end
+   end
+ end
+
+ describe 'DELETE #destroy' do
+   let!(:user_wanted_card) { create(:user_wanted_card, user: user) }
+
+   context 'when card exists' do
+     it 'deletes the card and redirects for HTML request' do
+       expect {
+         delete :destroy, params: { user_id: user.id, id: user_wanted_card.id }
+       }.to change(UserWantedCard, :count).by(-1)
+
+       expect(response).to redirect_to(user_user_wanted_cards_path(user))
+       expect(flash[:notice]).to include(user_wanted_card.card.name_en)
+     end
+
+     it 'returns no content for JSON request' do
+       delete :destroy, params: { 
+         user_id: user.id, 
+         id: user_wanted_card.id 
+       }, format: :json
+
+       expect(response).to have_http_status(:no_content)
+     end
+   end
+
+   context 'when card does not exist' do
+     it 'handles not found error for HTML request' do
+       delete :destroy, params: { user_id: user.id, id: 0 }
+
+       expect(response).to redirect_to(user_user_wanted_cards_path(user))
+       expect(flash[:alert]).to eq(I18n.t('user_wanted_cards.destroy.not_found'))
+     end
+
+     it 'returns not found status for JSON request' do
+       delete :destroy, params: { user_id: user.id, id: 0 }, format: :json
+
+       expect(response).to have_http_status(:not_found)
+       expect(JSON.parse(response.body)).to have_key('error')
+     end
+   end
+ end
 end

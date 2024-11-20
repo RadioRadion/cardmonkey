@@ -1,45 +1,82 @@
-<nav class="bg-white border-gray-200 dark:bg-gray-900">
-  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-    <a href="<%= root_path %>" class="flex items-center space-x-3 rtl:space-x-reverse">
-      <img src="https://flowbite.com/docs/images/logo.svg" class="h-8" alt="Flowbite Logo" />
-      <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Card Gather</span>
-    </a>
-    <% if user_signed_in? %>
-      <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-        <!-- Avatar and dropdown menu for signed in user -->
-        <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">
-          <span class="sr-only">Open user menu</span>
-          <%= image_tag("https://via.placeholder.com/64", alt: "User photo", class: "w-8 h-8 rounded-full") %>
-        </button>
-        <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">
-          <div class="px-4 py-3">
-            <span class="block text-sm text-gray-900 dark:text-white"><%= "nounours" %></span>
-            <span class="block text-sm text-gray-500 truncate dark:text-gray-400"><%= current_user.email %></span>
-          </div>
-          <ul class="py-2" aria-labelledby="user-menu-button">
-            <li><%= link_to "Dashboard", user_user_wanted_cards_path(current_user), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white" %></li>
-            <li><%= link_to "Settings", user_user_wanted_cards_path(current_user), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white" %></li>
-            <li><%= link_to "Sign out", user_user_wanted_cards_path(current_user), method: :delete, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white" %></li>
-          </ul>
+<nav class="bg-white border-b relative">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo et navigation gauche -->
+      <div class="flex items-center space-x-8">
+        <!-- Logo -->
+        <%= link_to root_path, class: "font-bold text-xl shrink-0" do %>
+          Card Gather
+        <% end %>
+
+        <!-- Navigation principale avec espacement correct -->
+        <div class="flex space-x-8">
+          <%= link_to "Home", root_path, class: "text-gray-500 hover:text-gray-900 px-3" %>
+          
+          <% if user_signed_in? %>
+            <%= link_to "Wantlist", user_user_wanted_cards_path(current_user), class: "text-gray-500 hover:text-gray-900 px-3" %>
+            <%= link_to "Collection", user_user_cards_path(current_user), class: "text-gray-500 hover:text-gray-900 px-3" %>
+            <%= link_to "Trades", user_trades_path(current_user), class: "text-gray-500 hover:text-gray-900 px-3" %>
+            <%= link_to "Messages", user_chatrooms_path(current_user), class: "text-gray-500 hover:text-gray-900 px-3" %>
+          <% end %>
         </div>
       </div>
-    <% else %>
-      <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-        <%= link_to "Get started", new_user_registration_path, class: "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" %>
-      </div>
-    <% end %>
-    <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-<%= user_signed_in? ? 'user' : 'cta' %>">
-      <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-        <li><%= link_to "Home", root_path, class: "block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white" %></li>
+
+      <!-- Menu droite -->
+      <div class="flex items-center">
         <% if user_signed_in? %>
-          <li><%= link_to "Wantlist", user_user_wanted_cards_path(current_user), class: "block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white" %></li>
-          <li><%= link_to "Collection", user_user_cards_path(current_user), class: "block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:text:white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white" %></li>
-          <li><%= link_to "Trades", user_trades_path(current_user), class: "block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:text:white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white" %></li>
-          <li><%= link_to "Messages", user_chatrooms_path(current_user), class: "block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:text:white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white" %></li>
+          <!-- Dropdown Profile avec z-index élevé -->
+          <div class="relative" data-controller="dropdown">
+            <button type="button" 
+                    class="flex rounded-full bg-gray-100 p-1"
+                    data-action="click->dropdown#toggle">
+              <%= image_tag "https://via.placeholder.com/64", class: "h-8 w-8 rounded-full", alt: "Profile" %>
+            </button>
+
+            <!-- Menu dropdown avec z-index élevé -->
+            <div data-dropdown-target="menu" 
+                 class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50">
+              <div class="px-4 py-2 border-b">
+                <p class="text-sm font-medium text-gray-900"><%= current_user.username %></p>
+                <p class="text-sm text-gray-500 truncate"><%= current_user.email %></p>
+              </div>
+
+              <%= link_to "My Profile", user_path(current_user), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+              <%= link_to "Edit Profile", edit_user_path(current_user), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+              <%= link_to "Dashboard", dashboard_matches_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+              <%= link_to "Sign out", destroy_user_session_path, 
+                  data: { turbo_method: :delete }, 
+                  class: "block px-4 py-2 text-sm text-red-600 hover:bg-red-50" %>
+            </div>
+          </div>
         <% else %>
-          <!-- Links for users not signed in can be added here if needed -->
+          <%= link_to "Sign in", new_user_session_path, class: "text-gray-500 hover:text-gray-900" %>
+          <%= link_to "Sign up", new_user_registration_path, class: "ml-4 px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700" %>
         <% end %>
-      </ul>
+
+        <!-- Bouton menu mobile -->
+        <button type="button" 
+                class="lg:hidden ml-4 text-gray-500 hidden"
+                data-controller="mobile-menu"
+                data-action="mobile-menu#toggle">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Menu mobile -->
+    <div class="hidden md:hidden" data-mobile-menu-target="menu">
+      <div class="pt-2 pb-3 space-y-1">
+        <%= link_to "Home", root_path, class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
+        
+        <% if user_signed_in? %>
+          <%= link_to "Wantlist", user_user_wanted_cards_path(current_user), class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
+          <%= link_to "Collection", user_user_cards_path(current_user), class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
+          <%= link_to "Trades", user_trades_path(current_user), class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
+          <%= link_to "Messages", user_chatrooms_path(current_user), class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
+        <% end %>
+      </div>
     </div>
   </div>
 </nav>

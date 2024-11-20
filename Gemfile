@@ -74,7 +74,7 @@ group :test do
   gem 'selenium-webdriver'
   # Easy installation and use of web drivers to run system tests with browsers
   gem 'webdrivers', '= 5.3.0'
-
+  gem 'database_cleaner-active_record'
   gem 'shoulda-matchers', '~> 4.0'
 end
 

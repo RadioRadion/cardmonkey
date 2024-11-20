@@ -21,7 +21,7 @@ class UserWantedCardsController < ApplicationController
     @form = Forms::UserWantedCardForm.new(user_wanted_card_form_params)
     
     if @form.save
-      redirect_to user_user_wanted_cards_path(@user), notice: t('.success')
+      redirect_to user_user_wanted_cards_path(@user), notice: t('user_wanted_cards.create.success')
     else
       Rails.logger.debug "Form errors: #{@form.errors.full_messages}"
       render :new, status: :unprocessable_entity
@@ -47,7 +47,7 @@ class UserWantedCardsController < ApplicationController
       respond_to do |format|
         format.html { 
           redirect_to user_user_wanted_cards_path(@user), 
-          notice: t('.success') 
+          notice: t('user_wanted_cards.update.success')
         }
         format.json { render json: success_json_response }
       end
@@ -71,7 +71,7 @@ class UserWantedCardsController < ApplicationController
       respond_to do |format|
         format.html {
           redirect_to user_user_wanted_cards_path(@user),
-          notice: t('.success', name: name)
+          notice: t('user_wanted_cards.destroy.success', name: name)
         }
         format.json { head :no_content }
       end
@@ -99,14 +99,14 @@ class UserWantedCardsController < ApplicationController
 
   def success_json_response
     {
-      message: t('.success'),
+      message: t('user_wanted_cards.update.success'),
       quantity: @user_wanted_card.quantity
     }
   end
 
   def error_json_response
     {
-      message: t('.error'),
+      message: t('user_wanted_cards.update.error'),
       errors: @form.errors.full_messages
     }
   end
@@ -115,7 +115,7 @@ class UserWantedCardsController < ApplicationController
     respond_to do |format|
       format.html do
         redirect_to user_user_wanted_cards_path(@user),
-        alert: t('.not_found')
+        alert: t('user_wanted_cards.destroy.not_found')
       end
       format.json { 
         render json: { error: error.message }, 

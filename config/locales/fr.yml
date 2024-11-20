@@ -1,4 +1,28 @@
 fr:
+  user_wanted_cards:
+    create:
+      success: "La carte a été ajoutée à votre liste de recherche"
+      error: "Une erreur est survenue lors de l'ajout de la carte"
+    update:
+      success: "La carte a été mise à jour dans votre liste de recherche"
+      error: "Une erreur est survenue lors de la mise à jour de la carte"
+    destroy:
+      success: "La carte %{name} a été retirée de votre liste de recherche"
+      error: "Une erreur est survenue lors de la suppression de la carte"
+      not_found: "La carte n'a pas été trouvée dans votre liste de recherche"
+
+  user_cards:
+    create:
+      success: "La carte a été ajoutée à votre collection"
+      error: "Une erreur est survenue lors de l'ajout de la carte"
+    update:
+      success: "La carte a été mise à jour dans votre collection"
+      error: "Une erreur est survenue lors de la mise à jour de la carte"
+    destroy:
+      success: "La carte %{name} a été retirée de votre collection"
+      error: "Une erreur est survenue lors de la suppression de la carte"
+      not_found: "La carte n'a pas été trouvée dans votre collection"
+
   activerecord:
     models:
       user_card: "Carte de collection"
@@ -56,30 +80,6 @@ fr:
         attributes:
           foil: "Foil"
 
-  user_cards:
-    create:
-      success: "La carte a été ajoutée à votre collection"
-      error: "Une erreur est survenue lors de l'ajout de la carte"
-    update:
-      success: "La carte a été mise à jour dans votre collection"
-      error: "Une erreur est survenue lors de la mise à jour de la carte"
-    destroy:
-      success: "La carte %{name} a été retirée de votre collection"
-      error: "Une erreur est survenue lors de la suppression de la carte"
-      not_found: "La carte n'a pas été trouvée dans votre collection"
-
-  user_wanted_cards:
-    create:
-      success: "La carte a été ajoutée à votre liste de recherche"
-      error: "Une erreur est survenue lors de l'ajout de la carte"
-    update:
-      success: "La carte a été mise à jour dans votre liste de recherche"
-      error: "Une erreur est survenue lors de la mise à jour de la carte"
-    destroy:
-      success: "La carte %{name} a été retirée de votre liste de recherche"
-      error: "Une erreur est survenue lors de la suppression de la carte"
-      not_found: "La carte n'a pas été trouvée dans votre liste de recherche"
-
   cards:
     conditions:
       poor: "Mauvais"
@@ -128,37 +128,3 @@ fr:
       actions:
         edit: "Modifier"
         delete: "Supprimer"
-
-# config/locales/en.yml
-en:
-  activerecord:
-    models:
-      user_card: "Collection Card"
-      user_wanted_card: "Wanted Card"
-    attributes:
-      user_card:
-        condition: "Condition"
-        language: "Language"
-        quantity: "Quantity"
-        foil: "Foil"
-    enums:
-      user_card:
-        condition:
-          poor: "Poor"
-          played: "Played"
-          light_played: "Light Played"
-          good: "Good"
-          excellent: "Excellent"
-          near_mint: "Near Mint"
-          mint: "Mint"
-        language:
-          french: "French"
-          english: "English"
-          german: "German"
-          italian: "Italian"
-          simplified_chinese: "Simplified Chinese"
-          traditional_chinese: "Traditional Chinese"
-          japanese: "Japanese"
-          portuguese: "Portuguese"
-          russian: "Russian"
-          korean: "Korean"
