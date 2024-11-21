@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_11_20_075442) do
+ActiveRecord::Schema[7.1].define(version: 2024_11_21_134500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -119,7 +119,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_20_075442) do
     t.bigint "chatroom_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "read_at"
+    t.index ["chatroom_id", "created_at"], name: "index_messages_on_chatroom_id_and_created_at"
     t.index ["chatroom_id"], name: "index_messages_on_chatroom_id"
+    t.index ["read_at"], name: "index_messages_on_read_at"
+    t.index ["user_id", "chatroom_id"], name: "index_messages_on_user_id_and_chatroom_id"
     t.index ["user_id"], name: "index_messages_on_user_id"
   end
 

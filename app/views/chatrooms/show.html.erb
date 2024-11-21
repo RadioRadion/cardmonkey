@@ -1,51 +1,83 @@
-<div class="container">
-  <div class="row">
-  <!--   <div class="col-6">
-    </div> -->
-    <div class="col-3">
-      <div class="member_list">
-        <%  @chatrooms.each do |chatroom| %>
-          <ul class="list-unstyled">
-            <li class="left clearfix">
-              <span class="chat-img pull-left">
-                <% if current_user.id == chatroom.user_id %>
-                  <% user = User.find(chatroom.user_id_invit) %>
-                  <%=  link_to user.username, user_chatroom_path(current_user, chatroom) %>
-                <%  else  %>
-                  <% user = User.find(chatroom.user_id) %>
-                  <%=  link_to user.username, user_chatroom_path(current_user, chatroom) %>
-                <% end %>
+<div class="min-h-screen bg-gray-100">
+  <div class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-12 gap-6">
+      <!-- Chatroom List Sidebar -->
+      <div class="col-span-3 bg-white rounded-lg shadow">
+        <div class="p-4 border-b">
+          <h2 class="text-lg font-semibold">Conversations</h2>
+        </div>
+        <div class="overflow-y-auto max-h-[calc(100vh-200px)]">
+          <% @chatrooms.each do |chatroom| %>
+            <%= link_to user_chatroom_path(current_user, chatroom), 
+                class: "block p-4 hover:bg-gray-50 #{@chatroom == chatroom ? 'bg-blue-50' : ''}" do %>
+              <div class="flex items-center space-x-3">
+                <% other_user = chatroom.other_user(current_user) %>
+                <div class="relative">
+                  <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                    <span class="text-gray-600 font-medium">
+                      <%= other_user.username.first.upcase %>
+                    </span>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <h3 class="font-medium"><%= other_user.username %></h3>
+                  <% if chatroom.messages.any? %>
+                    <p class="text-sm text-gray-500 truncate">
+                      <%= chatroom.messages.last.display_content %>
+                    </p>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Chat Area -->
+      <div class="col-span-9 bg-white rounded-lg shadow flex flex-col h-[calc(100vh-120px)]"
+           data-controller="chat">
+        <!-- Chat Header -->
+        <div class="p-4 border-b flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+              <span class="text-gray-600 font-medium">
+                <%= @other_user.username.first.upcase %>
               </span>
-            </li>
-          </ul>
-        <% end %>
-      </div>
-    </div>
-    <div class="col-9">
-      <div class="chat-header">
-        <h4> <%= @chatroom.name %></h4>
-      </div>
-      <div id="messages" data-chatroom-id="<%= @chatroom.id %>">
-        <% @chatroom.messages.each do |message| %>
-        <%= render "messages/message", message: message %>
-        <% end %>
-      </div>
-      <div id="create-message">
-        <%= simple_form_for [ current_user, @chatroom, @message ], remote: true do |f| %>
-          <%= f.input :content, label: false, placeholder: "Message"%>
-        <% end %>
+            </div>
+            <div>
+              <h2 class="text-lg font-semibold"><%= @other_user.username %></h2>
+              <span class="text-sm text-gray-500" data-user-status="<%= @other_user.id %>">offline</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div id="messages" 
+             class="flex-1 overflow-y-auto p-4 space-y-4" 
+             data-chatroom-id="<%= @chatroom.id %>"
+             data-chat-target="messageList">
+          <%= render @messages.reverse %>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="typing-indicator" class="px-4 py-2 text-sm text-gray-500 hidden"></div>
+
+        <!-- Message Input -->
+        <div class="border-t p-4">
+          <%= form_with(model: @message, 
+                        url: user_chatroom_messages_path(current_user, @chatroom),
+                        html: { class: "flex items-center space-x-2" }) do |f| %>
+            <%= f.text_field :content,
+                           id: "message_content",
+                           class: "flex-1 rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500",
+                           placeholder: "Écrivez votre message..." %>
+            <%= f.submit "Envoyer",
+                        class: "px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" %>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="d-flex align-items-center rounded-circle">
-  <div>
-    <%= link_to "Messagerie", user_chatrooms_path, class: 'btn btn-secondary' %>
-  </div>
-   <div>
-    <%= link_to "New Message", new_user_chatroom_path, class: 'btn far fa-edit' %>
-  </div>
-</div>
-
-
+<%= turbo_stream_from @chatroom %>

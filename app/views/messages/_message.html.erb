@@ -1,34 +1,34 @@
-<div class="col-6 <%= current_user.id == message.user_id ? "messageLeft" : "messageRight" %>">
-  <div class="message-container" id="message-<%= message.id %>">
-        <i class="author">
-          <%= image_tag "https://kitt.lewagon.com/placeholder/users/#{current_user.username}", class: "avatar" %>
-          <span><%= message.user.username %></span>
-        </i>
-         <div class="message-content">
-          <!-- Code pour chopper le lien du trade via actioncable,
-            ne marche que si il y +link_to -->
-          <% pattern_new = /(?<intro>Un nouveau trade est arrivé !) (?<link>\d+)$/
-          match_data_new = message.content.match(pattern_new)
-          pattern_edit = /(?<intro>Trade modifié !) (?<link>\d+)$/
-          match_data_edit = message.content.match(pattern_edit)
-          trade = Trade.find_by(id: match_data_new[:link]) if match_data_new
-          trade = Trade.find_by(id: match_data_edit[:link]) if match_data_edit
-          %>
-
-          <% if match_data_new.blank? && match_data_edit.blank? %>
-            <p><%= message.content%> </p>
+<div class="message <%= message.user == current_user ? 'flex justify-end' : 'flex justify-start' %>"
+     id="message_<%= message.id %>">
+  <div class="<%= message.user == current_user ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> 
+              rounded-lg px-4 py-2 max-w-[70%] break-words relative group">
+    <% unless message.user == current_user %>
+      <div class="text-xs text-gray-500 mb-1">
+        <%= message.user.username %>
+      </div>
+    <% end %>
+    
+    <% if message.trade_message? %>
+      <div class="flex flex-col space-y-2">
+        <div class="font-medium"><%= message.display_content %></div>
+        <%= link_to "Voir le trade", trade_path(message.trade_id), 
+            class: "#{message.user == current_user ? 'bg-white text-blue-500' : 'bg-blue-500 text-white'} 
+                   px-4 py-2 rounded-lg inline-block hover:opacity-90 transition-opacity text-center" %>
+      </div>
+    <% else %>
+      <%= message.content %>
+    <% end %>
+    
+    <div class="text-xs <%= message.user == current_user ? 'text-blue-100' : 'text-gray-500' %> mt-1">
+      <%= message.timestamp %>
+      <% if message.user == current_user %>
+        <span class="ml-2">
+          <i class="fas fa-check-double" title="Delivered"></i>
+          <% if message.read_at %>
+            <i class="fas fa-eye ml-1" title="Read"></i>
           <% end %>
-
-          <% [match_data_new, match_data_edit].each do |match_data| %>
-            <% if match_data %>
-              <p><%= match_data[:intro] %> </p>
-              <p><%= link_to("Valider ici", user_trade_path(trade.user_id, trade.id)) if !match_data.nil? && trade.present?  %></p>
-              <p><%= "Cette proposition de trade n'existe plus" if trade.blank? && !match_data.nil? %></p>
-            <% end %>
-          <% end %>
-
-          <small><%= message.created_at.strftime("%a %b %e at %l:%M%p") %></small>
-        </div>
+        </span>
+      <% end %>
+    </div>
   </div>
 </div>
-

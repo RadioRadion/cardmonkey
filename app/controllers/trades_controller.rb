@@ -1,5 +1,5 @@
 class TradesController < ApplicationController
-  before_action :set_trade, only: [:show, :edit, :update, :accept]  # Limite les actions
+  before_action :set_trade, only: [:show, :edit, :update, :accept]
   before_action :set_trade_participants, only: [:show, :edit]
   before_action :set_partner, only: [:new_proposition, :update_trade_value]
 
@@ -20,23 +20,17 @@ class TradesController < ApplicationController
   end
 
   def create
-    Rails.logger.debug "Trade params: #{params[:trade].inspect}"
-    Rails.logger.debug "Current user: #{current_user.inspect}"
-    
     @trade = current_user.trades.build(
       user_id_invit: params[:trade][:user_id_invit],
       status: "pending"
     )
 
-    Rails.logger.debug "Created trade: #{@trade.inspect}"
-    Rails.logger.debug "Trade errors: #{@trade.errors.full_messages}" if @trade.invalid?
-
     if @trade.save
       handle_trade_creation
       redirect_to user_path(current_user), notice: "Proposition de trade envoyée !"
     else
-      Rails.logger.error("Trade creation failed: #{@trade.errors.full_messages}")
-      redirect_back fallback_location: root_path, alert: "Erreur lors de la création du trade: #{@trade.errors.full_messages.join(', ')}"
+      redirect_back fallback_location: root_path, 
+                    alert: "Erreur lors de la création du trade: #{@trade.errors.full_messages.join(', ')}"
     end
   end
 
@@ -62,7 +56,6 @@ class TradesController < ApplicationController
       .includes(card_version: [:card, :extension])
       .order("cards.name_#{I18n.locale}")
 
-    # Appliquer les filtres de recherche
     if params[:user_query].present?
       @user_cards = @user_cards.joins(card_version: :card)
         .where("cards.name_#{I18n.locale} ILIKE ?", "%#{params[:user_query]}%")
@@ -73,17 +66,13 @@ class TradesController < ApplicationController
         .where("cards.name_#{I18n.locale} ILIKE ?", "%#{params[:partner_query]}%")
     end
 
-    if params[:filter].present?
-      apply_advanced_filters
-    end
+    apply_advanced_filters if params[:filter].present?
     
-    # Récupérer l'historique des trades
     @trade_history = Trade.where(
       "(user_id = ? AND user_id_invit = ?) OR (user_id = ? AND user_id_invit = ?)",
       current_user.id, @partner.id, @partner.id, current_user.id
     ).order(created_at: :desc).limit(5)
 
-    # Suggestions basées sur les wishlists
     @suggested_cards = find_suggested_cards
 
     @trade = Trade.new(
@@ -191,11 +180,11 @@ class TradesController < ApplicationController
   end
 
   def notify_trade_creation
-    Notification.create_notification(@trade.user_id_invit, "Nouveau trade !")
+    Notification.create_notification(@trade.user_id_invit, "Nouveau trade proposé !")
     Trade.save_message(
       current_user.id, 
       @trade.user_id_invit, 
-      "Un nouveau trade est arrivé ! #{@trade.id}"
+      "trade_id:#{@trade.id}"
     )
   end
 
@@ -247,7 +236,7 @@ class TradesController < ApplicationController
 
   def notify_trade_status_change(message, notification_text)
     other_user_id = @trade.other_user_id(current_user)
-    Trade.save_message(current_user.id, other_user_id, message)
+    Trade.save_message(current_user.id, other_user_id, "trade_id:#{@trade.id}")
     Notification.create_notification(other_user_id, notification_text)
   end
 

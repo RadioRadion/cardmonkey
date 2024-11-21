@@ -1,9 +1,20 @@
 class Notification < ApplicationRecord
   belongs_to :user
 
-  enum status: { open: "0", closed: "1" }
+  validates :content, :status, presence: true
 
-  def self.create_notification(user_id, content)
-    Notification.create!(user_id: user_id, content: content, status: :open)
+  scope :unread, -> { where(status: 'unread') }
+  scope :recent, -> { order(created_at: :desc).limit(5) }
+
+  def self.create_notification(recipient_id, message)
+    create(
+      user_id: recipient_id,
+      content: message,
+      status: 'unread'
+    )
+  end
+
+  def mark_as_read!
+    update!(status: 'read')
   end
 end
