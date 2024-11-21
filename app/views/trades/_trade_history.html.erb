@@ -1,0 +1,58 @@
+<div class="bg-white rounded-lg shadow p-4 mt-6">
+  <h3 class="text-lg font-semibold mb-4">Historique des échanges avec <%= @partner.username %></h3>
+
+  <% if @trade_history.any? %>
+    <div class="space-y-4">
+      <% @trade_history.each do |trade| %>
+        <%= turbo_frame_tag "trade_history_#{trade.id}" do %>
+          <div class="border rounded-lg p-3 hover:bg-gray-50">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <span class="text-sm text-gray-600">
+                  <%= l trade.created_at, format: :short %>
+                </span>
+                <span class="ml-2 px-2 py-0.5 rounded-full text-xs
+                  <%= trade_status_classes(trade.status) %>">
+                  <%= trade.status %>
+                </span>
+              </div>
+              
+              <%= link_to trade_path(trade), 
+                          class: "text-blue-600 hover:text-blue-800 text-sm" do %>
+                Voir le détail →
+              <% end %>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-gray-600 mb-1">Échangé</p>
+                <div class="flex -space-x-2">
+                  <% trade.user_cards.where(user: current_user).limit(3).each do |card| %>
+                    <%= image_tag card.card_version.img_uri, 
+                                class: "w-8 h-8 rounded-full ring-2 ring-white",
+                                title: card.card_version.card.name_fr %>
+                  <% end %>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-xs text-gray-600 mb-1">Reçu</p>
+                <div class="flex -space-x-2">
+                  <% trade.user_cards.where(user: @partner).limit(3).each do |card| %>
+                    <%= image_tag card.card_version.img_uri, 
+                                class: "w-8 h-8 rounded-full ring-2 ring-white",
+                                title: card.card_version.card.name_fr %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-gray-500 text-center py-4">
+      Aucun échange précédent avec <%= @partner.username %>
+    </p>
+  <% end %>
+</div>

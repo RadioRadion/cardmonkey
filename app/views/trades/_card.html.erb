@@ -1,0 +1,57 @@
+<div class="relative group" 
+     data-controller="card-quantity"
+     data-card-quantity-max-value="<%= card.quantity %>"
+     data-card-id="<%= card.id %>"
+     data-card-preview="true"
+     data-preview-image="<%= card.card_version.img_uri %>"
+     data-card-name="<%= card.card_version.card.name_fr %>"
+     data-card-set="<%= card.card_version.extension.name %>"
+     data-card-price="<%= number_to_currency(card.card_version.eur_price) %>">
+  
+  <%= image_tag card.card_version.img_uri,
+                class: "!w-[30px] !h-[30px] object-contain rounded-lg transition-all hover:ring-2 hover:ring-blue-500 hover:shadow-lg cursor-pointer",
+                loading: "lazy" %>
+
+  <%# Quantité et condition %>
+  <div class="absolute top-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs">
+    <%= card.quantity %>x • <%= card.condition %>
+  </div>
+
+  <%# Prix %>
+  <% if card.card_version.eur_price.present? %>
+    <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs">
+      <%= number_to_currency(card.card_version.eur_price) %>
+    </div>
+  <% end %>
+
+  <%# Boutons de quantité %>
+  <div class="absolute bottom-2 right-2 space-x-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-lg shadow-lg p-1 flex items-center">
+    <button data-action="click->card-quantity#decrement"
+            data-card-quantity-target="decrement"
+            class="p-1 hover:bg-gray-100 rounded">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+      </svg>
+    </button>
+    
+    <span data-card-quantity-target="quantity"
+          class="px-2 min-w-[1.5rem] text-center font-medium">0</span>
+    
+    <button data-action="click->card-quantity#increment"
+            data-card-quantity-target="increment"
+            class="p-1 hover:bg-gray-100 rounded">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+    </button>
+  </div>
+
+  <%# Badge wishlist %>
+  <% if side == 'user' && @partner.user_wanted_cards.exists?(card_id: card.card_version.card_id) %>
+    <div class="absolute -top-2 -right-2 bg-green-500 text-white p-1 rounded-full shadow-md">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+  <% end %>
+</div>

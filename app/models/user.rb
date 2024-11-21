@@ -3,6 +3,7 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   geocoded_by :address
   after_validation :geocode, if: :will_save_change_to_address?
+  has_one_attached :avatar
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
@@ -80,6 +81,15 @@ class User < ApplicationRecord
                               .group('user_cards.language')
                               .count
     }
+  end
+
+  def avatar_thumbnail
+    if avatar.attached?
+      avatar
+    else
+      # Version plus simple avec une image statique
+      "https://via.placeholder.com/64"
+    end
   end
 
 end

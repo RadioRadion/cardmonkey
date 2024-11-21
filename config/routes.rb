@@ -1,23 +1,31 @@
 Rails.application.routes.draw do
   devise_for :users
   root to: 'user_cards#index'
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
+  # Routes pour matches
   resources :matches, only: [:index, :show] do
     collection do
-      # Si tu veux ajouter des routes spéciales comme :
       get 'by_user/:user_id', to: 'matches#by_user', as: :by_user
     end
   end
+
+  # Routes pour trades unifiées
   resources :trades do
     member do
       patch :accept
       patch :reject
       patch :complete
     end
-    
+
+    collection do
+      get :new_proposition
+      get :update_trade_value
+    end
+
     resources :trade_user_cards, only: [:create, :destroy], as: :cards
   end
+
+  # Routes imbriquées dans users
   resources :users, only: [:show, :edit, :update] do
     resources :matches, only: [:index]
     resources :trades, only: [:index]
@@ -27,9 +35,9 @@ Rails.application.routes.draw do
       resources :messages, only: [:create]
     end
   end
+
+  # Routes additionnelles
   get 'dashboard/matches', to: 'dashboard#matches'
   get 'cards/search', to: 'cards#search', defaults: { format: 'json' }
   get 'cards/versions', to: 'cards#versions', defaults: { format: 'json' }
 end
-
-

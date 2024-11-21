@@ -43,9 +43,10 @@
               <%= link_to "My Profile", user_path(current_user), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
               <%= link_to "Edit Profile", edit_user_path(current_user), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
               <%= link_to "Dashboard", dashboard_matches_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
-              <%= link_to "Sign out", destroy_user_session_path, 
-                  data: { turbo_method: :delete }, 
-                  class: "block px-4 py-2 text-sm text-red-600 hover:bg-red-50" %>
+              <%= button_to "Sign out", 
+                destroy_user_session_path, 
+                method: :delete,
+                class: "block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" %>
             </div>
           </div>
         <% else %>

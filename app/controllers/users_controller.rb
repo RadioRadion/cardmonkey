@@ -4,21 +4,10 @@ class UsersController < ApplicationController
   before_action :ensure_current_user, only: [:edit, :update]
 
   def show
-    if @user != current_user
-      @path = "/users/#{@user.id}/trades/"
-      @trade = Trade.new
-      cards_other_wants_ids = @user.user_wanted_cards.map(&:card_id)
-      @cards_other_wants = UserCard.where(user_id: current_user).where(card_id: cards_other_wants_ids)
-      cards_i_wants_ids = current_user.user_wanted_cards.map(&:card_id)
-      @cards_i_wants = UserCard.where(user_id: @user).where(card_id: cards_i_wants_ids)
-      @my_cards = UserCard.where(user_id: current_user).where.not(card_id: cards_other_wants_ids)
-      @other_cards = UserCard.where(user_id: @user).where.not(card_id: cards_i_wants_ids)
-    else
-      @cards = current_user.user_cards
-      @wants = current_user.user_wanted_cards
-      @stats = current_user.matching_stats
-      users = User.near(current_user.address, current_user.area)
-    end
+    @user = User.find(params[:id])
+    @stats = @user.matching_stats if @user == current_user
+    @editing = params[:field] == "info"
+    @editing_preferences = params[:field] == "preferences"
   end
 
   def edit
@@ -26,10 +15,51 @@ class UsersController < ApplicationController
   end
 
   def update
+    @user = User.find(params[:id])
+    updating_avatar = user_params.key?(:avatar)
+    
     if @user.update(user_params)
-      redirect_to edit_user_path(@user), notice: 'Profile updated successfully!'
+      respond_to do |format|
+        format.turbo_stream do
+          if updating_avatar
+            render turbo_stream: turbo_stream.replace(
+              "profile_avatar",
+              partial: "users/avatar",
+              locals: { user: @user }
+            )
+          else
+            # Refresh the entire profile section for other updates
+            render turbo_stream: [
+              turbo_stream.replace(
+                "profile_info",
+                partial: "users/profile_info",
+                locals: { user: @user, editing: false }
+              ),
+              turbo_stream.replace(
+                "trading_preferences",
+                partial: "users/trading_preferences",
+                locals: { user: @user, editing_preferences: false }
+              )
+            ]
+          end
+        end
+        format.html { redirect_to user_path(@user), notice: "Profile updated successfully." }
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.turbo_stream do
+          if updating_avatar
+            render turbo_stream: turbo_stream.update(
+              "profile_avatar",
+              partial: "users/avatar",
+              locals: { user: @user }
+            )
+          else
+            render :show, status: :unprocessable_entity
+          end
+        end
+        format.html { render :show, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -37,15 +67,26 @@ class UsersController < ApplicationController
 
   def set_user
     @user = User.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to root_path, alert: "User not found."
   end
 
   def ensure_current_user
     unless @user == current_user
-      redirect_to root_path, alert: "You're not authorized to perform this action."
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.update(
+            "flash_messages",
+            partial: "shared/flash",
+            locals: { message: "You're not authorized to perform this action.", type: "error" }
+          )
+        end
+        format.html { redirect_to root_path, alert: "You're not authorized to perform this action." }
+      end
     end
   end
 
   def user_params
-    params.require(:user).permit(:username, :email, :address, :area, :preference)
+    params.require(:user).permit(:username, :email, :address, :area, :preference, :avatar)
   end
 end

@@ -1,0 +1,107 @@
+<div class="container mx-auto px-4 py-6 pb-32" data-controller="trade-selection" data-trade-selection-partner-id-value="<%= @partner.id %>">
+  <%# En-tête avec titre et recherche %>
+  <div class="mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold">
+        Proposer un échange à <%= @partner.username %>
+      </h1>
+      <span class="text-gray-600">
+        <%= pluralize(@partner.user_wanted_cards.count, 'carte') %> recherchée(s)
+      </span>
+    </div>
+    
+    <%# Barre de recherche %>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <%= form_with url: new_proposition_trades_path(partner_id: @partner.id), method: :get, data: { turbo_frame: "cards_grid" } do |f| %>
+        <input type="text" 
+               name="user_query"
+               value="<%= params[:user_query] %>"
+               placeholder="Rechercher dans vos cartes..." 
+               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+               data-action="input->trade-selection#search">
+        <input type="text" 
+               name="partner_query"
+               value="<%= params[:partner_query] %>"
+               placeholder="Rechercher dans ses cartes..." 
+               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+               data-action="input->trade-selection#search">
+      <% end %>
+    </div>
+  </div>
+
+  <%# Grilles de cartes %>
+  <%= turbo_frame_tag "cards_grid" do %>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <%# Vos cartes %>
+      <div class="bg-white rounded-lg shadow">
+        <div class="p-4 border-b">
+          <h2 class="text-xl font-semibold">Vos cartes</h2>
+        </div>
+        <div class="divide-y">
+          <%= render partial: "trades/card_row",
+                    collection: @user_cards,
+                    locals: { side: 'user' } %>
+        </div>
+      </div>
+
+      <%# Cartes du partenaire %>
+      <div class="bg-white rounded-lg shadow">
+        <div class="p-4 border-b">
+          <h2 class="text-xl font-semibold">Cartes de <%= @partner.username %></h2>
+        </div>
+        <div class="divide-y">
+          <%= render partial: "trades/card_row",
+                    collection: @partner_cards,
+                    locals: { side: 'partner' } %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Barre de résumé fixe %>
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <%= form_with model: @trade, local: true, class: "w-full", data: { action: "submit->trade-selection#submitTrade" } do |f| %>
+        <%= f.hidden_field :user_id, value: current_user.id %>
+        <%= f.hidden_field :user_id_invit, value: @partner.id %>
+        <%= f.hidden_field :offer %>
+        <%= f.hidden_field :target %>
+        
+        <div class="flex justify-between items-center">
+          <%# Côté gauche avec les totaux %>
+          <div class="flex gap-8">
+            <div>
+              <span class="text-sm text-gray-600">Vous donnez</span>
+              <div class="font-medium">
+                <span data-trade-selection-target="userCardCount">0</span> cartes
+                (<span data-trade-selection-target="userValue">0,00 €</span>)
+              </div>
+            </div>
+            <div>
+              <span class="text-sm text-gray-600">Vous recevez</span>
+              <div class="font-medium">
+                <span data-trade-selection-target="partnerCardCount">0</span> cartes
+                (<span data-trade-selection-target="partnerValue">0,00 €</span>)
+              </div>
+            </div>
+            <%# Balance du trade %>
+            <div class="border-l pl-8">
+              <span class="text-sm text-gray-600">Balance</span>
+              <div class="font-medium" data-trade-selection-target="balance">0,00 €</div>
+            </div>
+          </div>
+
+          <%# Boutons d'action %>
+          <div class="flex gap-4 items-center">
+            <%= link_to "Annuler", user_path(@partner), 
+                      class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50" %>
+            
+            <%= f.submit "Valider l'échange", 
+                      class: "bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+                      data: { trade_selection_target: "submitButton" } %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

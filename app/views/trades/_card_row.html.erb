@@ -1,0 +1,50 @@
+<div class="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg" 
+     data-controller="card-quantity"
+     data-card-quantity-max-value="<%= card_row.quantity %>"
+     data-card-quantity-price-value="<%= card_row.card_version.eur_price.to_f %>"
+     data-card-id="<%= card_row.id %>"
+     data-side="<%= side %>">
+  
+  <%# Colonne image %>
+  <div class="flex-shrink-0">
+    <%= image_tag card_row.card_version.img_uri,
+                  style: "width: 80px; height: 112px;",
+                  class: "rounded shadow-sm object-contain",
+                  loading: "lazy" %>
+  </div>
+
+  <%# Colonne infos %>
+  <div class="flex-grow">
+    <div class="font-medium"><%= card_row.card_version.card.name_fr %></div>
+    <div class="text-sm text-gray-600">
+      <%= card_row.condition %> • <%= card_row.language %>
+      <% if card_row.card_version.eur_price %>
+        • <%= number_to_currency(card_row.card_version.eur_price, unit: "€") %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Colonne quantité %>
+  <div class="flex items-center gap-2">
+    <button type="button"
+            class="w-8 h-8 flex items-center justify-center rounded border hover:bg-gray-100 disabled:opacity-50"
+            data-card-quantity-target="decrement"
+            data-action="click->card-quantity#decrement">
+      -
+    </button>
+    
+    <span class="w-8 text-center" 
+          data-card-quantity-target="quantity">
+      0
+    </span>
+    
+    <button type="button"
+            class="w-8 h-8 flex items-center justify-center rounded border hover:bg-gray-100 disabled:opacity-50"
+            data-card-quantity-target="increment"
+            data-action="click->card-quantity#increment">
+      +
+    </button>
+    
+    <span class="text-sm text-gray-500">/ <%= card_row.quantity %></span>
+  </div>
+</div>

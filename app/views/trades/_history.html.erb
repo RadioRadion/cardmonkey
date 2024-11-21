@@ -1,0 +1,75 @@
+<div class="bg-white rounded-lg shadow p-4 mt-6">
+  <h3 class="text-lg font-semibold mb-4">
+    Historique avec <%= @partner.username %>
+    <span class="ml-2 text-sm text-gray-500">
+      <%= pluralize(@trade_history.count, 'échange') %>
+    </span>
+  </h3>
+
+  <div class="space-y-4">
+    <% @trade_history.each do |trade| %>
+      <div class="border rounded-lg p-3 hover:bg-gray-50">
+        <div class="flex justify-between items-start mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-600">
+              <%= l trade.created_at, format: :short %>
+            </span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs
+                      <%= trade_status_badge_class(trade.status) %>">
+              <%= trade.status %>
+            </span>
+          </div>
+          
+          <%= link_to trade_path(trade), 
+                      class: "text-sm text-blue-600 hover:text-blue-800" do %>
+            Voir le détail →
+          <% end %>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-2">
+          <div>
+            <p class="text-xs text-gray-500 mb-1">Cartes échangées</p>
+            <div class="flex -space-x-2">
+              <% trade.trade_user_cards.includes(user_card: :card_version)
+                                    .where(user_cards: { user_id: current_user.id })
+                                    .first(3).each do |tuc| %>
+                <%= image_tag tuc.user_card.card_version.img_uri,
+                            class: "w-8 h-8 rounded-full ring-2 ring-white",
+                            title: tuc.user_card.card_version.card.name_fr %>
+              <% end %>
+              <% if trade.trade_user_cards.where(user_cards: { user_id: current_user.id }).count > 3 %>
+                <span class="flex items-center justify-center w-8 h-8 rounded-full ring-2 ring-white bg-gray-100 text-xs text-gray-600">
+                  +<%= trade.trade_user_cards.where(user_cards: { user_id: current_user.id }).count - 3 %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+
+          <div>
+            <p class="text-xs text-gray-500 mb-1">Cartes reçues</p>
+            <div class="flex -space-x-2">
+              <% trade.trade_user_cards.includes(user_card: :card_version)
+                                    .where(user_cards: { user_id: @partner.id })
+                                    .first(3).each do |tuc| %>
+                <%= image_tag tuc.user_card.card_version.img_uri,
+                            class: "w-8 h-8 rounded-full ring-2 ring-white",
+                            title: tuc.user_card.card_version.card.name_fr %>
+              <% end %>
+              <% if trade.trade_user_cards.where(user_cards: { user_id: @partner.id }).count > 3 %>
+                <span class="flex items-center justify-center w-8 h-8 rounded-full ring-2 ring-white bg-gray-100 text-xs text-gray-600">
+                  +<%= trade.trade_user_cards.where(user_cards: { user_id: @partner.id }).count - 3 %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @trade_history.empty? %>
+      <p class="text-center text-gray-500 py-4">
+        Aucun échange précédent avec <%= @partner.username %>
+      </p>
+    <% end %>
+  </div>
+</div>

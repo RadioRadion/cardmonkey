@@ -5,6 +5,8 @@
     "@rails/actioncable": "^6.0.0",
     "@rails/activestorage": "^6.0.0",
     "@rails/ujs": "^6.0.0",
+    "browserslist": "^4.24.2",
+    "caniuse-lite": "^1.0.30001680",
     "flowbite": "^2.3.0",
     "turbolinks": "^5.2.0"
   },

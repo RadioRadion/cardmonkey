@@ -1,0 +1,58 @@
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg"
+     data-controller="trade-summary">
+  <%= form_with model: @trade, 
+                class: "container mx-auto px-4 py-4",
+                data: { action: "submit->trade-selection#submitTrade" } do |f| %>
+    
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-8">
+        <%# Cartes données %>
+        <div>
+          <p class="text-sm text-gray-600">Vous donnez</p>
+          <div class="flex items-baseline space-x-2">
+            <p class="font-medium">
+              <span data-trade-summary-target="userCardCount">0</span> cartes
+            </p>
+            <p class="text-sm text-gray-600">
+              (<span data-trade-summary-target="userTotalValue">0,00 €</span>)
+            </p>
+          </div>
+        </div>
+
+        <%# Indicateur de différence %>
+        <div data-trade-summary-target="difference"
+             class="flex flex-col items-center">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">
+            <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <span class="text-sm font-medium" 
+                data-trade-summary-target="differenceValue">
+            0,00 €
+          </span>
+        </div>
+
+        <%# Cartes reçues %>
+        <div>
+          <p class="text-sm text-gray-600">Vous recevez</p>
+          <div class="flex items-baseline space-x-2">
+            <p class="font-medium">
+              <span data-trade-summary-target="partnerCardCount">0</span> cartes
+            </p>
+            <p class="text-sm text-gray-600">
+              (<span data-trade-summary-target="partnerTotalValue">0,00 €</span>)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div data-trade-summary-target="status" class="text-sm"></div>
+        <%= f.submit "Proposer l'échange",
+                    class: "bg-blue-600 text-white px-6 py-2 rounded-lg 
+                           hover:bg-blue-700 disabled:opacity-50",
+                    disabled: true,
+                    data: { "trade-summary-target": "submitButton" } %>
+      </div>
+    </div>
+  <% end %>
+</div>

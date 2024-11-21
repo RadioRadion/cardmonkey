@@ -10,6 +10,12 @@ import ModalController from "./controllers/modal_controller"
 import DropdownController from "./controllers/dropdown_controller"
 import MobileMenuController from "./controllers/mobile_menu_controller"
 import TradeController from "./controllers/trade_controller"
+import AvatarUploadController from "./controllers/avatar_upload_controller"
+import TradeSelectionController from "./controllers/trade_selection_controller"
+import CardQuantityController from "./controllers/card_quantity_controller"
+import TradeSummaryController from "./controllers/trade_summary_controller"
+import CardPreviewController from "./controllers/card_preview_controller"
+import FiltersController from "./controllers/filters_controller"
 
 // Démarrage de l'application Stimulus
 window.Stimulus = Application.start()
@@ -23,3 +29,9 @@ Stimulus.register("modal", ModalController)
 Stimulus.register("dropdown", DropdownController)
 Stimulus.register("mobile-menu", MobileMenuController)
 Stimulus.register("trade", TradeController)
+Stimulus.register("avatar-upload", AvatarUploadController)
+Stimulus.register("trade-selection", TradeSelectionController)
+Stimulus.register("card-quantity", CardQuantityController)
+Stimulus.register("trade-summary", TradeSummaryController)
+Stimulus.register("card-preview", CardPreviewController)
+Stimulus.register("filters", FiltersController)
