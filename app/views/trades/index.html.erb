@@ -1,14 +1,195 @@
-<h2>Trades acceptés :</h2>
-<% @trades_accepted.each do |trade| %>
-  <%= link_to "Trade", user_trade_path(trade.user_id, trade.id) %>
-<% end %>
+<%= turbo_stream_from current_user, :trades %>
 
-<h2>Trades en attente de confirmation :</h2>
-<% @trades_pending.each do |trade| %>
-  <%= link_to "Trade", user_trade_path(trade.user_id, trade.id) %>
-<% end %>
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <%# Header with Quick Actions %>
+  <div class="sm:flex sm:items-center sm:justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Espace d'échange</h1>
+      <p class="mt-2 text-sm text-gray-500">Trouvez les cartes que vous recherchez et proposez des échanges équitables</p>
+    </div>
+  </div>
 
-<h2>Anciens trades :</h2>
-<% @trades_done.each do |trade| %>
-  <%= link_to "Trade", user_trade_path(trade.user_id, trade.id) %>
-<% end %>
+  <%# Quick Actions - Centered %>
+  <div class="flex justify-center mb-8">
+    <div class="flex flex-wrap gap-4 justify-center">
+      <%= link_to new_user_card_path, class: "flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-md" do %>
+        <i class="fas fa-plus-circle mr-2"></i>
+        Ajouter des cartes à échanger
+      <% end %>
+      <%= link_to new_user_wanted_card_path, class: "flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md" do %>
+        <i class="fas fa-search mr-2"></i>
+        Ajouter des cartes recherchées
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <%# Left Column: Active Trades %>
+    <div class="lg:col-span-2 space-y-6">
+      <%# Trades en attente %>
+      <% if @trades['0'].present? %>
+        <%= turbo_frame_tag "pending_trades" do %>
+          <section class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-4 bg-white border-b border-gray-200">
+              <h2 class="flex items-center">
+                <span class="text-lg font-medium text-gray-900">En attente</span>
+                <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                  <%= @trades['0'].size %>
+                </span>
+              </h2>
+            </div>
+            <div class="divide-y divide-gray-200">
+              <% @trades['0'].each do |trade| %>
+                <%= turbo_frame_tag dom_id(trade) do %>
+                  <%= render partial: "trade_row", locals: { trade: trade } %>
+                <% end %>
+              <% end %>
+            </div>
+          </section>
+        <% end %>
+      <% end %>
+
+      <%# Trades acceptés %>
+      <% if @trades['1'].present? %>
+        <%= turbo_frame_tag "accepted_trades" do %>
+          <section class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-4 bg-white border-b border-gray-200">
+              <h2 class="flex items-center">
+                <span class="text-lg font-medium text-gray-900">Acceptés</span>
+                <span class="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                  <%= @trades['1'].size %>
+                </span>
+              </h2>
+            </div>
+            <div class="divide-y divide-gray-200">
+              <% @trades['1'].each do |trade| %>
+                <%= turbo_frame_tag dom_id(trade) do %>
+                  <%= render partial: "trade_row", locals: { trade: trade } %>
+                <% end %>
+              <% end %>
+            </div>
+          </section>
+        <% end %>
+      <% end %>
+
+      <%# Trades récemment terminés %>
+      <% if @trades['2'].present? %>
+        <%= turbo_frame_tag "completed_trades" do %>
+          <section class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-4 bg-white border-b border-gray-200">
+              <h2 class="flex items-center">
+                <span class="text-lg font-medium text-gray-900">Récemment terminés</span>
+                <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                  <%= @trades['2'].size %>
+                </span>
+              </h2>
+            </div>
+            <div class="divide-y divide-gray-200">
+              <% @trades['2'].take(3).each do |trade| %>
+                <%= turbo_frame_tag dom_id(trade) do %>
+                  <%= render partial: "trade_row", locals: { trade: trade } %>
+                <% end %>
+              <% end %>
+            </div>
+          </section>
+        <% end %>
+      <% end %>
+
+      <%# Message si aucun trade actif %>
+      <% if @trades.empty? %>
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <div class="text-center">
+            <div class="mx-auto h-12 w-12 text-gray-400">
+              <i class="fas fa-handshake text-2xl"></i>
+            </div>
+            <h3 class="mt-2 text-sm font-semibold text-gray-900">Aucun échange en cours</h3>
+            <p class="mt-1 text-sm text-gray-500">Commencez par proposer un échange à un autre utilisateur.</p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Right Column: Trade Opportunities & Stats %>
+    <div class="space-y-6">
+      <%# Opportunités d'échange %>
+      <section class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
+          <h2 class="text-lg font-medium text-gray-900">Opportunités d'échange</h2>
+        </div>
+        <div class="p-4">
+          <% if current_user.user_wanted_cards.any? %>
+            <% @matches.each do |match| %>
+              <div class="flex items-center justify-between py-3 border-b border-gray-200 last:border-0">
+                <div class="flex items-center space-x-3">
+                  <div class="flex-shrink-0">
+                    <%= image_tag match.user_card.card_version.img_uri, class: "h-10 w-10 rounded-lg object-cover" if match.user_card.card_version.img_uri %>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900"><%= match.user_card.card_version.card.name_fr %></p>
+                    <p class="text-xs text-gray-500">Possédée par <%= match.user_card.user.username %></p>
+                  </div>
+                </div>
+                <%= link_to "Voir", new_proposition_trades_path(partner_id: match.user_card.user.id), class: "text-sm text-blue-600 hover:text-blue-800" %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-center py-4">
+              <p class="text-sm text-gray-500">Ajoutez des cartes à votre liste de recherche pour voir les opportunités d'échange</p>
+              <%= link_to "Ajouter des cartes recherchées", new_user_wanted_card_path, class: "mt-2 inline-block text-sm text-blue-600 hover:text-blue-800" %>
+            </div>
+          <% end %>
+        </div>
+      </section>
+
+      <%# Statistiques d'échange %>
+      <section class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
+          <h2 class="text-lg font-medium text-gray-900">Vos statistiques</h2>
+        </div>
+        <div class="p-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="text-center">
+              <p class="text-2xl font-bold text-gray-900"><%= @stats[:trades_completed] %></p>
+              <p class="text-sm text-gray-500">Échanges réalisés</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-bold text-gray-900"><%= @stats[:cards_available] %></p>
+              <p class="text-sm text-gray-500">Cartes disponibles</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-bold text-gray-900"><%= @stats[:cards_wanted] %></p>
+              <p class="text-sm text-gray-500">Cartes recherchées</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-bold text-gray-900"><%= @stats[:potential_matches] %></p>
+              <p class="text-sm text-gray-500">Matchs potentiels</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <%# Conseils pour les échanges %>
+      <section class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
+          <h2 class="text-lg font-medium text-gray-900">Conseils pour échanger</h2>
+        </div>
+        <div class="p-4">
+          <ul class="space-y-3 text-sm text-gray-600">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+              <span>Ajoutez des cartes à votre collection et votre liste de recherche pour augmenter vos chances de match</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+              <span>Vérifiez régulièrement vos opportunités d'échange pour ne pas manquer de bonnes occasions</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+              <span>Utilisez le chat pour discuter des détails de l'échange avec votre partenaire</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

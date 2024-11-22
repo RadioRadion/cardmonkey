@@ -1,0 +1,55 @@
+<%# app/views/trades/_trade_row.html.erb %>
+<div class="p-4 hover:bg-gray-50">
+  <div class="flex items-center justify-between">
+    <div class="min-w-0 flex-1">
+      <div class="flex items-center gap-2">
+        <%= trade.status_badge %>
+        <p class="truncate font-medium text-gray-900">
+          avec <%= trade.partner_name_for(current_user) %>
+        </p>
+      </div>
+      
+      <%# Infos sur les cartes %>
+      <div class="mt-1 flex items-center gap-4 text-sm text-gray-500">
+        <% user_cards = trade.trade_user_cards.joins(:user_card).where(user_cards: { user_id: current_user.id }) %>
+        <% partner_cards = trade.trade_user_cards.joins(:user_card).where.not(user_cards: { user_id: current_user.id }) %>
+        
+        <span><%= pluralize(user_cards.count, 'carte') %> proposée(s)</span>
+        <span>•</span>
+        <span><%= pluralize(partner_cards.count, 'carte') %> demandée(s)</span>
+      </div>
+
+      <p class="mt-1 text-sm text-gray-500">
+        <%= time_ago_in_words(trade.updated_at) %>
+      </p>
+    </div>
+    
+    <div class="flex items-center gap-4">
+      <%= link_to trade_path(trade), 
+          class: "inline-flex items-center rounded-lg text-sm font-semibold text-blue-600 hover:text-blue-800",
+          data: { turbo_frame: "_top" } do %>
+        Voir détails
+        <svg class="ml-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+        </svg>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Actions pour les trades en attente %>
+  <% if trade.status == "0" && trade.user_id_invit == current_user.id %>
+    <div class="mt-4 flex items-center gap-3">
+      <%= button_to trade_path(trade, status: "accepted"),
+          method: :patch,
+          class: "rounded-md bg-blue-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500" do %>
+        Accepter l'échange
+      <% end %>
+
+      <%= button_to trade_path(trade, status: "rejected"),
+          method: :patch,
+          class: "rounded-md bg-white px-3.5 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" do %>
+        Refuser
+      <% end %>
+    </div>
+  <% end %>
+</div>

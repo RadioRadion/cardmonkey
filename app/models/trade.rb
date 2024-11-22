@@ -1,9 +1,17 @@
 class Trade < ApplicationRecord
   belongs_to :user
   belongs_to :user_invit, class_name: 'User', foreign_key: 'user_id_invit', optional: true
-  
+
   has_many :trade_user_cards, dependent: :destroy
   has_many :user_cards, through: :trade_user_cards
+
+  broadcasts_to ->(trade) { [trade.user, :trades] }
+  broadcasts_to ->(trade) { [trade.user_invit, :trades] }
+
+  after_update_commit -> {
+    broadcast_replace_to [user, :trades]
+    broadcast_replace_to [user_invit, :trades] if user_invit
+  }
 
   scope :pending, -> { where(status: "pending") }
   scope :accepted, -> { where(status: "accepted") }

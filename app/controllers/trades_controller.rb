@@ -4,8 +4,26 @@ class TradesController < ApplicationController
   before_action :set_partner, only: [:new_proposition, :update_trade_value, :search_cards]
 
   def index
-    @trades = current_user.all_trades.includes(:user_cards, :trade_user_cards)
+    # Load trades with necessary associations
+    @trades = current_user.all_trades
+      .includes(:user_cards, :trade_user_cards, user_cards: { card_version: [:card, :extension] })
       .group_by(&:status)
+
+    # Load potential matches for trade opportunities
+    @matches = current_user.matches
+      .includes(
+        user_card: { card_version: [:card, :extension], user: {} },
+        user_wanted_card: { card_version: [:card, :extension] }
+      )
+      .limit(5)
+
+    # Load trade statistics
+    @stats = {
+      trades_completed: current_user.trades.done.count,
+      cards_available: current_user.user_cards.count,
+      cards_wanted: current_user.user_wanted_cards.count,
+      potential_matches: current_user.matches.count
+    }
   end
 
   def show

@@ -67,6 +67,10 @@ class User < ApplicationRecord
         .distinct
   end
 
+  def all_trades
+    Trade.where('user_id = ? OR user_id_invit = ?', id, id)
+  end
+
   # Statistiques de matching
   def matching_stats
     {
