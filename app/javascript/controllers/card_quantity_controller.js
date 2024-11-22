@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["quantity", "increment", "decrement"]
+  static targets = ["quantity", "increment", "decrement", "selectionBadge"]
   static values = {
     max: Number,
     current: Number,
@@ -11,6 +11,7 @@ export default class extends Controller {
   connect() {
     this.currentValue = 0
     this.updateButtonStates()
+    this.updateSelectionBadge()
   }
 
   increment() {
@@ -19,6 +20,7 @@ export default class extends Controller {
       this.updateDisplay()
     }
     this.updateButtonStates()
+    this.updateSelectionBadge()
   }
 
   decrement() {
@@ -27,6 +29,7 @@ export default class extends Controller {
       this.updateDisplay()
     }
     this.updateButtonStates()
+    this.updateSelectionBadge()
   }
 
   updateDisplay() {
@@ -39,7 +42,7 @@ export default class extends Controller {
         cardId: this.element.dataset.cardId,
         side: this.element.dataset.side,
         quantity: this.currentValue,
-        price: this.priceValue || 0
+        price: parseFloat(this.priceValue) || 0
       }
     })
     this.element.dispatchEvent(event)
@@ -52,5 +55,11 @@ export default class extends Controller {
     // Mise à jour visuelle des boutons
     this.incrementTarget.classList.toggle("opacity-50", this.currentValue >= this.maxValue)
     this.decrementTarget.classList.toggle("opacity-50", this.currentValue <= 0)
+  }
+
+  updateSelectionBadge() {
+    if (this.hasSelectionBadgeTarget) {
+      this.selectionBadgeTarget.classList.toggle("hidden", this.currentValue === 0)
+    }
   }
 }
