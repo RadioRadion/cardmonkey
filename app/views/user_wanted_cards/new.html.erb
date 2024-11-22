@@ -1,5 +1,12 @@
-<h1 class="text-xl font-bold text-center mb-6">Ajouter une carte recherchée</h1>
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 flex flex-col justify-center py-12">
+  <div class="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Ajouter une carte recherchée</h1>
+      <p class="mt-2 text-lg text-gray-500">Ajoutez une nouvelle carte à votre liste de recherche</p>
+    </div>
 
-<%= render 'form', 
-           form_url: user_user_wanted_cards_path(@user),
-           editing: false %>
+    <%= render 'form', 
+              form_url: user_user_wanted_cards_path(@user),
+              editing: false %>
+  </div>
+</div>
