@@ -7,12 +7,15 @@ export default class extends Controller {
     "userValue", 
     "partnerValue", 
     "balance",
-    "submitButton"
+    "submitButton",
+    "userCardsGrid",
+    "partnerCardsGrid"
   ]
 
   connect() {
     this.userCards = new Map() // cardId -> {quantity, price}
     this.partnerCards = new Map()
+    this.partnerId = this.element.dataset.tradeSelectionPartnerIdValue
     
     // Écouter les changements de quantité
     this.element.addEventListener("card-quantity:changed", this.handleQuantityChange.bind(this))
@@ -83,14 +86,50 @@ export default class extends Controller {
     }).format(amount)
   }
 
-  // Gestion de la recherche avec debounce
-  search(event) {
+  // Nouvelle méthode de recherche avec fetch
+  async search(event) {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout)
     }
 
-    this.searchTimeout = setTimeout(() => {
-      event.target.form.requestSubmit()
+    const query = event.target.value.trim()
+    const side = event.target.name === 'user_query' ? 'user' : 'partner'
+    const minLength = 3
+
+    // Si le champ est vide, on recharge toutes les cartes
+    if (query === '') {
+      this.searchTimeout = setTimeout(async () => {
+        try {
+          const response = await fetch(`/trades/search_cards?query=&side=${side}&partner_id=${this.partnerId}`)
+          if (!response.ok) throw new Error('Erreur réseau')
+          
+          const html = await response.text()
+          const target = side === 'user' ? this.userCardsGridTarget : this.partnerCardsGridTarget
+          target.innerHTML = html
+        } catch (error) {
+          console.error('Erreur lors du rechargement:', error)
+        }
+      }, 100) // Délai plus court pour le reset
+      return
+    }
+
+    // Si la recherche a moins de 3 caractères, on ne fait rien
+    if (query.length < minLength) {
+      return
+    }
+
+    // Recherche normale avec 3 caractères ou plus
+    this.searchTimeout = setTimeout(async () => {
+      try {
+        const response = await fetch(`/trades/search_cards?query=${encodeURIComponent(query)}&side=${side}&partner_id=${this.partnerId}`)
+        if (!response.ok) throw new Error('Erreur réseau')
+        
+        const html = await response.text()
+        const target = side === 'user' ? this.userCardsGridTarget : this.partnerCardsGridTarget
+        target.innerHTML = html
+      } catch (error) {
+        console.error('Erreur lors de la recherche:', error)
+      }
     }, 300)
   }
 

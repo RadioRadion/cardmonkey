@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     collection do
       get :new_proposition
       get :update_trade_value
+      get :search_cards
     end
 
     resources :trade_user_cards, only: [:create, :destroy], as: :cards

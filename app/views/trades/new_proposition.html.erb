@@ -12,61 +12,55 @@
     
     <%# Barres de recherche %>
     <div class="flex gap-4">
-      <%= form_with url: new_proposition_trades_path(partner_id: @partner.id), method: :get, data: { turbo_frame: "cards_grid" }, class: "flex-1" do |f| %>
-        <div class="flex gap-4">
-          <div class="flex-1">
-            <input type="text" 
-                   name="user_query"
-                   value="<%= params[:user_query] %>"
-                   placeholder="Rechercher dans vos cartes..." 
-                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                   data-action="input->trade-selection#search">
-          </div>
-          <div class="flex-1">
-            <input type="text" 
-                   name="partner_query"
-                   value="<%= params[:partner_query] %>"
-                   placeholder="Rechercher dans ses cartes..." 
-                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                   data-action="input->trade-selection#search">
-          </div>
+      <div class="flex gap-4 w-full">
+        <div class="flex-1">
+          <input type="text" 
+                 name="user_query"
+                 placeholder="Rechercher dans vos cartes..." 
+                 class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                 data-action="input->trade-selection#search">
         </div>
-      <% end %>
+        <div class="flex-1">
+          <input type="text" 
+                 name="partner_query"
+                 placeholder="Rechercher dans ses cartes..." 
+                 class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                 data-action="input->trade-selection#search">
+        </div>
+      </div>
     </div>
   </div>
 
   <%# Grilles de cartes %>
-  <%= turbo_frame_tag "cards_grid" do %>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <%# Vos cartes %>
-      <div class="bg-white rounded-lg shadow">
-        <div class="p-4 border-b">
-          <h2 class="text-xl font-semibold">Vos cartes</h2>
-        </div>
-        <div class="p-4">
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            <%= render partial: "trades/card",
-                      collection: @user_cards,
-                      locals: { side: 'user' } %>
-          </div>
-        </div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <%# Vos cartes %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-semibold">Vos cartes</h2>
       </div>
-
-      <%# Cartes du partenaire %>
-      <div class="bg-white rounded-lg shadow">
-        <div class="p-4 border-b">
-          <h2 class="text-xl font-semibold">Cartes de <%= @partner.username %></h2>
-        </div>
-        <div class="p-4">
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            <%= render partial: "trades/card",
-                      collection: @partner_cards,
-                      locals: { side: 'partner' } %>
-          </div>
+      <div class="p-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4" data-trade-selection-target="userCardsGrid">
+          <%= render partial: "trades/card",
+                    collection: @user_cards,
+                    locals: { side: 'user' } %>
         </div>
       </div>
     </div>
-  <% end %>
+
+    <%# Cartes du partenaire %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-semibold">Cartes de <%= @partner.username %></h2>
+      </div>
+      <div class="p-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4" data-trade-selection-target="partnerCardsGrid">
+          <%= render partial: "trades/card",
+                    collection: @partner_cards,
+                    locals: { side: 'partner' } %>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <%# Barre de résumé fixe %>
   <div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">

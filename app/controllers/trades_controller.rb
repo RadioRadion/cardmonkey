@@ -1,7 +1,7 @@
 class TradesController < ApplicationController
   before_action :set_trade, only: [:show, :edit, :update, :accept]
   before_action :set_trade_participants, only: [:show, :edit]
-  before_action :set_partner, only: [:new_proposition, :update_trade_value]
+  before_action :set_partner, only: [:new_proposition, :update_trade_value, :search_cards]
 
   def index
     @trades = current_user.all_trades.includes(:user_cards, :trade_user_cards)
@@ -56,18 +56,6 @@ class TradesController < ApplicationController
       .includes(card_version: [:card, :extension])
       .order("cards.name_#{I18n.locale}")
 
-    if params[:user_query].present?
-      @user_cards = @user_cards.joins(card_version: :card)
-        .where("cards.name_#{I18n.locale} ILIKE ?", "%#{params[:user_query]}%")
-    end
-  
-    if params[:partner_query].present?
-      @partner_cards = @partner_cards.joins(card_version: :card)
-        .where("cards.name_#{I18n.locale} ILIKE ?", "%#{params[:partner_query]}%")
-    end
-
-    apply_advanced_filters if params[:filter].present?
-    
     @trade_history = Trade.where(
       "(user_id = ? AND user_id_invit = ?) OR (user_id = ? AND user_id_invit = ?)",
       current_user.id, @partner.id, @partner.id, current_user.id
@@ -79,11 +67,35 @@ class TradesController < ApplicationController
       user: current_user,
       user_id_invit: @partner.id
     )
+  end
 
-    respond_to do |format|
-      format.html
-      format.turbo_stream if turbo_stream_request?
+  def search_cards
+    query = params[:query].to_s.strip
+    side = params[:side]
+
+    cards = if side == 'user'
+      current_user.user_cards
+    else
+      @partner.user_cards
     end
+
+    @filtered_cards = cards
+      .includes(card_version: [:card, :extension])
+      .joins(card_version: :card)
+
+    # Si la requête est vide, on retourne toutes les cartes
+    if query.blank?
+      @filtered_cards = @filtered_cards.order("cards.name_#{I18n.locale}")
+    else
+      @filtered_cards = @filtered_cards
+        .where("cards.name_fr ILIKE :query OR cards.name_en ILIKE :query", query: "%#{query}%")
+        .order("cards.name_#{I18n.locale}")
+        .limit(20)
+    end
+
+    render partial: "trades/card", 
+           collection: @filtered_cards, 
+           locals: { side: side }
   end
 
   def update_trade_value
@@ -217,32 +229,9 @@ class TradesController < ApplicationController
     end
   end
 
-  def apply_advanced_filters
-    filter_params = params[:filter]
-  
-    @user_cards = @user_cards.where(language: filter_params[:language]) if filter_params[:language].present?
-    @user_cards = @user_cards.where(condition: filter_params[:condition]) if filter_params[:condition].present?
-    
-    if filter_params[:rarity].present?
-      @user_cards = @user_cards.where(card_versions: { rarity: filter_params[:rarity] })
-    end
-  
-    if filter_params[:price_min].present? || filter_params[:price_max].present?
-      @user_cards = @user_cards.where(
-        price: filter_params[:price_min].to_f..filter_params[:price_max].to_f
-      )
-    end
-  end
-
   def notify_trade_status_change(message, notification_text)
     other_user_id = @trade.other_user_id(current_user)
     Trade.save_message(current_user.id, other_user_id, "trade_id:#{@trade.id}")
     Notification.create_notification(other_user_id, notification_text)
-  end
-
-  def turbo_stream_request?
-    params[:user_query].present? || 
-    params[:partner_query].present? || 
-    params[:filter].present?
   end
 end
