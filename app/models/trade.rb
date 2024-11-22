@@ -1,5 +1,7 @@
 class Trade < ApplicationRecord
   belongs_to :user
+  belongs_to :user_invit, class_name: 'User', foreign_key: 'user_id_invit', optional: true
+  
   has_many :trade_user_cards, dependent: :destroy
   has_many :user_cards, through: :trade_user_cards
 
@@ -21,8 +23,27 @@ class Trade < ApplicationRecord
     )
   end
 
-  def other_user_id(current_user)
-    user_id == current_user.id ? user_id_invit : user_id
+  def status_badge
+    case status
+    when 'pending'
+      '<span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">En attente</span>'
+    when 'accepted'
+      '<span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Accepté</span>'
+    when 'rejected'
+      '<span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">Refusé</span>'
+    when 'completed'
+      '<span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Complété</span>'
+    end.html_safe
+  end
+
+  def partner_for(current_user)
+    return user if current_user.id == user_id_invit
+    user_invit
+  end
+
+  def partner_name_for(current_user)
+    partner = partner_for(current_user)
+    partner&.username || 'Utilisateur supprimé'
   end
 
   def notify_status_change(current_user_id, message)

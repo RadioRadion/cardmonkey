@@ -1,0 +1,7 @@
+<%= turbo_frame_tag "main_content" do %>
+  <% if user_signed_in? %>
+    <%= render "dashboard" %>
+  <% else %>
+    <%= render "landing" %>
+  <% end %>
+<% end %>

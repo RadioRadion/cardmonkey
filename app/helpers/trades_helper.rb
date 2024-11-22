@@ -22,4 +22,10 @@ module TradesHelper
       "text-blue-600"
     end
   end
+
+  def card_count_text(trade)
+    count = trade.user_cards.size
+    "#{count} #{'carte'.pluralize(count)}"
+  end
+  
 end

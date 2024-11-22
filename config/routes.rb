@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   devise_for :users
-  root to: 'user_cards#index'
+  root to: 'home#index'
 
   # Routes pour matches
   resources :matches, only: [:index, :show] do
@@ -41,4 +41,26 @@ Rails.application.routes.draw do
   get 'dashboard/matches', to: 'dashboard#matches'
   get 'cards/search', to: 'cards#search', defaults: { format: 'json' }
   get 'cards/versions', to: 'cards#versions', defaults: { format: 'json' }
+  resources :notifications do
+    member do
+      patch :mark_as_read
+    end
+  end
+  resources :user_cards do
+    collection do
+      get :search  # Pour chercher des cartes à ajouter
+      post :import # Optionnel: pour import en masse
+    end
+  end
+  
+  resources :user_wanted_cards do
+    collection do
+      get :search
+    end
+  end
+  resources :notifications, only: [:index] do
+    member do
+      patch :mark_as_read
+    end
+  end
 end
