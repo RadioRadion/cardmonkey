@@ -1,4 +1,25 @@
 fr:
+  navbar:
+    home: "Accueil"
+    wantlist: "Liste de souhaits"
+    collection: "Collection"
+    trades: "Échanges"
+    messages: "Messages"
+    profile:
+      my_profile: "Mon profil"
+      edit_profile: "Modifier le profil"
+      dashboard: "Tableau de bord"
+      sign_out: "Déconnexion"
+    auth:
+      sign_in: "Connexion"
+      sign_up: "Inscription"
+
+  footer:
+    about: "À propos"
+    privacy_policy: "Politique de confidentialité"
+    licensing: "Licences"
+    contact: "Contact"
+
   user_wanted_cards:
     create:
       success: "La carte a été ajoutée à votre liste de recherche"

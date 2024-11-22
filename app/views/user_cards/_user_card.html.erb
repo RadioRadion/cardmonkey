@@ -1,0 +1,24 @@
+<%# app/views/user_cards/_user_card.html.erb %>
+<tr class="bg-white hover:bg-gray-50" 
+    data-controller="user-card" 
+    data-user-card-id="<%= user_card.id %>" 
+    data-user-id="<%= user_card.user_id %>">
+  
+  <th scope="row" class="px-4 py-3 font-medium text-gray-900">
+    <%= user_card.card_version.card.name_en %>
+  </th>
+  
+  <td class="px-4 py-3 text-gray-600">
+    <%= condition_label(user_card.condition) %>
+  </td>
+  
+  <td class="px-4 py-3">
+    <% if user_card.card_version.extension.icon_uri.present? %>
+      <%= image_tag user_card.card_version.extension.icon_uri, 
+                  alt: user_card.card_version.extension.name, 
+                  class: "w-8 h-8" %>
+    <% end %>
+  </td>
+  
+  <%# ... reste du code de la ligne ... %>
+</tr>

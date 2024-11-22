@@ -1,100 +1,56 @@
-<div class="flex justify-center mt-8 mb-8">
-  <%= link_to t('wants.collection.add_card'), 
-              new_user_user_wanted_card_path(@user), 
-              class: "inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 focus:outline-none transition-colors" %>
-</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <%# Header avec titre et stats %>
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Ma Liste de Souhaits</h1>
+    
+    <%= link_to new_user_user_wanted_card_path(@user), 
+        class: "inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 focus:outline-none transition-colors" do %>
+      <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/>
+      </svg>
+      <%= t('wants.collection.add_card') %>
+    <% end %>
+  </div>
 
-<div class="relative overflow-x-auto rounded-lg border border-gray-200">
-  <table class="w-full text-sm text-left">
-    <thead class="text-xs uppercase bg-gray-100">
-      <tr>
-        <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.card') %></th>
-        <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.min_condition') %></th>
-        <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.extension') %></th>
-        <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.language') %></th>
-        <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.foil') %></th>
-        <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.quantity') %></th>
-        <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.matches') %></th>
-        <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.scan') %></th>
-        <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.actions') %></th>
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-gray-200">
-      <% @user_wanted_cards.each do |wanted_card| %>
-        <tr class="bg-white hover:bg-gray-50" 
-            data-controller="user-wanted-card" 
-            data-user-wanted-card-id="<%= wanted_card.id %>" 
-            data-user-id="<%= wanted_card.user_id %>">
-          
-          <th scope="row" class="px-4 py-3 font-medium text-gray-900">
-            <%= wanted_card.card.name_en %>
-          </th>
-          
-          <td class="px-4 py-3 text-gray-600">
-            <%= condition_label(wanted_card.min_condition) unless wanted_card.min_condition == 'unimportant' %>
-            <%= t('wants.conditions.unimportant') if wanted_card.min_condition == 'unimportant' %>
-          </td>
-          
-          <td class="px-4 py-3">
-            <% if wanted_card.card_version_id.present? %>
-              <% if wanted_card.card_version&.extension&.icon_uri.present? %>
-                <%= image_tag wanted_card.card_version.extension.icon_uri, 
-                              alt: wanted_card.card_version.extension.name, 
-                              class: "w-8 h-8",
-                              title: "#{wanted_card.card_version.extension.name} - #{wanted_card.card_version.extension.code}" %>
-              <% else %>
-                <%= "#{wanted_card.card_version.extension.name} - #{wanted_card.card_version.extension.code}" %>
-              <% end %>
-            <% else %>
-              <%= t('wants.extensions.any') %>
-            <% end %>
-          </td>
-          
-          <td class="px-4 py-3 text-gray-600">
-            <%= language_label(wanted_card.language) unless wanted_card.language == 'any' %>
-            <%= t('wants.languages.any') if wanted_card.language == 'any' %>
-          </td>
-          
-          <td class="px-4 py-3">
-            <% if wanted_card.foil %>
-              <%= image_tag "star.svg", alt: t('wants.attributes.foil'), class: "w-6 h-6" %>
-            <% end %>
-          </td>
-          
-          <td class="px-4 py-3 text-gray-600">
-            <%= wanted_card.quantity %>
-          </td>
-          
-          <td class="px-4 py-3 text-gray-600">
-            <%= wanted_card.matches_count %>
-          </td>
-          
-          <td class="px-4 py-3">
-            <div class="relative flex justify-center group">
-              <button class="text-gray-600 hover:text-gray-900">
-                <i class="fas fa-eye"></i>
-              </button>
-              <div class="absolute hidden group-hover:block w-52 h-72 top-full mt-2 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg overflow-hidden z-10 border border-gray-200">
-                <%= image_tag wanted_card.img_uri,
-                            alt: wanted_card.card.name_en, 
-                            class: "w-full h-full object-cover" %>
-              </div>
-            </div>
-          </td>
-          
-          <td class="px-4 py-3">
-            <div class="flex items-center space-x-4">
-              <%= link_to t('wants.table.actions.edit'), 
-                        edit_user_user_wanted_card_path(wanted_card.user, wanted_card), 
-                        class: "text-blue-600 hover:text-blue-800 font-medium" %>
-              <button data-action="user-wanted-card#delete" 
-                      class="text-red-600 hover:text-red-800 font-medium">
-                <%= t('wants.table.actions.delete') %>
-              </button>
-            </div>
-          </td>
+  <%# Stats Cards %>
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-lg shadow p-4 border border-gray-200">
+      <p class="text-sm text-gray-500">Total Cartes Recherchées</p>
+      <p class="text-2xl font-bold"><%= @user_wanted_cards.sum(&:quantity) rescue 0 %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-4 border border-gray-200">
+      <p class="text-sm text-gray-500">Cartes Uniques</p>
+      <p class="text-2xl font-bold"><%= @user_wanted_cards.count rescue 0 %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-4 border border-gray-200">
+      <p class="text-sm text-gray-500">Correspondances Totales</p>
+      <p class="text-2xl font-bold"><%= @user_wanted_cards.sum(&:matches_count) rescue 0 %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-4 border border-gray-200">
+      <p class="text-sm text-gray-500">Cartes Trouvables</p>
+      <p class="text-2xl font-bold"><%= @user_wanted_cards.where("matches_count > 0").count rescue 0 %></p>
+    </div>
+  </div>
+
+  <%# Ta table originale %>
+  <div class="relative overflow-x-auto rounded-lg border border-gray-200">
+    <table class="w-full text-sm text-left">
+      <thead class="text-xs uppercase bg-gray-100">
+        <tr>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.card') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.min_condition') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.extension') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.language') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.foil') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.quantity') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.matches') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.scan') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.actions') %></th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <%= render partial: "user_wanted_card", collection: @user_wanted_cards %>
+      </tbody>
+    </table>
+  </div>
 </div>
