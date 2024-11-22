@@ -32,30 +32,34 @@
   <%# Grilles de cartes %>
   <%= turbo_frame_tag "cards_grid" do %>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <%# Vos cartes %>
-      <div class="bg-white rounded-lg shadow">
-        <div class="p-4 border-b">
-          <h2 class="text-xl font-semibold">Vos cartes</h2>
-        </div>
-        <div class="divide-y">
-          <%= render partial: "trades/card_row",
+  <%# Vos cartes %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-semibold">Vos cartes</h2>
+      </div>
+      <div class="p-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <%= render partial: "trades/card",
                     collection: @user_cards,
                     locals: { side: 'user' } %>
         </div>
       </div>
+    </div>
 
-      <%# Cartes du partenaire %>
-      <div class="bg-white rounded-lg shadow">
-        <div class="p-4 border-b">
-          <h2 class="text-xl font-semibold">Cartes de <%= @partner.username %></h2>
-        </div>
-        <div class="divide-y">
-          <%= render partial: "trades/card_row",
+    <%# Cartes du partenaire %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-semibold">Cartes de <%= @partner.username %></h2>
+      </div>
+      <div class="p-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <%= render partial: "trades/card",
                     collection: @partner_cards,
                     locals: { side: 'partner' } %>
         </div>
       </div>
     </div>
+  </div>
   <% end %>
 
   <%# Barre de résumé fixe %>
