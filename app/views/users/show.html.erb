@@ -44,17 +44,17 @@
                 <div class="space-y-2">
                   <%= f.text_field :username, 
                       class: "block w-full rounded-md border-0 bg-white/80 shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-300 text-gray-900",
-                      placeholder: "Username" %>
+                      placeholder: t('activerecord.attributes.user.username') %>
                   <%= f.email_field :email, 
                       class: "block w-full rounded-md border-0 bg-white/80 shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-300 text-gray-900",
-                      placeholder: "Email" %>
+                      placeholder: t('activerecord.attributes.user.email') %>
                 </div>
                 <div class="flex space-x-2">
                   <%= f.button type: "submit", 
                       class: "px-3 py-1.5 bg-white/90 text-blue-600 rounded-md hover:bg-white transition-colors duration-200 font-medium text-sm" do %>
-                    <span>Save Changes</span>
+                    <span><%= t('users.profile.save_changes') %></span>
                   <% end %>
-                  <%= link_to "Cancel", 
+                  <%= link_to t('users.profile.cancel'), 
                       user_path(@user), 
                       class: "px-3 py-1.5 text-white/90 hover:text-white transition-colors duration-200 text-sm" %>
                 </div>
@@ -65,7 +65,8 @@
                   <%= @user.username %>
                   <% if current_user == @user %>
                     <%= link_to edit_user_path(@user, field: "info"), 
-                        class: "ml-2 text-white/70 hover:text-white transition-colors duration-200 opacity-0 group-hover:opacity-100" do %>
+                        class: "ml-2 text-white/70 hover:text-white transition-colors duration-200 opacity-0 group-hover:opacity-100",
+                        title: t('users.profile.edit_profile') do %>
                       <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                       </svg>
@@ -86,11 +87,11 @@
 
       <!-- Statistiques -->
       <div class="p-6">
-        <h2 class="text-lg font-medium text-gray-900 mb-4">Trading Statistics</h2>
+        <h2 class="text-lg font-medium text-gray-900 mb-4"><%= t('users.profile.trading_statistics') %></h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="bg-gray-50 p-4 rounded-lg text-center transition-all duration-200 hover:shadow-md">
             <div class="text-2xl font-bold text-blue-600"><%= @stats[:total_matches] %></div>
-            <div class="text-sm text-gray-500">Total Matches</div>
+            <div class="text-sm text-gray-500"><%= t('users.profile.total_matches') %></div>
           </div>
         </div>
       </div>

@@ -19,7 +19,7 @@
 
       <% if @form.errors.any? %>
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
-          <strong class="font-bold">Erreurs :</strong>
+          <strong class="font-bold"><%= t('user_wanted_cards.form.errors') %></strong>
           <ul class="mt-2 list-disc pl-5">
             <% @form.errors.full_messages.each do |message| %>
               <li><%= message %></li>
@@ -32,13 +32,13 @@
         <% unless editing %>
           <div>
             <label for="card_name" class="block text-sm font-medium text-gray-700 mb-2">
-              Nom de la carte
+              <%= t('user_wanted_cards.form.card_name') %>
             </label>
             <input type="text"
                    id="card_name"
                    name="card_name"
                    value="<%= @form.card_name %>"
-                   placeholder="Rechercher une carte..."
+                   placeholder="<%= t('user_wanted_cards.form.search_placeholder') %>"
                    class="block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm"
                    data-action="keyup->autocomplete#search"
                    data-autocomplete-target="input">
@@ -53,12 +53,12 @@
         <div data-autocomplete-target="formFields" class="<%= editing ? '' : 'hidden' %> space-y-6">
           <div>
             <label for="card_version_id" class="block text-sm font-medium text-gray-700 mb-2">
-              Extension (optionnel)
+              <%= t('user_wanted_cards.form.extension') %>
             </label>
             <%= f.input :card_version_id,
                   label: false,
                   collection: editing ? @versions : [],
-                  include_blank: "N'importe quelle extension",
+                  include_blank: t('user_wanted_cards.form.any_extension'),
                   selected: @form.card_version_id,
                   label_method: ->(cv) { "#{cv.extension.name} - #{cv.extension.code}" },
                   value_method: :id,
@@ -73,7 +73,7 @@
           <%= f.input :min_condition,
                       collection: UserCard.conditions.keys,
                       include_blank: true,
-                      prompt: "N'importe quelle condition",
+                      prompt: t('user_wanted_cards.form.any_condition'),
                       label_html: { class: "block text-sm font-medium text-gray-700 mb-2" },
                       input_html: {
                         class: "block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm"
@@ -82,7 +82,7 @@
           <%= f.input :language,
                       collection: UserCard.languages.keys,
                       include_blank: true,
-                      prompt: "N'importe quelle langue",
+                      prompt: t('user_wanted_cards.form.any_language'),
                       label_html: { class: "block text-sm font-medium text-gray-700 mb-2" },
                       input_html: {
                         class: "block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm"
@@ -108,7 +108,7 @@
 
           <button type="submit"
                   class="w-full flex justify-center py-4 px-6 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            <%= editing ? "Enregistrer les modifications" : "Ajouter la carte" %>
+            <%= editing ? t('user_wanted_cards.form.save_changes') : t('user_wanted_cards.form.add_card') %>
           </button>
         </div>
       </div>

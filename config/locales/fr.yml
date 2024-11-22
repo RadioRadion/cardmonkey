@@ -21,6 +21,16 @@ fr:
     contact: "Contact"
 
   user_wanted_cards:
+    form:
+      errors: "Erreurs :"
+      card_name: "Nom de la carte"
+      search_placeholder: "Rechercher une carte..."
+      extension: "Extension (optionnel)"
+      any_extension: "N'importe quelle extension"
+      any_condition: "N'importe quelle condition"
+      any_language: "N'importe quelle langue"
+      save_changes: "Enregistrer les modifications"
+      add_card: "Ajouter la carte"
     create:
       success: "La carte a été ajoutée à votre liste de recherche"
       error: "Une erreur est survenue lors de l'ajout de la carte"
@@ -33,6 +43,13 @@ fr:
       not_found: "La carte n'a pas été trouvée dans votre liste de recherche"
 
   user_cards:
+    form:
+      errors: "Erreurs :"
+      card_name: "Nom de la carte"
+      search_placeholder: "Rechercher une carte..."
+      extension: "Extension"
+      save_changes: "Enregistrer les modifications"
+      add_card: "Ajouter la carte"
     create:
       success: "La carte a été ajoutée à votre collection"
       error: "Une erreur est survenue lors de l'ajout de la carte"
@@ -44,6 +61,28 @@ fr:
       error: "Une erreur est survenue lors de la suppression de la carte"
       not_found: "La carte n'a pas été trouvée dans votre collection"
 
+  users:
+    profile:
+      save_changes: "Enregistrer les modifications"
+      cancel: "Annuler"
+      trading_statistics: "Statistiques d'échange"
+      total_matches: "Matchs totaux"
+      trading_preferences: "Préférences d'échange"
+      edit_profile: "Modifier le profil"
+      edit_preferences: "Modifier les préférences"
+      trading_location: "Lieu d'échange"
+      trading_area: "Zone d'échange (km)"
+      trading_preference: "Préférence d'échange"
+      value_based: "Échange basé sur la valeur"
+      quantity_based: "Échange basé sur la quantité"
+      save_preferences: "Enregistrer les préférences"
+      location: "Lieu"
+      area: "Zone"
+      preference: "Préférence"
+      not_set: "Non défini"
+      enter_location: "Entrez votre lieu d'échange"
+      enter_area: "Entrez le rayon en kilomètres"
+
   activerecord:
     models:
       user_card: "Carte de collection"
@@ -54,6 +93,21 @@ fr:
         language: "Langue"
         quantity: "Quantité"
         foil: "Foil"
+        card_name: "Nom de la carte"
+        extension: "Extension"
+      user_wanted_card:
+        min_condition: "État minimum"
+        language: "Langue"
+        quantity: "Quantité"
+        foil: "Foil"
+        card_name: "Nom de la carte"
+        extension: "Extension"
+      user:
+        username: "Nom d'utilisateur"
+        email: "Adresse e-mail"
+        address: "Adresse"
+        area: "Zone d'échange"
+        preference: "Préférence d'échange"
     enums:
       user_card:
         condition:
@@ -75,6 +129,10 @@ fr:
           portuguese: "Portugais"
           russian: "Russe"
           korean: "Coréen"
+      user:
+        preference:
+          value_based: "Basé sur la valeur"
+          quantity_based: "Basé sur la quantité"
       wants:
         extensions:
           any: "N'importe quelle extension"
