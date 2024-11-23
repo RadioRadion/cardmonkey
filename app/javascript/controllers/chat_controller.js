@@ -4,7 +4,11 @@ export default class extends Controller {
   static targets = ["messageList"]
 
   connect() {
-    this.scrollToBottom()
+    // Initial scroll to bottom when the chat loads
+    setTimeout(() => {
+      this.scrollToBottom()
+    }, 100)
+    
     this.setupAutoScroll()
   }
 

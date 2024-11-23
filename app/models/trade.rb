@@ -49,6 +49,9 @@ class Trade < ApplicationRecord
     user_invit
   end
 
+  # Alias pour la compatibilité avec TradeCardCollector
+  alias_method :other_user, :partner_for
+
   def partner_name_for(current_user)
     partner = partner_for(current_user)
     partner&.username || 'Utilisateur supprimé'

@@ -28,7 +28,7 @@ class TradesController < ApplicationController
 
   def show
     @cards_by_user = @trade.user_cards
-      .includes(:card_version)
+      .includes(card_version: [:card, :extension])  # Eager load card_version and its associations
       .group_by(&:user_id)
       .transform_values { |cards| calculate_cards_info(cards) }
   end
@@ -62,7 +62,7 @@ class TradesController < ApplicationController
       handle_trade_modification
     end
 
-    redirect_to user_trade_path(@trade.user_id, @trade)
+    redirect_to trade_path(@trade)
   end
 
   def new_proposition
@@ -152,7 +152,7 @@ class TradesController < ApplicationController
   def calculate_cards_info(cards)
     {
       cards: cards,
-      total_price: cards.sum { |card| card.price.to_f }.round(2)
+      total_price: cards.sum { |card| card.card_version.eur_price.to_f }.round(2)
     }
   end
 
@@ -248,8 +248,8 @@ class TradesController < ApplicationController
   end
 
   def notify_trade_status_change(message, notification_text)
-    other_user_id = @trade.other_user_id(current_user)
-    Trade.save_message(current_user.id, other_user_id, "trade_id:#{@trade.id}")
-    Notification.create_notification(other_user_id, notification_text)
+    other_user = @trade.other_user(current_user)
+    Trade.save_message(current_user.id, other_user.id, "trade_id:#{@trade.id}")
+    Notification.create_notification(other_user.id, notification_text)
   end
 end

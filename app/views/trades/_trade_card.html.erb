@@ -1,146 +1,71 @@
-<%# app/views/trades/index.html.erb %>
-<%= turbo_stream_from current_user, :trades %>
+<div class="relative group" 
+     data-preview-image="<%= trade_card.card_version.img_uri %>"
+     data-card-name="<%= trade_card.card_version.card.name_fr %>"
+     data-card-set="<%= trade_card.card_version.extension.name %>"
+     data-card-price="<%= number_to_currency(trade_card.card_version.eur_price) %>">
+  
+  <%= image_tag trade_card.card_version.img_uri,
+                class: "w-[120px] h-[167px] object-contain rounded-lg transition-all hover:shadow-lg cursor-pointer",
+                loading: "lazy" %>
 
-<div class="max-w-7xl mx-auto px-4 py-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-2xl font-semibold text-gray-900">Mes échanges</h1>
-    </div>
+  <%# Quantité et condition %>
+  <div class="absolute top-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs">
+    <%= trade_card.quantity %>x • <%= trade_card.condition %>
   </div>
 
-  <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-    <%# Trades en attente %>
-    <% if @trades['0'].present? %>
-      <%= turbo_frame_tag "pending_trades" do %>
-        <section class="trades-section">
-          <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="p-4 bg-white border-b border-gray-200">
-              <h2 class="flex items-center">
-                <span class="text-lg font-medium text-gray-900">En attente</span>
-                <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                  <%= @trades['0'].size %>
-                </span>
-              </h2>
-            </div>
-            
-            <div class="divide-y divide-gray-200">
-              <% @trades['0'].each do |trade| %>
-                <%= turbo_frame_tag trade do %>
-                  <%= render "trade_row", trade: trade %>
-                <% end %>
-              <% end %>
-            </div>
-          </div>
-        </section>
-      <% end %>
-    <% end %>
-
-    <%# Trades acceptés %>
-    <% if @trades['1'].present? %>
-      <%= turbo_frame_tag "accepted_trades" do %>
-        <section class="trades-section">
-          <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="p-4 bg-white border-b border-gray-200">
-              <h2 class="flex items-center">
-                <span class="text-lg font-medium text-gray-900">Acceptés</span>
-                <span class="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                  <%= @trades['1'].size %>
-                </span>
-              </h2>
-            </div>
-            
-            <div class="divide-y divide-gray-200">
-              <% @trades['1'].each do |trade| %>
-                <%= turbo_frame_tag trade do %>
-                  <%= render "trade_row", trade: trade %>
-                <% end %>
-              <% end %>
-            </div>
-          </div>
-        </section>
-      <% end %>
-    <% end %>
-
-    <%# Trades terminés %>
-    <% if @trades['2'].present? %>
-      <%= turbo_frame_tag "completed_trades" do %>
-        <section class="trades-section">
-          <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="p-4 bg-white border-b border-gray-200">
-              <h2 class="flex items-center">
-                <span class="text-lg font-medium text-gray-900">Terminés</span>
-                <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                  <%= @trades['2'].size %>
-                </span>
-              </h2>
-            </div>
-            
-            <div class="divide-y divide-gray-200">
-              <% @trades['2'].each do |trade| %>
-                <%= turbo_frame_tag trade do %>
-                  <%= render "trade_row", trade: trade %>
-                <% end %>
-              <% end %>
-            </div>
-          </div>
-        </section>
-      <% end %>
-    <% end %>
-  </div>
-</div>
-
-<%# app/views/trades/_trade_row.html.erb %>
-<div class="p-4 hover:bg-gray-50">
-  <div class="flex items-center justify-between">
-    <div class="min-w-0 flex-1">
-      <div class="flex items-center gap-2">
-        <%= trade.status_badge %>
-        <p class="truncate font-medium text-gray-900">
-          avec <%= trade.partner_name_for(current_user) %>
-        </p>
-      </div>
-      
-      <%# Infos sur les cartes %>
-      <div class="mt-1 flex items-center gap-4 text-sm text-gray-500">
-        <% user_cards = trade.trade_user_cards.joins(:user_card).where(user_cards: { user_id: current_user.id }) %>
-        <% partner_cards = trade.trade_user_cards.joins(:user_card).where.not(user_cards: { user_id: current_user.id }) %>
-        
-        <span><%= pluralize(user_cards.count, 'carte') %> proposée(s)</span>
-        <span>•</span>
-        <span><%= pluralize(partner_cards.count, 'carte') %> demandée(s)</span>
-      </div>
-
-      <p class="mt-1 text-sm text-gray-500">
-        <%= time_ago_in_words(trade.updated_at) %>
-      </p>
+  <%# Prix %>
+  <% if trade_card.card_version.eur_price.present? %>
+    <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs">
+      <%= number_to_currency(trade_card.card_version.eur_price) %>
     </div>
-    
-    <div class="flex items-center gap-4">
-      <%= link_to trade_path(trade), 
-          class: "inline-flex items-center rounded-lg text-sm font-semibold text-blue-600 hover:text-blue-800",
-          data: { turbo_frame: "_top" } do %>
-        Voir détails
-        <svg class="ml-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+  <% end %>
+
+  <%# Badge wishlist - uniquement si pas en lecture seule %>
+  <% unless local_assigns[:readonly] %>
+    <% if local_assigns[:side] == 'user' && @partner.user_wanted_cards.exists?(card_id: trade_card.card_version.card_id) %>
+      <div class="absolute -top-2 left-2 bg-yellow-500 text-white p-1 rounded-full shadow-md">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
         </svg>
-      <% end %>
-    </div>
-  </div>
+      </div>
+    <% end %>
+  <% end %>
 
-  <%# Actions pour les trades en attente %>
-  <% if trade.status == "0" && trade.user_id_invit == current_user.id %>
-    <div class="mt-4 flex items-center gap-3">
-      <%= button_to trade_path(trade, status: "accepted"),
-          method: :patch,
-          class: "rounded-md bg-blue-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500" do %>
-        Accepter l'échange
-      <% end %>
+  <%# Contrôles de quantité - uniquement si pas en lecture seule %>
+  <% unless local_assigns[:readonly] %>
+    <div class="absolute bottom-2 right-2 space-x-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-lg shadow-lg p-1 flex items-center"
+         data-controller="card-quantity"
+         data-card-quantity-max-value="<%= trade_card.quantity %>"
+         data-card-quantity-price-value="<%= trade_card.card_version.eur_price %>"
+         data-card-id="<%= trade_card.id %>"
+         data-side="<%= local_assigns[:side] %>">
+      
+      <button data-action="click->card-quantity#decrement"
+              data-card-quantity-target="decrement"
+              class="p-1 hover:bg-gray-100 rounded">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+        </svg>
+      </button>
+      
+      <span data-card-quantity-target="quantity"
+            class="px-2 min-w-[1.5rem] text-center font-medium">0</span>
+      
+      <button data-action="click->card-quantity#increment"
+              data-card-quantity-target="increment"
+              class="p-1 hover:bg-gray-100 rounded">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+      </button>
 
-      <%= button_to trade_path(trade, status: "rejected"),
-          method: :patch,
-          class: "rounded-md bg-white px-3.5 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" do %>
-        Refuser
-      <% end %>
+      <%# Badge de sélection %>
+      <div data-card-quantity-target="selectionBadge" 
+           class="absolute -top-2 -right-2 bg-green-500 text-white p-1 rounded-full shadow-md hidden">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
     </div>
   <% end %>
 </div>

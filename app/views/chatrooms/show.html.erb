@@ -53,10 +53,12 @@
 
         <!-- Messages Area -->
         <div id="messages" 
-             class="flex-1 overflow-y-auto p-4 space-y-4" 
+             class="flex-1 overflow-y-auto p-4 flex flex-col-reverse" 
              data-chatroom-id="<%= @chatroom.id %>"
              data-chat-target="messageList">
-          <%= render @messages.reverse %>
+          <div class="space-y-4">
+            <%= render @messages %>
+          </div>
         </div>
 
         <!-- Typing Indicator -->

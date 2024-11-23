@@ -38,9 +38,14 @@ class TradeCardCollector
   end
 
   def find_wanted_cards(wanting_user, having_user)
-    wanted_card_ids = wanting_user.user_wanted_cards.pluck(:card_id)
+    # Récupérer les card_version_ids correspondant aux cards voulues
+    wanted_card_versions = CardVersion.joins(:card)
+      .where(card_id: wanting_user.user_wanted_cards.pluck(:card_id))
+      .pluck(:id)
+
+    # Trouver les user_cards correspondantes
     having_user.user_cards
-              .where(card_id: wanted_card_ids)
+              .where(card_version_id: wanted_card_versions)
               .where.not(id: @trade.user_cards.pluck(:id))
   end
 
