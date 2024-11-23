@@ -7,9 +7,14 @@ class User < ApplicationRecord
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
-  has_many :trades
+  
+  # Chatroom associations
+  has_many :sent_chatrooms, class_name: 'Chatroom', foreign_key: 'user_id'
+  has_many :received_chatrooms, class_name: 'Chatroom', foreign_key: 'user_id_invit'
   has_many :messages
-  has_many :chatrooms, through: :messages
+  
+  # Other associations
+  has_many :trades
   has_many :user_cards
   has_many :cards, through: :user_cards
   has_many :user_wanted_cards
@@ -17,6 +22,10 @@ class User < ApplicationRecord
   has_many :notifications
 
   enum preference: { value_based: 0, quantity_based: 1 }
+
+  def chatrooms
+    Chatroom.where('user_id = :user_id OR user_id_invit = :user_id', user_id: id)
+  end
 
   def top_matching_users(limit = 10)
     User.find_by_sql([<<-SQL, { user_id: id, limit: limit }])
@@ -95,5 +104,4 @@ class User < ApplicationRecord
       "https://via.placeholder.com/64"
     end
   end
-
 end

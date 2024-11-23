@@ -9,6 +9,7 @@ class MessagesController < ApplicationController
 
     if @message.save
       broadcast_message
+      create_notification
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to user_chatroom_path(current_user, @chatroom) }
@@ -61,6 +62,15 @@ class MessagesController < ApplicationController
         partial: 'messages/message',
         locals: { message: @message }
       )
+    )
+  end
+
+  def create_notification
+    recipient_id = @chatroom.user_id == current_user.id ? @chatroom.user_id_invit : @chatroom.user_id
+    Notification.create_notification(
+      recipient_id,
+      "Nouveau message de #{current_user.username} : #{@message.content.truncate(30)}",
+      'message'
     )
   end
 end

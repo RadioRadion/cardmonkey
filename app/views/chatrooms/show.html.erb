@@ -15,12 +15,12 @@
                 <div class="relative">
                   <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
                     <span class="text-gray-600 font-medium">
-                      <%= other_user.username.first.upcase %>
+                      <%= other_user&.username&.first&.upcase || '?' %>
                     </span>
                   </div>
                 </div>
                 <div class="flex-1">
-                  <h3 class="font-medium"><%= other_user.username %></h3>
+                  <h3 class="font-medium"><%= other_user&.username || 'Utilisateur inconnu' %></h3>
                   <% if chatroom.messages.any? %>
                     <p class="text-sm text-gray-500 truncate">
                       <%= chatroom.messages.last.display_content %>
@@ -41,12 +41,12 @@
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
               <span class="text-gray-600 font-medium">
-                <%= @other_user.username.first.upcase %>
+                <%= @other_user&.username&.first&.upcase || '?' %>
               </span>
             </div>
             <div>
-              <h2 class="text-lg font-semibold"><%= @other_user.username %></h2>
-              <span class="text-sm text-gray-500" data-user-status="<%= @other_user.id %>">offline</span>
+              <h2 class="text-lg font-semibold"><%= @other_user&.username || 'Utilisateur inconnu' %></h2>
+              <span class="text-sm text-gray-500" data-user-status="<%= @other_user&.id %>">offline</span>
             </div>
           </div>
         </div>

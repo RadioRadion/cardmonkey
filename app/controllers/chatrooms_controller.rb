@@ -1,30 +1,69 @@
 class ChatroomsController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_user
   before_action :set_chatroom, only: [:show]
   before_action :authorize_chatroom_access, only: [:show]
 
   def index
-    @chatrooms = current_user_chatrooms.includes(:messages, :user, :user_invit)
-                                     .order('messages.created_at DESC')
+    @chatrooms = Chatroom
+      .includes(:messages, :user, :user_invit)
+      .where("chatrooms.user_id = :user_id OR chatrooms.user_id_invit = :user_id", user_id: @user.id)
+      .left_joins(:messages)
+      .select("chatrooms.*, MAX(messages.created_at) as last_message_at")
+      .group("chatrooms.id, chatrooms.user_id, chatrooms.user_id_invit, chatrooms.created_at, chatrooms.updated_at")
+      .order(Arel.sql("MAX(messages.created_at) DESC NULLS LAST"))
   end
 
   def show
-    @chatrooms = current_user_chatrooms.includes(:messages)
-    @messages = @chatroom.messages.includes(:user).order(created_at: :desc)
+    # Load all chatrooms for the sidebar with proper eager loading
+    @chatrooms = Chatroom
+      .includes(:messages, :user, :user_invit)
+      .where("chatrooms.user_id = :user_id OR chatrooms.user_id_invit = :user_id", user_id: @user.id)
+      .left_joins(:messages)
+      .select("chatrooms.*, MAX(messages.created_at) as last_message_at")
+      .group("chatrooms.id, chatrooms.user_id, chatrooms.user_id_invit, chatrooms.created_at, chatrooms.updated_at")
+      .order(Arel.sql("MAX(messages.created_at) DESC NULLS LAST"))
+
+    # Load messages and ensure other_user is properly set
+    @messages = @chatroom.messages.includes(:user).order(created_at: :asc)
     @message = Message.new
     @other_user = @chatroom.other_user(current_user)
+
+    if @other_user.nil?
+      redirect_to user_chatrooms_path(current_user), alert: "L'autre utilisateur n'est plus disponible."
+      return
+    end
+
     @chatroom.mark_messages_as_read!(current_user) if @chatroom.messages.unread.any?
+  end
+
+  def create
+    @chatroom = Chatroom.new(chatroom_params)
+    @chatroom.user = current_user
+
+    if @chatroom.save
+      redirect_to user_chatroom_path(current_user, @chatroom), notice: 'Conversation créée avec succès.'
+    else
+      redirect_to user_chatrooms_path(current_user), alert: 'Impossible de créer la conversation.'
+    end
   end
 
   private
 
+  def set_user
+    @user = User.find(params[:user_id])
+    unless @user == current_user
+      redirect_to user_chatrooms_path(current_user), alert: "Vous ne pouvez pas accéder aux messages d'autres utilisateurs."
+    end
+  end
+
   def set_chatroom
-    @chatroom = Chatroom.find(params[:id])
+    @chatroom = @user.chatrooms.includes(:user, :user_invit).find(params[:id])
   end
 
   def authorize_chatroom_access
     unless chatroom_member?
-      redirect_to user_chatrooms_path, alert: 'You do not have access to this chat room.'
+      redirect_to user_chatrooms_path(current_user), alert: "Vous n'avez pas accès à cette conversation."
     end
   end
 
@@ -32,7 +71,7 @@ class ChatroomsController < ApplicationController
     @chatroom.user_id == current_user.id || @chatroom.user_id_invit == current_user.id
   end
 
-  def current_user_chatrooms
-    Chatroom.where(user_id: current_user.id).or(Chatroom.where(user_id_invit: current_user.id))
+  def chatroom_params
+    params.require(:chatroom).permit(:user_id_invit)
   end
 end

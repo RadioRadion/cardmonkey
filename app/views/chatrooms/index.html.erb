@@ -8,24 +8,26 @@
       <div class="divide-y">
         <% if @chatrooms.any? %>
           <% @chatrooms.each do |chatroom| %>
+            <% other_user = chatroom.other_user(current_user) %>
             <%= link_to user_chatroom_path(current_user, chatroom), 
                 class: "block hover:bg-gray-50 transition-colors" do %>
               <div class="p-4 flex items-center space-x-4">
-                <% other_user = chatroom.other_user(current_user) %>
                 <div class="relative">
                   <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
                     <span class="text-gray-600 font-medium text-lg">
-                      <%= other_user.username.first.upcase %>
+                      <%= other_user&.username ? other_user.username[0].upcase : '?' %>
                     </span>
                   </div>
                 </div>
 
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-medium text-gray-900"><%= other_user.username %></h3>
+                    <h3 class="text-lg font-medium text-gray-900">
+                      <%= other_user&.username || "Utilisateur inconnu" %>
+                    </h3>
                     <% if chatroom.messages.any? %>
                       <span class="text-sm text-gray-500">
-                        <%= time_ago_in_words(chatroom.messages.last.created_at) %> ago
+                        <%= t('datetime.distance_in_words.ago', count: time_ago_in_words(chatroom.messages.last.created_at)) %>
                       </span>
                     <% end %>
                   </div>
@@ -35,13 +37,13 @@
                       <%= chatroom.messages.last.display_content %>
                     </p>
                   <% else %>
-                    <p class="text-sm text-gray-500">Start a conversation</p>
+                    <p class="text-sm text-gray-500">Démarrer une conversation</p>
                   <% end %>
 
                   <% unread_count = chatroom.unread_messages_count(current_user) %>
                   <% if unread_count > 0 %>
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      <%= unread_count %> new
+                      <%= unread_count %> nouveau<%= 's' if unread_count > 1 %>
                     </span>
                   <% end %>
                 </div>
@@ -61,8 +63,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
             </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">No messages yet</h3>
-            <p class="text-gray-500">Start a trade to begin messaging with other users!</p>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Pas encore de messages</h3>
+            <p class="text-gray-500">Commencez un échange pour discuter avec d'autres utilisateurs !</p>
           </div>
         <% end %>
       </div>
