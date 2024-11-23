@@ -2,6 +2,7 @@
      data-controller="card-quantity"
      data-card-quantity-max-value="<%= card.quantity %>"
      data-card-quantity-price-value="<%= card.card_version.eur_price %>"
+     data-card-quantity-selected-value="<%= local_assigns[:selected] == true %>"
      data-card-id="<%= card.id %>"
      data-side="<%= side %>"
      data-card-preview="true"

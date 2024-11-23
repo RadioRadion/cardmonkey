@@ -5,11 +5,19 @@ export default class extends Controller {
   static values = {
     max: Number,
     current: Number,
-    price: Number
+    price: Number,
+    selected: { type: Boolean, default: false }
   }
 
   connect() {
-    this.currentValue = 0
+    // Initialize with 1 if selected, 0 otherwise
+    this.currentValue = this.selectedValue ? 1 : 0
+    
+    // Update the display and trigger the event if selected
+    if (this.selectedValue) {
+      this.updateDisplay()
+    }
+    
     this.updateButtonStates()
     this.updateSelectionBadge()
   }
