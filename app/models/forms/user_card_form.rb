@@ -12,10 +12,12 @@ module Forms
     attribute :language, :string
     attribute :quantity, :integer
     attribute :foil, :boolean
+    attribute :card_name, :string  # Added this attribute for the form
 
     validates :user_id, :condition, :language, :quantity, presence: true
     validates :quantity, numericality: { greater_than: 0 }
     validates :foil, inclusion: { in: [true, false, '0', '1', 0, 1] }
+    validates :card_name, presence: true, unless: :editing?
 
     # Méthode de classe pour initialiser le form à partir d'un modèle existant
     def self.from_model(user_card)
@@ -26,15 +28,25 @@ module Forms
         condition: user_card.condition,
         language: user_card.language,
         quantity: user_card.quantity,
-        foil: user_card.foil
+        foil: user_card.foil,
+        card_name: user_card.card_version&.card&.name_fr
       )
     end
 
+    def editing?
+      id.present?
+    end
+
     def card_name
+      return @card_name if @card_name.present?
       return nil unless card_version_id.present?
       version = CardVersion.find_by(id: card_version_id)
       return nil unless version&.card
       "#{version.card.name_fr} - #{version.card.name_en}"
+    end
+
+    def card_name=(value)
+      @card_name = value
     end
 
     def save
