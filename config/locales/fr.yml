@@ -20,6 +20,57 @@ fr:
     licensing: "Licences"
     contact: "Contact"
 
+  trades:
+    show:
+      title: "Échange avec %{partner}"
+      your_cards: "Vos cartes"
+      partner_cards: "Cartes de %{partner}"
+      no_cards: "Aucune carte sélectionnée"
+      you_give: "Vous donnez"
+      you_receive: "Vous recevez"
+      balance: "Balance"
+      card: "carte"
+      cards: "cartes"
+      modify: "Modifier"
+      accept: "Accepter"
+      mark_as_done: "Marquer comme terminé"
+      back: "Retour"
+    edit:
+      title: "Modifier l'échange avec %{partner}"
+      available_cards: "carte(s) disponible(s)"
+      search_your_cards: "Rechercher dans vos cartes..."
+      search_their_cards: "Rechercher dans ses cartes..."
+      your_cards: "Vos cartes"
+      partner_cards: "Cartes de %{partner}"
+      cards_they_want: "Cartes recherchées par %{partner}"
+      cards_you_want: "Cartes que vous recherchez"
+      you_give: "Vous donnez"
+      you_receive: "Vous recevez"
+      balance: "Balance"
+      cancel: "Annuler"
+      update_trade: "Mettre à jour l'échange"
+    new_proposition:
+      title: "Proposer un échange à %{partner}"
+      wanted_cards_count: "carte recherchée||cartes recherchées"
+      search_your_cards: "Rechercher dans vos cartes..."
+      search_their_cards: "Rechercher dans ses cartes..."
+      your_cards: "Vos cartes"
+      partner_cards: "Cartes de %{partner}"
+      you_give: "Vous donnez"
+      you_receive: "Vous recevez"
+      balance: "Balance"
+      cancel: "Annuler"
+      validate_trade: "Valider l'échange"
+    trade_row:
+      with: "avec"
+      card_offered: "carte proposée||cartes proposées"
+      card_requested: "carte demandée||cartes demandées"
+      view_details: "Voir détails"
+      accept_trade: "Accepter l'échange"
+      reject: "Refuser"
+    trade_card:
+      quantity_separator: " • "
+
   user_wanted_cards:
     form:
       errors: "Erreurs :"

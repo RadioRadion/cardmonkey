@@ -3,7 +3,7 @@
   <div class="mb-6">
     <div class="flex justify-between items-center mb-4">
       <h1 class="text-2xl font-bold">
-        Échange avec <%= @trade.partner_name_for(current_user) %>
+        <%= t('.title', partner: @trade.partner_name_for(current_user)) %>
       </h1>
       <div>
         <%= @trade.status_badge %>
@@ -16,7 +16,7 @@
     <%# Vos cartes %>
     <div class="bg-white rounded-lg shadow">
       <div class="p-4 border-b">
-        <h2 class="text-xl font-semibold">Vos cartes</h2>
+        <h2 class="text-xl font-semibold"><%= t('.your_cards') %></h2>
       </div>
       <div class="p-4">
         <% if @cards_by_user[current_user.id].present? %>
@@ -29,7 +29,7 @@
             Total: <%= number_to_currency(@cards_by_user[current_user.id][:total_price], unit: "€", format: "%n %u") %>
           </div>
         <% else %>
-          <p class="text-gray-500 text-center py-4">Aucune carte sélectionnée</p>
+          <p class="text-gray-500 text-center py-4"><%= t('.no_cards') %></p>
         <% end %>
       </div>
     </div>
@@ -37,7 +37,7 @@
     <%# Cartes du partenaire %>
     <div class="bg-white rounded-lg shadow">
       <div class="p-4 border-b">
-        <h2 class="text-xl font-semibold">Cartes de <%= @trade.partner_name_for(current_user) %></h2>
+        <h2 class="text-xl font-semibold"><%= t('.partner_cards', partner: @trade.partner_name_for(current_user)) %></h2>
       </div>
       <div class="p-4">
         <% partner_id = @trade.partner_for(current_user).id %>
@@ -51,7 +51,7 @@
             Total: <%= number_to_currency(@cards_by_user[partner_id][:total_price], unit: "€", format: "%n %u") %>
           </div>
         <% else %>
-          <p class="text-gray-500 text-center py-4">Aucune carte sélectionnée</p>
+          <p class="text-gray-500 text-center py-4"><%= t('.no_cards') %></p>
         <% end %>
       </div>
     </div>
@@ -64,23 +64,23 @@
         <%# Côté gauche avec les totaux %>
         <div class="flex gap-8">
           <div>
-            <span class="text-sm text-gray-600">Vous donnez</span>
+            <span class="text-sm text-gray-600"><%= t('.you_give') %></span>
             <div class="font-medium">
-              <%= pluralize(@cards_by_user.dig(current_user.id, :cards)&.size || 0, 'carte') %>
+              <%= pluralize(@cards_by_user.dig(current_user.id, :cards)&.size || 0, t('.card'), t('.cards')) %>
               (<%= number_to_currency(@cards_by_user.dig(current_user.id, :total_price) || 0, unit: "€", format: "%n %u") %>)
             </div>
           </div>
           <div>
-            <span class="text-sm text-gray-600">Vous recevez</span>
+            <span class="text-sm text-gray-600"><%= t('.you_receive') %></span>
             <div class="font-medium">
               <% partner_id = @trade.partner_for(current_user).id %>
-              <%= pluralize(@cards_by_user.dig(partner_id, :cards)&.size || 0, 'carte') %>
+              <%= pluralize(@cards_by_user.dig(partner_id, :cards)&.size || 0, t('.card'), t('.cards')) %>
               (<%= number_to_currency(@cards_by_user.dig(partner_id, :total_price) || 0, unit: "€", format: "%n %u") %>)
             </div>
           </div>
           <%# Balance du trade %>
           <div class="border-l pl-8">
-            <span class="text-sm text-gray-600">Balance</span>
+            <span class="text-sm text-gray-600"><%= t('.balance') %></span>
             <div class="font-medium">
               <% balance = (@cards_by_user.dig(current_user.id, :total_price) || 0) - (@cards_by_user.dig(partner_id, :total_price) || 0) %>
               <%= number_to_currency(balance.abs, unit: "€", format: "%n %u") %>
@@ -92,24 +92,24 @@
         <div class="flex gap-4 items-center">
           <% if @trade.pending? %>
             <% if @trade.user_id == current_user.id %>
-              <%= link_to "Modifier", edit_trade_path(@trade),
+              <%= link_to t('.modify'), edit_trade_path(@trade),
                         class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50" %>
             <% else %>
               <%= button_to trade_path(@trade, status: "accepted"),
                           method: :patch,
                           class: "text-white bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700" do %>
-                Accepter
+                <%= t('.accept') %>
               <% end %>
             <% end %>
           <% elsif @trade.accepted? %>
             <%= button_to trade_path(@trade, status: "done"),
                         method: :patch,
                         class: "text-white bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700" do %>
-              Marquer comme terminé
+              <%= t('.mark_as_done') %>
             <% end %>
           <% end %>
           
-          <%= link_to "Retour", user_trades_path(current_user),
+          <%= link_to t('.back'), user_trades_path(current_user),
                     class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50" %>
         </div>
       </div>
