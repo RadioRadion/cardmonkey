@@ -6,7 +6,7 @@
         <%= t('.title', partner: @trade.partner_name_for(current_user)) %>
       </h1>
       <span class="text-gray-600">
-        <%= pluralize(@trade_data[:collection_cards][:theirs].count, t('.available_cards')) %>
+        <%= @trade_data[:collection_cards][:theirs].count %> cartes disponibles
       </span>
     </div>
     
@@ -16,14 +16,14 @@
         <div class="flex-1">
           <input type="text" 
                  name="user_query"
-                 placeholder="<%= t('.search_your_cards') %>" 
+                 placeholder="Rechercher dans vos cartes..." 
                  class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                  data-action="input->trade-selection#search">
         </div>
         <div class="flex-1">
           <input type="text" 
                  name="partner_query"
-                 placeholder="<%= t('.search_their_cards') %>" 
+                 placeholder="Rechercher dans ses cartes..." 
                  class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                  data-action="input->trade-selection#search">
         </div>
@@ -36,11 +36,11 @@
     <%# Vos cartes %>
     <div class="bg-white rounded-lg shadow">
       <div class="p-4 border-b">
-        <h2 class="text-xl font-semibold"><%= t('.your_cards') %></h2>
+        <h2 class="text-xl font-semibold">Vos cartes</h2>
         <div class="mt-2 text-sm text-gray-600">
           <% if @trade_data[:wanted_cards][:they_want].any? %>
             <div class="mb-2">
-              <span class="font-medium text-blue-600"><%= t('.cards_they_want', partner: @trade.partner_name_for(current_user)) %></span>
+              <span class="font-medium text-blue-600">Cartes recherchées par <%= @trade.partner_name_for(current_user) %></span>
             </div>
           <% end %>
         </div>
@@ -68,11 +68,11 @@
     <%# Cartes du partenaire %>
     <div class="bg-white rounded-lg shadow">
       <div class="p-4 border-b">
-        <h2 class="text-xl font-semibold"><%= t('.partner_cards', partner: @trade.partner_name_for(current_user)) %></h2>
+        <h2 class="text-xl font-semibold">Cartes de <%= @trade.partner_name_for(current_user) %></h2>
         <div class="mt-2 text-sm text-gray-600">
           <% if @trade_data[:wanted_cards][:i_want].any? %>
             <div class="mb-2">
-              <span class="font-medium text-blue-600"><%= t('.cards_you_want') %></span>
+              <span class="font-medium text-blue-600">Cartes que vous recherchez</span>
             </div>
           <% end %>
         </div>
@@ -109,32 +109,32 @@
           <%# Côté gauche avec les totaux %>
           <div class="flex gap-8">
             <div>
-              <span class="text-sm text-gray-600"><%= t('.you_give') %></span>
+              <span class="text-sm text-gray-600">Vous donnez</span>
               <div class="font-medium">
                 <span data-trade-selection-target="userCardCount">0</span> cartes
-                (<span data-trade-selection-target="userValue">0,00 €</span>)
+                (<span data-trade-selection-target="userValue">0,00</span> €)
               </div>
             </div>
             <div>
-              <span class="text-sm text-gray-600"><%= t('.you_receive') %></span>
+              <span class="text-sm text-gray-600">Vous recevez</span>
               <div class="font-medium">
                 <span data-trade-selection-target="partnerCardCount">0</span> cartes
-                (<span data-trade-selection-target="partnerValue">0,00 €</span>)
+                (<span data-trade-selection-target="partnerValue">0,00</span> €)
               </div>
             </div>
             <%# Balance du trade %>
             <div class="border-l pl-8">
-              <span class="text-sm text-gray-600"><%= t('.balance') %></span>
+              <span class="text-sm text-gray-600">Balance</span>
               <div class="font-medium" data-trade-selection-target="balance">0,00 €</div>
             </div>
           </div>
 
           <%# Boutons d'action %>
           <div class="flex gap-4 items-center">
-            <%= link_to t('.cancel'), trade_path(@trade), 
+            <%= link_to "Annuler", trade_path(@trade), 
                       class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50" %>
             
-            <%= f.submit t('.update_trade'), 
+            <%= f.submit "Mettre à jour l'échange", 
                       class: "text-white bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
                       data: { trade_selection_target: "submitButton" } %>
           </div>

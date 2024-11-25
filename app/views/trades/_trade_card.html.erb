@@ -10,13 +10,13 @@
 
   <%# Quantité et condition %>
   <div class="absolute top-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs">
-    <%= trade_card.quantity %>x<%= t('.quantity_separator') %><%= trade_card.condition %>
+    <%= trade_card.quantity %>x • <%= trade_card.condition %>
   </div>
 
   <%# Prix %>
   <% if trade_card.card_version.eur_price.present? %>
     <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs">
-      <%= number_to_currency(trade_card.card_version.eur_price) %>
+      <%= number_to_currency(trade_card.card_version.eur_price, unit: "€", format: "%n %u") %>
     </div>
   <% end %>
 

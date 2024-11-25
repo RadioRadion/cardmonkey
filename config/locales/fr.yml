@@ -49,6 +49,9 @@ fr:
       balance: "Balance"
       cancel: "Annuler"
       update_trade: "Mettre à jour l'échange"
+      card: "carte"
+      cards: "cartes"
+      currency: "€"
     new_proposition:
       title: "Proposer un échange à %{partner}"
       wanted_cards_count: "carte recherchée||cartes recherchées"
@@ -61,6 +64,9 @@ fr:
       balance: "Balance"
       cancel: "Annuler"
       validate_trade: "Valider l'échange"
+      card: "carte"
+      cards: "cartes"
+      currency: "€"
     trade_row:
       with: "avec"
       card_offered: "carte proposée||cartes proposées"
@@ -70,6 +76,8 @@ fr:
       reject: "Refuser"
     trade_card:
       quantity_separator: " • "
+      condition: "État"
+      currency: "€"
 
   user_wanted_cards:
     form:
