@@ -22,9 +22,14 @@ export default class extends Controller {
     try {
       const response = await fetch(`/cards/search?query=${encodeURIComponent(query)}`)
       this.suggestionsList = await response.json()
-      this.showSuggestions()
+      if (this.suggestionsList.length > 0) {
+        this.showSuggestions()
+      } else {
+        this.hideSuggestions()
+      }
     } catch (error) {
       console.error("Erreur lors de la recherche:", error)
+      this.hideSuggestions()
     }
   }
 
@@ -42,8 +47,8 @@ export default class extends Controller {
   }
 
   hideSuggestions() {
-    this.suggestionsTarget.innerHTML = ''
     this.suggestionsTarget.classList.add('hidden')
+    this.suggestionsTarget.innerHTML = ''
   }
 
   async selectCard(event) {

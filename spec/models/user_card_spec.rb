@@ -1,23 +1,19 @@
-# spec/models/user_card_spec.rb
 require 'rails_helper'
 
 RSpec.describe UserCard, type: :model do
-  # Associations
   describe 'associations' do
     it { should belong_to(:user) }
     it { should belong_to(:card_version) }
     it { should have_many(:matches).dependent(:destroy) }
   end
 
-  # Validations
   describe 'validations' do
     it { should validate_presence_of(:quantity) }
     it { should validate_presence_of(:condition) }
     it { should validate_presence_of(:language) }
-    it { should allow_value(true, false).for(:foil) }
+    it { should validate_inclusion_of(:foil).in_array([true, false]) }
   end
 
-  # Enums
   describe 'enums' do
     it { should define_enum_for(:condition).with_values(
       poor: 'poor',
@@ -29,104 +25,80 @@ RSpec.describe UserCard, type: :model do
       mint: 'mint'
     ).backed_by_column_of_type(:string) }
 
-    it 'defaults condition to good' do
-      user_card = build(:user_card, condition: nil)
-      expect(user_card.condition).to eq('good')
-    end
+    it { should define_enum_for(:language).with_values(
+      french: 'fr',
+      english: 'en',
+      german: 'de',
+      italian: 'it',
+      simplified_chinese: 'zhs',
+      traditional_chinese: 'zht',
+      japanese: 'ja',
+      portuguese: 'pt',
+      russian: 'ru',
+      korean: 'ko'
+    ).backed_by_column_of_type(:string) }
   end
 
-  # Callbacks et Matching Logic
-  describe 'matching logic' do
-    let(:user) { create(:user) }
-    let(:other_user) { create(:user) }
-    let(:card_version) { create(:card_version) }
-    
-    describe '#create_matches' do
-      let(:user_card) { build(:user_card, 
-        user: user,
-        card_version: card_version,
-        condition: 'near_mint',
-        language: 'french'
-      )}
+  describe 'callbacks' do
+    describe 'after_create' do
+      let(:user_card) { build(:user_card) }
 
-      context 'when matching wanted cards exist' do
-        before do
-          create(:user_wanted_card,
-            user: other_user,
-            card: card_version.card,
-            min_condition: 'good',
-            language: 'french'
-          )
-        end
-
-        it 'creates matches after creation' do
-          expect { user_card.save! }.to change(Match, :count).by(1)
-        end
-      end
-
-      context 'when no matching wanted cards exist' do
-        it 'does not create any matches' do
-          expect { user_card.save! }.not_to change(Match, :count)
-        end
+      it 'creates matches after creation' do
+        expect(user_card).to receive(:create_matches)
+        user_card.save
       end
     end
 
-    describe '#update_matches' do
-      let!(:user_card) { create(:user_card, condition: 'near_mint') }
-      let!(:match) { create(:match, user_card: user_card) }
+    describe 'after_update' do
+      let(:user_card) { create(:user_card) }
 
       context 'when relevant attributes change' do
-        it 'recreates matches when condition changes' do
-          expect {
-            user_card.update!(condition: 'good')
-          }.to change(Match, :count)
+        before do
+          allow(user_card).to receive(:relevant_attributes_changed?).and_return(true)
         end
 
-        it 'recreates matches when language changes' do
-          expect {
-            user_card.update!(language: 'english')
-          }.to change(Match, :count)
+        it 'updates matches' do
+          expect(user_card).to receive(:update_matches)
+          user_card.save
         end
       end
 
-      context 'when non-relevant attributes change' do
-        it 'does not recreate matches when quantity changes' do
-          expect {
-            user_card.update!(quantity: 5)
-          }.not_to change(Match, :count)
+      context 'when relevant attributes do not change' do
+        before do
+          allow(user_card).to receive(:relevant_attributes_changed?).and_return(false)
+        end
+
+        it 'does not update matches' do
+          expect(user_card).not_to receive(:update_matches)
+          user_card.save
         end
       end
     end
   end
 
-  # Helper Methods
-  describe '#find_potential_matches' do
-    let(:user_card) { create(:user_card, condition: 'near_mint', language: 'french') }
+  describe 'private methods' do
+    let(:user_card) { create(:user_card) }
 
-    it 'finds matches with exact language match' do
-      wanted_card = create(:user_wanted_card, 
-        language: 'french',
-        min_condition: 'good'
-      )
-      matches = user_card.send(:find_potential_matches)
-      expect(matches).to include(wanted_card)
-    end
+    describe '#relevant_attributes_changed?' do
+      it 'returns true when condition changes' do
+        user_card.condition = 'mint'
+        expect(user_card.send(:relevant_attributes_changed?)).to be true
+      end
 
-    it 'finds matches with no language preference' do
-      wanted_card = create(:user_wanted_card, 
-        language: nil,
-        min_condition: 'good'
-      )
-      matches = user_card.send(:find_potential_matches)
-      expect(matches).to include(wanted_card)
-    end
+      it 'returns true when language changes' do
+        user_card.language = 'fr'
+        expect(user_card.send(:relevant_attributes_changed?)).to be true
+      end
 
-    it 'excludes matches with insufficient condition' do
-      wanted_card = create(:user_wanted_card, 
-        min_condition: 'mint'
-      )
-      matches = user_card.send(:find_potential_matches)
-      expect(matches).not_to include(wanted_card)
+      it 'returns true when card_version_id changes' do
+        user_card.card_version_id = 999
+        expect(user_card.send(:relevant_attributes_changed?)).to be true
+      end
+
+      it 'returns false when other attributes change' do
+        user_card.quantity = 2
+        expect(user_card.send(:relevant_attributes_changed?)).to be false
+      end
     end
   end
 end

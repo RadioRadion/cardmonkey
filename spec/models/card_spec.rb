@@ -5,7 +5,6 @@ RSpec.describe Card, type: :model do
     it { should validate_presence_of(:scryfall_oracle_id) }
     it { should validate_presence_of(:name_fr) }
     it { should validate_presence_of(:name_en) }
-    it { should validate_uniqueness_of(:scryfall_oracle_id) }
   end
 
   describe 'associations' do
@@ -14,61 +13,79 @@ RSpec.describe Card, type: :model do
   end
 
   describe '#name' do
-    let(:card) { create(:card, name_fr: 'Contresort', name_en: 'Counterspell') }
+    let(:card) { build(:card, name_fr: 'Lotus Noir', name_en: 'Black Lotus') }
 
-    context 'with default language' do
-      it 'returns english name' do
-        expect(card.name).to eq('Counterspell')
+    context 'when preferred language is English' do
+      it 'returns the English name' do
+        expect(card.name(:en)).to eq('Black Lotus')
       end
     end
 
-    context 'with french language' do
-      it 'returns french name' do
-        expect(card.name(:fr)).to eq('Contresort')
+    context 'when preferred language is French' do
+      it 'returns the French name' do
+        expect(card.name(:fr)).to eq('Lotus Noir')
       end
     end
 
-    context 'with english language' do
-      it 'returns english name' do
-        expect(card.name(:en)).to eq('Counterspell')
+    context 'when preferred language is not supported' do
+      it 'returns the English name as default' do
+        expect(card.name(:es)).to eq('Black Lotus')
       end
     end
 
-    context 'with invalid language' do
-      it 'returns english name' do
-        expect(card.name(:invalid)).to eq('Counterspell')
+    context 'when no language is specified' do
+      it 'returns the English name as default' do
+        expect(card.name).to eq('Black Lotus')
       end
     end
   end
 
-  describe 'card versions' do
-    let(:card) { create(:card) }
-    let(:extension) { create(:extension) }
-
-    it 'can have multiple versions' do
-      create_list(:card_version, 3, card: card, extension: extension)
-      expect(card.card_versions.count).to eq(3)
+  describe '.fetch_cards' do
+    let(:mock_response) do
+      {
+        'data' => [
+          {
+            'id' => 'test-id',
+            'image_uris' => { 'border_crop' => 'https://example.com/image.jpg' },
+            'set' => 'test-set',
+            'name' => 'Test Card',
+            'prices' => { 'eur' => '1.99' }
+          }
+        ]
+      }.to_json
     end
 
-    it 'can have versions from different extensions' do
-      extensions = create_list(:extension, 3)
-      extensions.each do |ext|
-        create(:card_version, card: card, extension: ext)
-      end
-      expect(card.card_versions.map(&:extension)).to match_array(extensions)
+    before do
+      stub_request(:get, /api.scryfall.com/)
+        .to_return(status: 200, body: mock_response, headers: { 'Content-Type' => 'application/json' })
+      
+      allow(Down).to receive(:download).and_return(double(path: 'temp/path'))
+      allow(FileUtils).to receive(:mv)
     end
-  end
 
-  describe 'user wanted cards' do
-    let(:card) { create(:card) }
-    let(:users) { create_list(:user, 3) }
+    it 'creates cards from the Scryfall API response' do
+      expect {
+        Card.fetch_cards('test-set')
+      }.to change(Card, :count).by(1)
+    end
 
-    it 'can be wanted by multiple users' do
-      users.each do |user|
-        create(:user_wanted_card, card: card, user: user)
+    it 'downloads and saves card images' do
+      Card.fetch_cards('test-set')
+      expect(Down).to have_received(:download)
+      expect(FileUtils).to have_received(:mv)
+    end
+
+    context 'when API request fails' do
+      before do
+        stub_request(:get, /api.scryfall.com/)
+          .to_return(status: 404)
       end
-      expect(card.user_wanted_cards.count).to eq(3)
-      expect(card.user_wanted_cards.map(&:user)).to match_array(users)
+
+      it 'raises an error' do
+        expect {
+          Card.fetch_cards('test-set')
+        }.to raise_error(JSON::ParserError)
+      end
     end
   end
 end

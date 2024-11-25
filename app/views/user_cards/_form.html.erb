@@ -1,5 +1,5 @@
-<div class="bg-white shadow-xl rounded-lg overflow-hidden">
-  <div class="p-6 sm:p-8">
+<div class="bg-white shadow-xl rounded-lg w-full">
+  <div class="p-4 sm:p-6">
     <%= simple_form_for(@form,
                       as: :user_card,
                       url: form_url,
@@ -26,6 +26,7 @@
         <% unless editing %>
           <div>
             <%= f.input :card_name,
+                        label: t('user_cards.form.card_name'),
                         wrapper_html: { class: "relative" },
                         label_html: { class: "block text-sm font-medium text-gray-700 mb-2" },
                         placeholder: "Rechercher une carte...",
@@ -39,7 +40,7 @@
 
             <div id="card-suggestions" 
                  data-autocomplete-target="suggestions" 
-                 class="suggestions-list bg-white border border-gray-200 rounded-lg shadow-sm max-h-60 overflow-y-auto absolute w-full z-10">
+                 class="hidden suggestions-list bg-white border border-gray-200 rounded-lg shadow-sm max-h-60 overflow-y-auto absolute w-full z-10">
             </div>
           </div>
         <% end %>

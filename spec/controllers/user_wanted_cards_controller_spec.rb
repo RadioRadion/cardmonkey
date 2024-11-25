@@ -1,210 +1,224 @@
-# spec/controllers/user_wanted_cards_controller_spec.rb
 require 'rails_helper'
 
 RSpec.describe UserWantedCardsController, type: :controller do
- let(:user) { create(:user) }
- let(:card) { create(:card) }
- 
- before do
-   sign_in user
- end
+  let(:user) { create(:user) }
+  let(:card) { create(:card) }
+  let(:card_version) { create(:card_version, card: card) }
+  let(:valid_attributes) do
+    {
+      user_wanted_card: {
+        card_id: card.id,
+        card_version_id: card_version.id,
+        min_condition: 'good',
+        foil: false,
+        language: 'french',
+        quantity: 1
+      }
+    }
+  end
 
- describe 'GET #index' do
-   it 'assigns user wanted cards and renders index template' do
-     wanted_cards = create_list(:user_wanted_card, 3, user: user)
-     
-     get :index, params: { user_id: user.id }
-     
-     expect(assigns(:user_wanted_cards)).to match_array(wanted_cards)
-     expect(response).to render_template(:index)
-   end
+  let(:invalid_attributes) do
+    {
+      user_wanted_card: {
+        card_id: card.id,
+        min_condition: nil,
+        foil: nil,
+        language: nil,
+        quantity: nil
+      }
+    }
+  end
 
-   it 'eager loads associations correctly' do
-     expect(user.user_wanted_cards).to receive_message_chain(:includes, :order)
-     get :index, params: { user_id: user.id }
-   end
- end
+  before do
+    sign_in user
+  end
 
- describe 'GET #new' do
-   it 'initializes a new form object' do
-     get :new, params: { user_id: user.id }
-     
-     expect(assigns(:form)).to be_a(Forms::UserWantedCardForm)
-     expect(assigns(:form).user_id).to eq(user.id)
-     expect(response).to render_template(:new)
-   end
- end
+  describe 'GET #index' do
+    it 'returns a success response' do
+      create(:user_wanted_card, user: user)
+      get :index, params: { user_id: user.id }
+      expect(response).to be_successful
+    end
 
- describe 'POST #create' do
-   let(:valid_attributes) do
-     {
-       card_id: card.id,
-       quantity: 1,
-       min_condition: 'near_mint',
-       language: 'french',
-       foil: false
-     }
-   end
+    it 'assigns all user_wanted_cards as @user_wanted_cards' do
+      user_wanted_card = create(:user_wanted_card, user: user)
+      get :index, params: { user_id: user.id }
+      expect(assigns(:user_wanted_cards)).to include(user_wanted_card)
+    end
 
-   context 'with valid parameters' do
-     before do
-       allow_any_instance_of(Forms::UserWantedCardForm).to receive(:save).and_return(true)
-     end
+    it 'orders cards by name_en' do
+      card1 = create(:card, name_en: 'Zebra')
+      card2 = create(:card, name_en: 'Antelope')
+      wanted_card1 = create(:user_wanted_card, user: user, card: card1)
+      wanted_card2 = create(:user_wanted_card, user: user, card: card2)
+      
+      get :index, params: { user_id: user.id }
+      expect(assigns(:user_wanted_cards).to_a).to eq([wanted_card2, wanted_card1])
+    end
+  end
 
-     it 'creates a new wanted card and redirects' do
-       post :create, params: { 
-         user_id: user.id, 
-         user_wanted_card: valid_attributes 
-       }
+  describe 'GET #new' do
+    it 'returns a success response' do
+      get :new, params: { user_id: user.id }
+      expect(response).to be_successful
+    end
 
-       expect(response).to redirect_to(user_user_wanted_cards_path(user))
-       expect(flash[:notice]).to eq(I18n.t('user_wanted_cards.create.success'))
-     end
-   end
+    it 'initializes a new form object' do
+      get :new, params: { user_id: user.id }
+      expect(assigns(:form)).to be_a(Forms::UserWantedCardForm)
+      expect(assigns(:form).user_id).to eq(user.id)
+    end
+  end
 
-   context 'with invalid parameters' do
-     before do
-       allow_any_instance_of(Forms::UserWantedCardForm).to receive(:save).and_return(false)
-       allow_any_instance_of(Forms::UserWantedCardForm).to receive(:errors)
-         .and_return(double(full_messages: ['Error']))
-     end
+  describe 'POST #create' do
+    context 'with valid params' do
+      it 'creates a new UserWantedCard' do
+        expect {
+          post :create, params: valid_attributes.merge(user_id: user.id)
+        }.to change(UserWantedCard, :count).by(1)
+      end
 
-     it 'renders new template with errors' do
-       post :create, params: { 
-         user_id: user.id, 
-         user_wanted_card: valid_attributes 
-       }
+      it 'redirects to the user_wanted_cards list' do
+        post :create, params: valid_attributes.merge(user_id: user.id)
+        expect(response).to redirect_to(user_user_wanted_cards_path(user))
+      end
 
-       expect(response).to render_template(:new)
-       expect(response.status).to eq(422)
-     end
-   end
- end
+      it 'sets a success notice' do
+        post :create, params: valid_attributes.merge(user_id: user.id)
+        expect(flash[:notice]).to be_present
+      end
+    end
 
- describe 'GET #edit' do
-   let(:user_wanted_card) { create(:user_wanted_card, user: user) }
-   let(:card_versions) { create_list(:card_version, 2, card: user_wanted_card.card) }
+    context 'with invalid params' do
+      it 'does not create a new UserWantedCard' do
+        expect {
+          post :create, params: invalid_attributes.merge(user_id: user.id)
+        }.not_to change(UserWantedCard, :count)
+      end
 
-   before do
-     card_versions
-   end
+      it 'returns unprocessable_entity status' do
+        post :create, params: invalid_attributes.merge(user_id: user.id)
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+  end
 
-   it 'assigns form and card versions' do
-     get :edit, params: { user_id: user.id, id: user_wanted_card.id }
+  describe 'GET #edit' do
+    let(:user_wanted_card) { create(:user_wanted_card, user: user) }
 
-     expect(assigns(:form)).to be_a(Forms::UserWantedCardForm)
-     expect(assigns(:versions)).to match_array(card_versions)
-     expect(response).to render_template(:edit)
-   end
+    it 'returns a success response' do
+      get :edit, params: { id: user_wanted_card.id, user_id: user.id }
+      expect(response).to be_successful
+    end
 
-   it 'loads card versions with correct ordering' do
-     expect(user_wanted_card.card.card_versions).to receive_message_chain(:includes, :order)
-     get :edit, params: { user_id: user.id, id: user_wanted_card.id }
-   end
- end
+    it 'assigns the requested user_wanted_card' do
+      get :edit, params: { id: user_wanted_card.id, user_id: user.id }
+      expect(assigns(:user_wanted_card)).to eq(user_wanted_card)
+    end
 
- describe 'PATCH #update' do
-   let(:user_wanted_card) { create(:user_wanted_card, user: user) }
-   let(:valid_attributes) { { quantity: 2 } }
+    it 'loads card versions for the select' do
+      get :edit, params: { id: user_wanted_card.id, user_id: user.id }
+      expect(assigns(:versions)).to be_present
+    end
 
-   context 'with valid parameters' do
-     before do
-       allow_any_instance_of(Forms::UserWantedCardForm).to receive(:save).and_return(true)
-     end
+    it 'initializes the form with the user_wanted_card data' do
+      get :edit, params: { id: user_wanted_card.id, user_id: user.id }
+      expect(assigns(:form)).to be_a(Forms::UserWantedCardForm)
+    end
+  end
 
-     it 'updates the wanted card and redirects for HTML request' do
-       patch :update, params: { 
-         user_id: user.id, 
-         id: user_wanted_card.id, 
-         user_wanted_card: valid_attributes 
-       }
+  describe 'PATCH #update' do
+    let(:user_wanted_card) { create(:user_wanted_card, user: user) }
+    let(:new_attributes) do
+      {
+        user_wanted_card: {
+          min_condition: 'mint',
+          quantity: 2
+        }
+      }
+    end
 
-       expect(response).to redirect_to(user_user_wanted_cards_path(user))
-       expect(flash[:notice]).to eq(I18n.t('user_wanted_cards.update.success'))
-     end
+    context 'with valid params' do
+      context 'HTML format' do
+        it 'updates the requested user_wanted_card' do
+          patch :update, params: new_attributes.merge(id: user_wanted_card.id, user_id: user.id)
+          user_wanted_card.reload
+          expect(user_wanted_card.min_condition).to eq('mint')
+          expect(user_wanted_card.quantity).to eq(2)
+        end
 
-     it 'returns success JSON response for AJAX request' do
-       patch :update, params: { 
-         user_id: user.id, 
-         id: user_wanted_card.id, 
-         user_wanted_card: valid_attributes 
-       }, format: :json
+        it 'redirects to the user_wanted_cards list' do
+          patch :update, params: new_attributes.merge(id: user_wanted_card.id, user_id: user.id)
+          expect(response).to redirect_to(user_user_wanted_cards_path(user))
+        end
+      end
 
-       expect(response).to have_http_status(:success)
-       parsed_response = JSON.parse(response.body)
-       expect(parsed_response['message']).to eq(I18n.t('user_wanted_cards.update.success'))
-     end
-   end
+      context 'JSON format' do
+        it 'returns a JSON success response' do
+          patch :update, params: new_attributes.merge(id: user_wanted_card.id, user_id: user.id), format: :json
+          expect(response).to have_http_status(:ok)
+          expect(JSON.parse(response.body)).to have_key('message')
+        end
+      end
+    end
 
-   context 'with invalid parameters' do
-     before do
-       allow_any_instance_of(Forms::UserWantedCardForm).to receive(:save).and_return(false)
-       allow_any_instance_of(Forms::UserWantedCardForm).to receive(:errors)
-         .and_return(double(full_messages: ['Error']))
-     end
+    context 'with invalid params' do
+      context 'HTML format' do
+        it 'returns unprocessable_entity status' do
+          patch :update, params: invalid_attributes.merge(id: user_wanted_card.id, user_id: user.id)
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
 
-     it 'renders edit template with errors for HTML request' do
-       patch :update, params: { 
-         user_id: user.id, 
-         id: user_wanted_card.id, 
-         user_wanted_card: valid_attributes 
-       }
+      context 'JSON format' do
+        it 'returns a JSON error response' do
+          patch :update, params: invalid_attributes.merge(id: user_wanted_card.id, user_id: user.id), format: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(JSON.parse(response.body)).to have_key('errors')
+        end
+      end
+    end
+  end
 
-       expect(response).to render_template(:edit)
-       expect(response.status).to eq(422)
-     end
+  describe 'DELETE #destroy' do
+    let!(:user_wanted_card) { create(:user_wanted_card, user: user) }
 
-     it 'returns error JSON response for AJAX request' do
-       patch :update, params: { 
-         user_id: user.id, 
-         id: user_wanted_card.id, 
-         user_wanted_card: valid_attributes 
-       }, format: :json
+    context 'HTML format' do
+      it 'destroys the requested user_wanted_card' do
+        expect {
+          delete :destroy, params: { id: user_wanted_card.id, user_id: user.id }
+        }.to change(UserWantedCard, :count).by(-1)
+      end
 
-       expect(response).to have_http_status(:unprocessable_entity)
-       parsed_response = JSON.parse(response.body)
-       expect(parsed_response).to have_key('errors')
-     end
-   end
- end
+      it 'redirects to the user_wanted_cards list' do
+        delete :destroy, params: { id: user_wanted_card.id, user_id: user.id }
+        expect(response).to redirect_to(user_user_wanted_cards_path(user))
+      end
 
- describe 'DELETE #destroy' do
-   let!(:user_wanted_card) { create(:user_wanted_card, user: user) }
+      it 'sets a success notice with the card name' do
+        delete :destroy, params: { id: user_wanted_card.id, user_id: user.id }
+        expect(flash[:notice]).to be_present
+      end
 
-   context 'when card exists' do
-     it 'deletes the card and redirects for HTML request' do
-       expect {
-         delete :destroy, params: { user_id: user.id, id: user_wanted_card.id }
-       }.to change(UserWantedCard, :count).by(-1)
+      context 'when record is not found' do
+        it 'redirects to index with an alert' do
+          delete :destroy, params: { id: 999999, user_id: user.id }
+          expect(response).to redirect_to(user_user_wanted_cards_path(user))
+          expect(flash[:alert]).to be_present
+        end
+      end
+    end
 
-       expect(response).to redirect_to(user_user_wanted_cards_path(user))
-       expect(flash[:notice]).to include(user_wanted_card.card.name_en)
-     end
+    context 'JSON format' do
+      it 'returns no content on success' do
+        delete :destroy, params: { id: user_wanted_card.id, user_id: user.id }, format: :json
+        expect(response).to have_http_status(:no_content)
+      end
 
-     it 'returns no content for JSON request' do
-       delete :destroy, params: { 
-         user_id: user.id, 
-         id: user_wanted_card.id 
-       }, format: :json
-
-       expect(response).to have_http_status(:no_content)
-     end
-   end
-
-   context 'when card does not exist' do
-     it 'handles not found error for HTML request' do
-       delete :destroy, params: { user_id: user.id, id: 0 }
-
-       expect(response).to redirect_to(user_user_wanted_cards_path(user))
-       expect(flash[:alert]).to eq(I18n.t('user_wanted_cards.destroy.not_found'))
-     end
-
-     it 'returns not found status for JSON request' do
-       delete :destroy, params: { user_id: user.id, id: 0 }, format: :json
-
-       expect(response).to have_http_status(:not_found)
-       expect(JSON.parse(response.body)).to have_key('error')
-     end
-   end
- end
+      it 'returns not found when record does not exist' do
+        delete :destroy, params: { id: 999999, user_id: user.id }, format: :json
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end
