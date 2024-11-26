@@ -2,12 +2,13 @@
   "name": "cardmonkey",
   "private": true,
   "dependencies": {
+    "@hotwired/stimulus": "^3.2.2",
+    "@hotwired/turbo-rails": "^7.3.0",
     "@rails/actioncable": "^6.0.0",
     "@rails/activestorage": "^6.0.0",
     "@rails/ujs": "^6.0.0",
     "browserslist": "^4.24.2",
-    "caniuse-lite": "^1.0.30001680",
-    "turbolinks": "^5.2.0"
+    "caniuse-lite": "^1.0.30001680"
   },
   "version": "0.1.0",
   "scripts": {

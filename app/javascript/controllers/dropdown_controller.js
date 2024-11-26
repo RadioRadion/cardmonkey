@@ -5,13 +5,18 @@ export default class extends Controller {
 
   connect() {
     // Add event listener to close dropdown when clicking outside
-    document.addEventListener("click", this.handleClickOutside.bind(this))
-    document.addEventListener("turbo:click", this.hide.bind(this))
+    this.handleClickOutsideBound = this.handleClickOutside.bind(this)
+    document.addEventListener("click", this.handleClickOutsideBound)
+    
+    // Use turbo:before-cache instead of turbo:click
+    this.hideBound = this.hide.bind(this)
+    document.addEventListener("turbo:before-cache", this.hideBound)
   }
 
   disconnect() {
-    document.removeEventListener("click", this.handleClickOutside.bind(this))
-    document.removeEventListener("turbo:click", this.hide.bind(this))
+    // Clean up event listeners
+    document.removeEventListener("click", this.handleClickOutsideBound)
+    document.removeEventListener("turbo:before-cache", this.hideBound)
   }
 
   toggle(event) {
@@ -20,11 +25,13 @@ export default class extends Controller {
   }
 
   hide() {
-    this.menuTarget.classList.add("hidden")
+    if (this.hasMenuTarget) {
+      this.menuTarget.classList.add("hidden")
+    }
   }
 
   handleClickOutside(event) {
-    if (!this.element.contains(event.target)) {
+    if (this.element && !this.element.contains(event.target)) {
       this.hide()
     }
   }

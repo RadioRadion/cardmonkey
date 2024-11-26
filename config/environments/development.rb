@@ -50,12 +50,17 @@ Rails.application.configure do
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
 
+  # Debug mode disables concatenation and preprocessing of assets.
+  config.assets.debug = true
+
+  # Enable asset digests
+  config.assets.digest = true
+
   # Suppress logger output for asset requests.
   config.assets.quiet = true
 
-  # Enable hot reloading for CSS
-  config.assets.debug = true
-  config.assets.digest = false
+  # Serve assets with proper MIME types
+  config.public_file_server.enabled = true
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
