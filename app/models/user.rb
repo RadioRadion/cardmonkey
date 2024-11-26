@@ -33,47 +33,38 @@ class User < ApplicationRecord
       WITH match_counts AS (
         SELECT 
           CASE 
-            WHEN user_id = :user_id THEN user_id_target
-            WHEN user_id_target = :user_id THEN user_id
+            WHEN matches.user_id = :user_id THEN matches.user_id_target
+            WHEN matches.user_id_target = :user_id THEN matches.user_id
           END AS matched_user_id,
           COUNT(*) as match_count
         FROM matches
-        WHERE user_id = :user_id OR user_id_target = :user_id
+        WHERE (matches.user_id = :user_id OR matches.user_id_target = :user_id)
+          AND (matches.user_id IS NOT NULL AND matches.user_id_target IS NOT NULL)
         GROUP BY 
           CASE 
-            WHEN user_id = :user_id THEN user_id_target
-            WHEN user_id_target = :user_id THEN user_id
+            WHEN matches.user_id = :user_id THEN matches.user_id_target
+            WHEN matches.user_id_target = :user_id THEN matches.user_id
           END
       )
       SELECT 
         users.*,
-        match_counts.match_count,
-        (
-          SELECT COUNT(DISTINCT cards.id)
-          FROM matches
-          JOIN user_cards ON matches.user_card_id = user_cards.id
-          JOIN card_versions ON user_cards.card_version_id = card_versions.id
-          JOIN cards ON card_versions.card_id = cards.id
-          WHERE 
-            (matches.user_id = :user_id AND matches.user_id_target = users.id)
-            OR
-            (matches.user_id = users.id AND matches.user_id_target = :user_id)
-        ) as unique_cards_count
+        match_counts.match_count
       FROM users
-      JOIN match_counts ON users.id = match_counts.matched_user_id
-      ORDER BY match_count DESC, users.username
+      INNER JOIN match_counts ON users.id = match_counts.matched_user_id
+      ORDER BY match_counts.match_count DESC, users.username
       LIMIT :limit
     SQL
   end
 
   def matching_cards_with_user(other_user_id)
-    Match.joins(user_card: { card_version: :card })
+    Card.joins(card_versions: { user_cards: :matches })
         .where(
-          '(matches.user_id = ? AND matches.user_id_target = ?) OR (matches.user_id = ? AND matches.user_id_target = ?)',
-          id, other_user_id, other_user_id, id
+          '(matches.user_id = :user_id AND matches.user_id_target = :other_user_id) OR (matches.user_id = :other_user_id AND matches.user_id_target = :user_id)',
+          user_id: id, other_user_id: other_user_id
         )
-        .select('cards.*, matches.*, user_cards.condition, user_cards.language')
+        .select('cards.*, user_cards.condition, user_cards.language')
         .distinct
+        .order('cards.id')
   end
 
   def all_trades

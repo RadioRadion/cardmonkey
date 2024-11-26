@@ -5,15 +5,19 @@ FactoryBot.define do
     end
 
     after(:build) do |match, evaluator|
-      # Create the user_wanted_card first with its user
-      match.user_wanted_card ||= create(:user_wanted_card, user: evaluator.target_user)
+      unless match.user_wanted_card
+        # Create the user_wanted_card first with its user
+        match.user_wanted_card = create(:user_wanted_card, user: evaluator.target_user)
+      end
       
-      # Create the user_card with its user
-      match.user_card ||= create(:user_card)
-      match.user ||= match.user_card.user
+      unless match.user_card
+        # Create the user_card with its user
+        match.user_card = create(:user_card)
+        match.user ||= match.user_card.user
+      end
       
-      # Set the user_id_target from the user_wanted_card's user
-      match.user_id_target = match.user_wanted_card.user_id
+      # Only set user_id_target if not explicitly provided
+      match.user_id_target ||= match.user_wanted_card.user_id
     end
 
     trait :perfect_match do

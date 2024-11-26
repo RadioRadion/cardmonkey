@@ -48,17 +48,9 @@ class UsersController < ApplicationController
     else
       respond_to do |format|
         format.turbo_stream do
-          if updating_avatar
-            render turbo_stream: turbo_stream.update(
-              "profile_avatar",
-              partial: "users/avatar",
-              locals: { user: @user }
-            )
-          else
-            render :show, status: :unprocessable_entity
-          end
+          render turbo_stream: turbo_stream.update("flash_messages", "Une erreur est survenue"), status: 422
         end
-        format.html { render :show, status: :unprocessable_entity }
+        format.html { render :show, status: 422 }
       end
     end
   end
@@ -75,11 +67,7 @@ class UsersController < ApplicationController
     unless @user == current_user
       respond_to do |format|
         format.turbo_stream do
-          render turbo_stream: turbo_stream.update(
-            "flash_messages",
-            partial: "shared/flash",
-            locals: { message: "You're not authorized to perform this action.", type: "error" }
-          )
+          render turbo_stream: turbo_stream.update("flash_messages", "You're not authorized to perform this action."), status: 403
         end
         format.html { redirect_to root_path, alert: "You're not authorized to perform this action." }
       end

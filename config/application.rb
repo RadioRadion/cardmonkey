@@ -17,6 +17,11 @@ module Cardmonkey
     config.load_defaults 6.1
     config.active_support.cache_format_version = 7.0
 
+    # Configuration pour la langue par défaut
+    config.i18n.default_locale = :fr
+    config.i18n.available_locales = [:fr]
+    config.i18n.fallbacks = [:fr]
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading

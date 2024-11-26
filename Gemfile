@@ -76,6 +76,7 @@ group :test do
   gem 'webdrivers', '= 5.3.0'
   gem 'database_cleaner-active_record'
   gem 'shoulda-matchers', '~> 4.0'
+  gem 'rails-controller-testing'
 end
 
 group :development, :test do
@@ -83,7 +84,6 @@ group :development, :test do
   # autres gems pour le développement et les tests...
   gem 'faker'
 end
-
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
