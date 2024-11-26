@@ -4,13 +4,16 @@ FactoryBot.define do
     sequence(:content) { |n| "Notification content #{n}" }
     status { :unread }
     notification_type { nil }
+    read_at { nil }
 
     trait :read do
       status { :read }
+      read_at { Time.current }
     end
 
     trait :unread do
       status { :unread }
+      read_at { nil }
     end
 
     trait :trade_notification do
@@ -24,7 +27,7 @@ FactoryBot.define do
     end
 
     trait :old do
-      created_at { 1.week.ago }
+      created_at { 2.weeks.ago }
     end
 
     trait :recent do

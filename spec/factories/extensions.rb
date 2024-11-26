@@ -44,29 +44,21 @@ FactoryBot.define do
 
     trait :standard_legal do
       after(:create) do |extension|
-        create_list(:card, 3, :with_legalities) do |card|
-          create(:card_version, card: card, extension: extension)
-        end
+        create_list(:card_version, 3, extension: extension)
       end
     end
 
     trait :modern_legal do
       release_date { 8.years.ago }
       after(:create) do |extension|
-        create_list(:card, 3) do |card|
-          create(:card_legality, :modern, card: card)
-          create(:card_version, card: card, extension: extension)
-        end
+        create_list(:card_version, 3, extension: extension)
       end
     end
 
     trait :vintage_legal do
       release_date { 20.years.ago }
       after(:create) do |extension|
-        create_list(:card, 3) do |card|
-          create(:card_legality, :vintage, card: card)
-          create(:card_version, card: card, extension: extension)
-        end
+        create_list(:card_version, 3, extension: extension)
       end
     end
 
@@ -74,13 +66,9 @@ FactoryBot.define do
       with_all_rarities
       standard_legal
       after(:create) do |extension|
-        # Add some special cards
-        create(:card, :banned_in_standard).tap do |card|
-          create(:card_version, card: card, extension: extension, rarity: 'mythic')
-        end
-        create(:card, :restricted_in_vintage).tap do |card|
-          create(:card_version, card: card, extension: extension, rarity: 'rare')
-        end
+        # Add some special cards with different rarities
+        create(:card_version, extension: extension, rarity: 'mythic')
+        create(:card_version, extension: extension, rarity: 'rare')
       end
     end
   end

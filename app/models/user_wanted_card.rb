@@ -61,19 +61,6 @@ class UserWantedCard < ApplicationRecord
 
   private
 
-  private
-
-  def apply_condition_requirement(query)
-    return query if min_condition == 'unimportant'
-    
-    condition_index = CONDITION_ORDER.index(min_condition)
-    return query if condition_index.nil?
-    
-    valid_conditions = CONDITION_ORDER[condition_index..]
-    query.where(condition: valid_conditions)
-         .select(:id, :user_id)
-  end
-
   def create_matches
     potential_matches = find_potential_matches
     return if potential_matches.empty?
@@ -112,11 +99,11 @@ class UserWantedCard < ApplicationRecord
   def apply_condition_requirement(query)
     return query if min_condition == 'unimportant'
     
-    condition_index = UserCard::CONDITION_ORDER.index(min_condition)
-    valid_conditions = UserCard::CONDITION_ORDER[condition_index..]
+    condition_index = CONDITION_ORDER.index(min_condition)
+    return query if condition_index.nil?
     
+    valid_conditions = CONDITION_ORDER[condition_index..]
     query.where(condition: valid_conditions)
-      .select(:id, :user_id)
   end
 
   def build_matches(potential_matches)

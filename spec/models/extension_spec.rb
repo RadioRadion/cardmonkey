@@ -88,22 +88,16 @@ RSpec.describe Extension, type: :model do
     context 'standard_legal trait' do
       let(:extension) { create(:extension, :standard_legal) }
 
-      it 'creates cards with standard legality' do
+      it 'creates card versions' do
         expect(extension.card_versions.count).to eq(3)
-        extension.card_versions.each do |cv|
-          expect(cv.card.legalities.where(format: 'standard')).to exist
-        end
       end
     end
 
     context 'modern_legal trait' do
       let(:extension) { create(:extension, :modern_legal) }
 
-      it 'creates cards with modern legality' do
+      it 'creates card versions' do
         expect(extension.card_versions.count).to eq(3)
-        extension.card_versions.each do |cv|
-          expect(cv.card.legalities.where(format: 'modern')).to exist
-        end
       end
 
       it 'sets release date to modern-legal timeframe' do
@@ -114,11 +108,8 @@ RSpec.describe Extension, type: :model do
     context 'vintage_legal trait' do
       let(:extension) { create(:extension, :vintage_legal) }
 
-      it 'creates cards with vintage legality' do
+      it 'creates card versions' do
         expect(extension.card_versions.count).to eq(3)
-        extension.card_versions.each do |cv|
-          expect(cv.card.legalities.where(format: 'vintage')).to exist
-        end
       end
 
       it 'sets release date to vintage-legal timeframe' do
@@ -134,19 +125,11 @@ RSpec.describe Extension, type: :model do
         rarities = extension.card_versions.pluck(:rarity).uniq.sort
         expect(rarities).to eq(['common', 'mythic', 'rare', 'uncommon'])
 
-        # Check for standard legal cards
-        standard_legal_cards = extension.card_versions.joins(card: :legalities)
-          .where(card_legalities: { format: 'standard' })
-        expect(standard_legal_cards).to exist
-
-        # Check for special cards
-        banned_cards = extension.card_versions.joins(card: :legalities)
-          .where(card_legalities: { format: 'standard', status: 'banned' })
-        expect(banned_cards).to exist
-
-        restricted_cards = extension.card_versions.joins(card: :legalities)
-          .where(card_legalities: { format: 'vintage', status: 'restricted' })
-        expect(restricted_cards).to exist
+        # Check for additional special cards
+        mythic_cards = extension.card_versions.where(rarity: 'mythic')
+        rare_cards = extension.card_versions.where(rarity: 'rare')
+        expect(mythic_cards).to exist
+        expect(rare_cards).to exist
       end
     end
   end

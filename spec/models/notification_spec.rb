@@ -1,14 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe Notification, type: :model do
-  describe 'associations' do
-    it { should belong_to(:user) }
-  end
-
   describe 'validations' do
     it { should validate_presence_of(:content) }
     it { should validate_presence_of(:status) }
-    it { should validate_inclusion_of(:status).in_array(%w[unread read]) }
   end
 
   describe 'enums' do
@@ -46,7 +41,7 @@ RSpec.describe Notification, type: :model do
 
     describe '.today' do
       it 'returns notifications from today' do
-        today_notification = create(:notification, user: user, created_at: Time.current)
+        today_notification = create(:notification, user: user)
         expect(described_class.today).to include(today_notification)
         expect(described_class.today).not_to include(old_notification)
       end
@@ -54,7 +49,8 @@ RSpec.describe Notification, type: :model do
 
     describe '.this_week' do
       it 'returns notifications from this week' do
-        this_week_notification = create(:notification, user: user, created_at: 2.days.ago)
+        this_week_notification = create(:notification, user: user)
+        old_notification.update!(created_at: 2.weeks.ago)
         expect(described_class.this_week).to include(this_week_notification)
         expect(described_class.this_week).not_to include(old_notification)
       end

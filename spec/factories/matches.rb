@@ -1,9 +1,20 @@
 FactoryBot.define do
   factory :match do
-    association :user_card
-    association :user_wanted_card
-    association :user
-    association :user_id_target, factory: :user
+    transient do
+      target_user { create(:user) }
+    end
+
+    after(:build) do |match, evaluator|
+      # Create the user_wanted_card first with its user
+      match.user_wanted_card ||= create(:user_wanted_card, user: evaluator.target_user)
+      
+      # Create the user_card with its user
+      match.user_card ||= create(:user_card)
+      match.user ||= match.user_card.user
+      
+      # Set the user_id_target from the user_wanted_card's user
+      match.user_id_target = match.user_wanted_card.user_id
+    end
 
     trait :perfect_match do
       after(:build) do |match|
@@ -13,16 +24,17 @@ FactoryBot.define do
         match.user_card = create(:user_card,
           card_version: card_version,
           condition: 'mint',
-          language: 'français',
+          language: 'fr',
           user: match.user
         )
         
         match.user_wanted_card = create(:user_wanted_card,
           card: card,
           min_condition: 'near_mint',
-          language: 'français',
-          user: match.user_id_target
+          language: 'fr',
+          user: create(:user)
         )
+        match.user_id_target = match.user_wanted_card.user_id
       end
     end
 
@@ -40,8 +52,9 @@ FactoryBot.define do
         match.user_wanted_card = create(:user_wanted_card,
           card: card,
           min_condition: 'good',
-          user: match.user_id_target
+          user: create(:user)
         )
+        match.user_id_target = match.user_wanted_card.user_id
       end
     end
 
@@ -52,15 +65,16 @@ FactoryBot.define do
         
         match.user_card = create(:user_card,
           card_version: card_version,
-          language: 'anglais',
+          language: 'en',
           user: match.user
         )
         
         match.user_wanted_card = create(:user_wanted_card,
           card: card,
-          language: 'anglais',
-          user: match.user_id_target
+          language: 'en',
+          user: create(:user)
         )
+        match.user_id_target = match.user_wanted_card.user_id
       end
     end
 
@@ -72,16 +86,17 @@ FactoryBot.define do
         match.user_card = create(:user_card,
           card_version: card_version,
           condition: 'played',
-          language: 'allemand',
+          language: 'de',
           user: match.user
         )
         
         match.user_wanted_card = create(:user_wanted_card,
           card: card,
           min_condition: 'unimportant',
-          language: 'dont_care',
-          user: match.user_id_target
+          language: 'any',
+          user: create(:user)
         )
+        match.user_id_target = match.user_wanted_card.user_id
       end
     end
 
@@ -98,8 +113,9 @@ FactoryBot.define do
         match.user_wanted_card = create(:user_wanted_card,
           card: card,
           card_version: card_version,
-          user: match.user_id_target
+          user: create(:user)
         )
+        match.user_id_target = match.user_wanted_card.user_id
       end
     end
 

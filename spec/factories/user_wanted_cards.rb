@@ -2,10 +2,10 @@ FactoryBot.define do
   factory :user_wanted_card do
     association :user
     association :card
-    association :card_version, required: false
+    card_version { nil }
     quantity { 1 }
     min_condition { 'good' }
-    language { 'français' }
+    language { 'fr' }
     foil { false }
 
     trait :any_condition do
@@ -13,7 +13,7 @@ FactoryBot.define do
     end
 
     trait :any_language do
-      language { 'dont_care' }
+      language { 'any' }
     end
 
     trait :foil_only do
@@ -22,7 +22,20 @@ FactoryBot.define do
 
     trait :with_matches do
       after(:create) do |wanted_card|
-        create_list(:match, 2, user_wanted_card: wanted_card)
+        other_user = create(:user)
+        card_version = create(:card_version, card: wanted_card.card)
+        user_card = create(:user_card,
+          user: other_user,
+          card_version: card_version,
+          language: wanted_card.language,
+          condition: wanted_card.min_condition
+        )
+        create(:match,
+          user_card: user_card,
+          user_wanted_card: wanted_card,
+          user: other_user,
+          user_id_target: wanted_card.user_id
+        )
       end
     end
 
@@ -57,27 +70,27 @@ FactoryBot.define do
 
     # Specific Languages
     trait :french_only do
-      language { 'français' }
+      language { 'fr' }
     end
 
     trait :english_only do
-      language { 'anglais' }
+      language { 'en' }
     end
 
     trait :german_only do
-      language { 'allemand' }
+      language { 'de' }
     end
 
     trait :italian_only do
-      language { 'italien' }
+      language { 'it' }
     end
 
     trait :japanese_only do
-      language { 'japonais' }
+      language { 'ja' }
     end
 
     trait :russian_only do
-      language { 'russe' }
+      language { 'ru' }
     end
 
     # Multiple copies

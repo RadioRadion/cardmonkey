@@ -1,9 +1,10 @@
 FactoryBot.define do
   factory :card_version do
-    association :card
-    association :extension
+    association :card, strategy: :create
+    association :extension, strategy: :create
     
     sequence(:scryfall_id) { |n| "scryfall-#{n}" }
+    sequence(:collector_number) { |n| n.to_s }
     rarity { ['common', 'uncommon', 'rare', 'mythic'].sample }
     frame { ['1993', '1997', '2003', '2015', 'future'].sample }
     border_color { ['black', 'white', 'borderless', 'silver', 'gold'].sample }
@@ -28,6 +29,11 @@ FactoryBot.define do
 
     trait :mythic do
       rarity { 'mythic' }
+    end
+
+    trait :with_prices do
+      eur_price { 1.0 }
+      eur_foil_price { 2.0 }
     end
   end
 end

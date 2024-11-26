@@ -77,26 +77,28 @@ RSpec.describe UserCard, type: :model do
   end
 
   describe 'private methods' do
-    let(:user_card) { create(:user_card) }
-
     describe '#relevant_attributes_changed?' do
+      let(:user_card) { create(:user_card, :english) }
+
       it 'returns true when condition changes' do
-        user_card.condition = 'mint'
+        user_card.update(condition: 'mint')
         expect(user_card.send(:relevant_attributes_changed?)).to be true
       end
 
       it 'returns true when language changes' do
-        user_card.language = 'fr'
+        user_card.update(language: 'fr')
         expect(user_card.send(:relevant_attributes_changed?)).to be true
       end
 
       it 'returns true when card_version_id changes' do
-        user_card.card_version_id = 999
+        new_card_version = create(:card_version)
+        user_card.update(card_version_id: new_card_version.id)
         expect(user_card.send(:relevant_attributes_changed?)).to be true
       end
 
       it 'returns false when other attributes change' do
-        user_card.quantity = 2
+        original_quantity = user_card.quantity
+        user_card.update(quantity: original_quantity + 1)
         expect(user_card.send(:relevant_attributes_changed?)).to be false
       end
     end

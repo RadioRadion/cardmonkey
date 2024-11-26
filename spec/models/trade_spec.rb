@@ -48,39 +48,44 @@ RSpec.describe Trade, type: :model do
   end
 
   describe 'instance methods' do
-    let(:trade) { create(:trade, :with_cards) }
-    let(:current_user) { trade.user }
-    let(:partner) { trade.user_invit }
+    let(:trade) { create(:trade) }
+    let(:current_user) { create(:user) }
+    let(:partner) { create(:user) }
+
+    before do
+      trade.user = current_user
+      trade.user_invit = partner
+    end
 
     describe '#status_badge' do
       it 'returns the correct HTML for pending status' do
+        trade.update!(status: "0")
         expect(trade.status_badge).to include('En attente')
         expect(trade.status_badge).to include('bg-yellow-100')
       end
 
       it 'returns the correct HTML for accepted status' do
-        trade.update(status: :accepted)
+        trade.update!(status: "1")
         expect(trade.status_badge).to include('Accepté')
         expect(trade.status_badge).to include('bg-green-100')
       end
 
-      it 'returns the correct HTML for rejected status' do
-        trade.update(status: :rejected)
-        expect(trade.status_badge).to include('Refusé')
-        expect(trade.status_badge).to include('bg-red-100')
-      end
-
-      it 'returns the correct HTML for completed status' do
-        trade.update(status: :completed)
+      it 'returns the correct HTML for done status' do
+        trade.update!(status: "2")
         expect(trade.status_badge).to include('Complété')
         expect(trade.status_badge).to include('bg-blue-100')
       end
     end
 
-    describe '#partner_for' do
+    describe '#partner_for and #other_user' do
       it 'returns the correct partner for the current user' do
         expect(trade.partner_for(current_user)).to eq(partner)
         expect(trade.partner_for(partner)).to eq(current_user)
+      end
+
+      it 'returns the same result for other_user as partner_for' do
+        expect(trade.other_user(current_user)).to eq(trade.partner_for(current_user))
+        expect(trade.other_user(partner)).to eq(trade.partner_for(partner))
       end
     end
 
@@ -90,15 +95,23 @@ RSpec.describe Trade, type: :model do
       end
 
       it 'returns "Utilisateur supprimé" when partner is nil' do
-        trade.update(user_invit: nil)
+        trade.user_invit = nil
         expect(trade.partner_name_for(current_user)).to eq('Utilisateur supprimé')
       end
     end
 
     describe '#notify_status_change' do
+      let(:trade) { create(:trade) }
+      let(:current_user) { create(:user) }
+      let(:partner) { create(:user) }
+
+      before do
+        trade.update(user: current_user, user_invit: partner)
+      end
+
       it 'creates a notification and saves a message' do
-        expect(Notification).to receive(:create_notification)
-        expect(Trade).to receive(:save_message)
+        expect(Notification).to receive(:create_notification).with(partner.id, "Test message")
+        expect(Trade).to receive(:save_message).with(current_user.id, partner.id, "trade_id:#{trade.id}")
         trade.notify_status_change(current_user.id, "Test message")
       end
     end

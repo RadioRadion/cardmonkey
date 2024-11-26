@@ -45,8 +45,8 @@ RSpec.describe UserWantedCard, type: :model do
   describe 'scopes' do
     let!(:good_condition_card) { create(:user_wanted_card, min_condition: 'good') }
     let!(:mint_condition_card) { create(:user_wanted_card, min_condition: 'mint') }
-    let!(:french_card) { create(:user_wanted_card, language: 'french') }
-    let!(:english_card) { create(:user_wanted_card, language: 'english') }
+    let!(:french_card) { create(:user_wanted_card, language: 'fr') }
+    let!(:english_card) { create(:user_wanted_card, language: 'en') }
     let!(:card_with_matches) { create(:user_wanted_card, :with_matches) }
     let!(:card_without_matches) { create(:user_wanted_card) }
 
@@ -59,8 +59,8 @@ RSpec.describe UserWantedCard, type: :model do
 
     describe '.by_language' do
       it 'returns cards with specified language' do
-        expect(described_class.by_language('french')).to include(french_card)
-        expect(described_class.by_language('french')).not_to include(english_card)
+        expect(described_class.by_language('fr')).to include(french_card)
+        expect(described_class.by_language('fr')).not_to include(english_card)
       end
     end
 
@@ -93,11 +93,11 @@ RSpec.describe UserWantedCard, type: :model do
 
     describe '#potential_matches_count' do
       it 'returns the number of potential matches' do
-        # Create some potential matches
         other_user = create(:user)
+        card_version = create(:card_version, card: user_wanted_card.card)
         matching_card = create(:user_card, 
           user: other_user,
-          card: user_wanted_card.card,
+          card_version: card_version,
           language: user_wanted_card.language,
           condition: user_wanted_card.min_condition
         )
@@ -127,16 +127,17 @@ RSpec.describe UserWantedCard, type: :model do
       it 'creates matches' do
         other_user = create(:user)
         card = create(:card)
+        card_version = create(:card_version, card: card)
         matching_card = create(:user_card, 
           user: other_user,
-          card: card,
-          language: 'french',
+          card_version: card_version,
+          language: 'fr',
           condition: 'good'
         )
         
         user_wanted_card = build(:user_wanted_card,
           card: card,
-          language: 'french',
+          language: 'fr',
           min_condition: 'good'
         )
         

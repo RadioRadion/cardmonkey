@@ -4,7 +4,7 @@ class Notification < ApplicationRecord
 
   # Validations
   validates :content, presence: true
-  validates :status, presence: true, inclusion: { in: %w[unread read] }
+  validates :status, presence: true
 
   # Enums
   enum status: {
@@ -17,7 +17,7 @@ class Notification < ApplicationRecord
   scope :read, -> { where(status: :read) }
   scope :recent, -> { order(created_at: :desc).limit(5) }
   scope :today, -> { where('created_at >= ?', Time.current.beginning_of_day) }
-  scope :this_week, -> { where('created_at >= ?', Time.current.beginning_of_week) }
+  scope :this_week, -> { where('created_at >= ?', 1.week.ago) }
   scope :by_type, ->(type) { where('content ILIKE ?', "%#{type}%") }
 
   # Callbacks

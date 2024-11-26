@@ -16,7 +16,8 @@ class User < ApplicationRecord
   # Other associations
   has_many :trades
   has_many :user_cards
-  has_many :cards, through: :user_cards
+  has_many :card_versions, through: :user_cards
+  has_many :cards, through: :card_versions
   has_many :user_wanted_cards
   has_many :matches
   has_many :notifications
@@ -65,7 +66,6 @@ class User < ApplicationRecord
     SQL
   end
 
-  # Trouve les cartes qui matchent avec un utilisateur spécifique
   def matching_cards_with_user(other_user_id)
     Match.joins(user_card: { card_version: :card })
         .where(
@@ -80,7 +80,6 @@ class User < ApplicationRecord
     Trade.where('user_id = ? OR user_id_invit = ?', id, id)
   end
 
-  # Statistiques de matching
   def matching_stats
     {
       total_matches: Match.where(user_id: id).or(Match.where(user_id_target: id)).count,

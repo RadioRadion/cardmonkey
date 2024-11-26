@@ -4,7 +4,7 @@ FactoryBot.define do
     association :card_version
     quantity { 1 }
     condition { 'near_mint' }
-    language { 'français' }
+    language { 'fr' }
     foil { false }
 
     trait :available do
@@ -56,27 +56,27 @@ FactoryBot.define do
 
     # Languages
     trait :french do
-      language { 'français' }
+      language { 'fr' }
     end
 
     trait :english do
-      language { 'anglais' }
+      language { 'en' }
     end
 
     trait :german do
-      language { 'allemand' }
+      language { 'de' }
     end
 
     trait :italian do
-      language { 'italien' }
+      language { 'it' }
     end
 
     trait :japanese do
-      language { 'japonais' }
+      language { 'ja' }
     end
 
     trait :russian do
-      language { 'russe' }
+      language { 'ru' }
     end
 
     # Multiple copies

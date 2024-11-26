@@ -30,12 +30,15 @@ RSpec.describe User, type: :model do
   end
 
   describe 'associations' do
+    subject { build(:user) }
+
     it { should have_many(:sent_chatrooms).class_name('Chatroom') }
     it { should have_many(:received_chatrooms).class_name('Chatroom') }
     it { should have_many(:messages) }
     it { should have_many(:trades) }
     it { should have_many(:user_cards) }
-    it { should have_many(:cards).through(:user_cards) }
+    it { should have_many(:card_versions).through(:user_cards) }
+    it { should have_many(:cards).through(:card_versions) }
     it { should have_many(:user_wanted_cards) }
     it { should have_many(:matches) }
     it { should have_many(:notifications) }
@@ -68,8 +71,9 @@ RSpec.describe User, type: :model do
 
     it 'returns chatrooms where user is sender or receiver' do
       sent_chatroom = create(:chatroom, user: user, user_id_invit: other_user.id)
-      received_chatroom = create(:chatroom, user: other_user, user_id_invit: user.id)
-      unrelated_chatroom = create(:chatroom, user: other_user, user_id_invit: create(:user).id)
+      third_user = create(:user)
+      received_chatroom = create(:chatroom, user: third_user, user_id_invit: user.id)
+      unrelated_chatroom = create(:chatroom, user: other_user, user_id_invit: third_user.id)
 
       chatrooms = user.chatrooms
       expect(chatrooms).to include(sent_chatroom)
@@ -83,7 +87,6 @@ RSpec.describe User, type: :model do
     let(:other_user) { create(:user) }
 
     it 'returns users with matches in descending order' do
-      # Create some matches
       user_card = create(:user_card, user: user)
       create_list(:match, 3, user_id: user.id, user_id_target: other_user.id, user_card: user_card)
 
@@ -93,8 +96,8 @@ RSpec.describe User, type: :model do
 
     it 'limits the number of results' do
       users = create_list(:user, 3)
+      user_card = create(:user_card, user: user)
       users.each do |u|
-        user_card = create(:user_card, user: user)
         create(:match, user_id: user.id, user_id_target: u.id, user_card: user_card)
       end
 
@@ -105,14 +108,17 @@ RSpec.describe User, type: :model do
   describe '#matching_cards_with_user' do
     let(:user) { create(:user) }
     let(:other_user) { create(:user) }
-    let(:user_card) { create(:user_card, user: user) }
 
     it 'returns matching cards between two users' do
-      match = create(:match, user_id: user.id, user_id_target: other_user.id, user_card: user_card)
-      matching_cards = user.matching_cards_with_user(other_user.id)
+      extension = create(:extension)
+      card = create(:card)
+      card_version = create(:card_version, card: card, extension: extension)
+      user_card = create(:user_card, user: user, card_version: card_version)
+      create(:match, user_id: user.id, user_id_target: other_user.id, user_card: user_card)
       
+      matching_cards = user.matching_cards_with_user(other_user.id)
       expect(matching_cards).to be_present
-      expect(matching_cards.first.id).to eq(user_card.card_version.card.id)
+      expect(matching_cards.first.id).to eq(card.id)
     end
   end
 
@@ -135,19 +141,16 @@ RSpec.describe User, type: :model do
   describe '#matching_stats' do
     let(:user) { create(:user) }
     let(:other_user) { create(:user) }
-    let(:user_card) { create(:user_card, user: user, condition: 'mint', language: 'fr') }
-
-    before do
-      create(:match, user_id: user.id, user_id_target: other_user.id, user_card: user_card)
-    end
 
     it 'returns correct statistics' do
-      stats = user.matching_stats
+      user_card = create(:user_card, user: user, condition: 'mint', language: 'french')
+      create(:match, user_id: user.id, user_id_target: other_user.id, user_card: user_card)
 
+      stats = user.matching_stats
       expect(stats[:total_matches]).to eq(1)
       expect(stats[:unique_matched_users]).to eq(1)
       expect(stats[:matches_by_condition]).to include('mint' => 1)
-      expect(stats[:matches_by_language]).to include('fr' => 1)
+      expect(stats[:matches_by_language]).to include('french' => 1)
     end
   end
 

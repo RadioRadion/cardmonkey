@@ -1,43 +1,377 @@
-example_id                                        | status  | run_time        |
-------------------------------------------------- | ------- | --------------- |
-./spec/models/user_card_spec.rb[1:1:1]            | passed  | 0.00187 seconds |
-./spec/models/user_card_spec.rb[1:1:2]            | passed  | 0.0012 seconds  |
-./spec/models/user_card_spec.rb[1:1:3]            | passed  | 0.00096 seconds |
-./spec/models/user_card_spec.rb[1:2:1]            | passed  | 0.00223 seconds |
-./spec/models/user_card_spec.rb[1:2:2]            | passed  | 0.00287 seconds |
-./spec/models/user_card_spec.rb[1:2:3]            | passed  | 0.0025 seconds  |
-./spec/models/user_card_spec.rb[1:2:4]            | passed  | 0.001 seconds   |
-./spec/models/user_card_spec.rb[1:3:1]            | passed  | 0.00132 seconds |
-./spec/models/user_card_spec.rb[1:3:2]            | failed  | 0.00273 seconds |
-./spec/models/user_card_spec.rb[1:4:1:1:1]        | failed  | 0.00543 seconds |
-./spec/models/user_card_spec.rb[1:4:1:2:1]        | failed  | 0.2649 seconds  |
-./spec/models/user_card_spec.rb[1:4:2:1:1]        | failed  | 0.00492 seconds |
-./spec/models/user_card_spec.rb[1:4:2:1:2]        | failed  | 0.01824 seconds |
-./spec/models/user_card_spec.rb[1:4:2:2:1]        | failed  | 0.00493 seconds |
-./spec/models/user_card_spec.rb[1:5:1]            | failed  | 0.02285 seconds |
-./spec/models/user_card_spec.rb[1:5:2]            | failed  | 0.00668 seconds |
-./spec/models/user_card_spec.rb[1:5:3]            | failed  | 0.00609 seconds |
-./spec/models/user_wanted_card_spec.rb[1:1:1]     | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:1:2]     | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:1:3]     | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:1:4]     | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:2:1]     | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:2:2]     | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:2:3]     | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:2:4]     | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:3:1]     | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:3:2]     | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:4:1:1]   | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:4:2:1]   | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:4:3:1]   | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:4:4:1]   | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:5:1:1]   | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:5:2:1]   | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:5:3:1:1] | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:5:3:2:1] | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:6:1:1:1] | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:6:1:2:1] | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:6:1:3:1] | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:6:2:1]   | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:6:2:2]   | unknown |                 |
-./spec/models/user_wanted_card_spec.rb[1:6:2:3]   | unknown |                 |
+example_id                                                         | status  | run_time               |
+------------------------------------------------------------------ | ------- | ---------------------- |
+./spec/controllers/cards_controller_spec.rb[1:1:1]                 | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:2:1]                 | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:2:2]                 | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:3:1:1]               | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:3:1:2]               | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:3:2:1]               | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:4:1]                 | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:4:2]                 | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:5:1]                 | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:5:2]                 | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:5:3]                 | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:6:1]                 | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:6:2:1]               | unknown |                        |
+./spec/controllers/cards_controller_spec.rb[1:6:3:1]               | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:1:1]             | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:2:1:1]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:2:1:2]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:2:1:3]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:2:2:1]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:3:1:1]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:3:1:2]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:3:1:3]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:3:1:4]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:3:1:5]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:3:1:6]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:3:2:1]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:3:3:1]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:4:1:1]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:4:1:2]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:4:1:3]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:4:2:1]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:4:2:2]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:4:3:1]           | unknown |                        |
+./spec/controllers/chatrooms_controller_spec.rb[1:4:3:2]           | unknown |                        |
+./spec/controllers/matches_controller_spec.rb[1:1:1]               | failed  | 1.83 seconds           |
+./spec/controllers/matches_controller_spec.rb[1:1:2]               | failed  | 2.08 seconds           |
+./spec/controllers/matches_controller_spec.rb[1:1:3]               | failed  | 1.75 seconds           |
+./spec/controllers/matches_controller_spec.rb[1:2:1]               | failed  | 1.84 seconds           |
+./spec/controllers/matches_controller_spec.rb[1:2:2]               | failed  | 3.38 seconds           |
+./spec/controllers/matches_controller_spec.rb[1:3:1]               | failed  | 1.94 seconds           |
+./spec/controllers/matches_controller_spec.rb[1:3:2]               | failed  | 1.72 seconds           |
+./spec/controllers/matches_controller_spec.rb[1:3:3]               | failed  | 1.85 seconds           |
+./spec/controllers/matches_controller_spec.rb[1:3:4]               | failed  | 1.77 seconds           |
+./spec/controllers/messages_controller_spec.rb[1:1:1:1]            | failed  | 1.8 seconds            |
+./spec/controllers/messages_controller_spec.rb[1:1:2:1:1]          | failed  | 1.82 seconds           |
+./spec/controllers/messages_controller_spec.rb[1:1:2:1:2]          | failed  | 1.84 seconds           |
+./spec/controllers/messages_controller_spec.rb[1:1:2:1:3]          | failed  | 1.79 seconds           |
+./spec/controllers/messages_controller_spec.rb[1:1:2:1:4]          | failed  | 1.82 seconds           |
+./spec/controllers/messages_controller_spec.rb[1:1:2:1:5]          | failed  | 1.83 seconds           |
+./spec/controllers/messages_controller_spec.rb[1:1:2:2:1]          | failed  | 1.91 seconds           |
+./spec/controllers/messages_controller_spec.rb[1:1:2:2:2]          | failed  | 1.7 seconds            |
+./spec/controllers/messages_controller_spec.rb[1:1:2:2:3]          | failed  | 1.79 seconds           |
+./spec/controllers/messages_controller_spec.rb[1:1:3:1]            | failed  | 2.62 seconds           |
+./spec/controllers/messages_controller_spec.rb[1:1:3:2]            | failed  | 2.69 seconds           |
+./spec/controllers/notifications_controller_spec.rb[1:1:1]         | failed  | 0.89153 seconds        |
+./spec/controllers/notifications_controller_spec.rb[1:1:2]         | failed  | 0.85493 seconds        |
+./spec/controllers/notifications_controller_spec.rb[1:1:3:1]       | failed  | 0.91543 seconds        |
+./spec/controllers/notifications_controller_spec.rb[1:2:1]         | failed  | 0.87496 seconds        |
+./spec/controllers/notifications_controller_spec.rb[1:2:2]         | failed  | 0.97746 seconds        |
+./spec/controllers/notifications_controller_spec.rb[1:2:3]         | failed  | 0.83735 seconds        |
+./spec/controllers/notifications_controller_spec.rb[1:2:4:1]       | failed  | 2.86 seconds           |
+./spec/controllers/notifications_controller_spec.rb[1:3:1]         | failed  | 0.83458 seconds        |
+./spec/controllers/notifications_controller_spec.rb[1:3:2]         | failed  | 1.54 seconds           |
+./spec/controllers/notifications_controller_spec.rb[1:3:3]         | failed  | 0.86932 seconds        |
+./spec/controllers/notifications_controller_spec.rb[1:3:4]         | failed  | 1.88 seconds           |
+./spec/controllers/notifications_controller_spec.rb[1:4:1]         | failed  | 1.1 seconds            |
+./spec/controllers/notifications_controller_spec.rb[1:4:2]         | failed  | 0.84456 seconds        |
+./spec/controllers/notifications_controller_spec.rb[1:4:3:1]       | failed  | 2.01 seconds           |
+./spec/controllers/notifications_controller_spec.rb[1:4:3:2]       | failed  | 1.75 seconds           |
+./spec/controllers/notifications_controller_spec.rb[1:5:1]         | failed  | 0.92566 seconds        |
+./spec/controllers/notifications_controller_spec.rb[1:5:2]         | failed  | 0.92622 seconds        |
+./spec/controllers/notifications_controller_spec.rb[1:5:3]         | failed  | 1.93 seconds           |
+./spec/controllers/trades_controller_spec.rb[1:1:1]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:1:2]                | failed  | 242 minutes 52 seconds |
+./spec/controllers/trades_controller_spec.rb[1:1:3]                | failed  | 4.45 seconds           |
+./spec/controllers/trades_controller_spec.rb[1:1:4]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:2:1]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:2:2]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:2:3]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:3:1]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:3:2]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:3:3]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:4:1:1]              | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:4:1:2]              | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:4:1:3]              | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:4:1:4]              | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:4:2:1]              | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:5:1:1]              | failed  | 1.84 seconds           |
+./spec/controllers/trades_controller_spec.rb[1:5:1:2]              | failed  | 1.76 seconds           |
+./spec/controllers/trades_controller_spec.rb[1:5:2:1]              | failed  | 1.78 seconds           |
+./spec/controllers/trades_controller_spec.rb[1:5:3:1]              | failed  | 1.79 seconds           |
+./spec/controllers/trades_controller_spec.rb[1:6:1]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:6:2]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:6:3]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:6:4]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:6:5]                | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:7:1:1]              | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:7:1:2]              | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:7:2:1]              | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:7:2:2]              | unknown |                        |
+./spec/controllers/trades_controller_spec.rb[1:8:1]                | failed  | 1.76 seconds           |
+./spec/controllers/trades_controller_spec.rb[1:8:2]                | failed  | 1.71 seconds           |
+./spec/controllers/trades_controller_spec.rb[1:8:3]                | failed  | 1.8 seconds            |
+./spec/controllers/trades_controller_spec.rb[1:8:4]                | failed  | 2.03 seconds           |
+./spec/controllers/user_cards_controller_spec.rb[1:1:1]            | failed  | 0.97395 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:1:2]            | failed  | 1.04 seconds           |
+./spec/controllers/user_cards_controller_spec.rb[1:1:3]            | failed  | 0.91413 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:2:1]            | passed  | 0.93449 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:2:2]            | failed  | 0.99501 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:2:3]            | failed  | 0.94455 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:3:1:1]          | passed  | 0.89184 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:3:1:2]          | passed  | 0.92095 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:3:1:3]          | passed  | 0.93742 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:3:2:1]          | passed  | 0.96311 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:3:2:2]          | failed  | 0.87521 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:3:2:3]          | failed  | 0.87428 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:4:1]            | failed  | 0.97235 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:4:2]            | failed  | 0.92997 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:4:3]            | failed  | 1.23 seconds           |
+./spec/controllers/user_cards_controller_spec.rb[1:4:4]            | failed  | 0.84258 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:5:1:1:1]        | failed  | 1.07 seconds           |
+./spec/controllers/user_cards_controller_spec.rb[1:5:1:1:2]        | failed  | 0.93942 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:5:1:2:1]        | failed  | 0.92317 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:5:2:1:1]        | failed  | 0.92957 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:5:2:1:2]        | failed  | 0.89157 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:5:2:2:1]        | failed  | 0.88607 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:6:1:1]          | failed  | 0.85023 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:6:1:2]          | failed  | 0.89106 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:6:2:1]          | failed  | 0.84174 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:6:3:1:1]        | failed  | 0.88286 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:6:3:2:1]        | failed  | 0.94827 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:7:1]            | passed  | 0.97026 seconds        |
+./spec/controllers/user_cards_controller_spec.rb[1:7:2]            | passed  | 0.91187 seconds        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:1:1]     | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:1:2]     | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:1:3]     | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:2:1]     | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:2:2]     | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:3:1:1]   | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:3:1:2]   | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:3:1:3]   | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:3:2:1]   | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:3:2:2]   | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:4:1]     | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:4:2]     | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:4:3]     | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:4:4]     | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:5:1:1:1] | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:5:1:1:2] | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:5:1:2:1] | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:5:2:1:1] | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:5:2:2:1] | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:6:1:1]   | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:6:1:2]   | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:6:1:3]   | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:6:1:4:1] | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:6:2:1]   | unknown |                        |
+./spec/controllers/user_wanted_cards_controller_spec.rb[1:6:2:2]   | unknown |                        |
+./spec/controllers/users_controller_spec.rb[1:1:1]                 | passed  | 0.909 seconds          |
+./spec/controllers/users_controller_spec.rb[1:2:1:1]               | failed  | 0.88356 seconds        |
+./spec/controllers/users_controller_spec.rb[1:2:1:2]               | failed  | 0.87625 seconds        |
+./spec/controllers/users_controller_spec.rb[1:2:1:3]               | failed  | 1.98 seconds           |
+./spec/controllers/users_controller_spec.rb[1:2:1:4]               | failed  | 1.02 seconds           |
+./spec/controllers/users_controller_spec.rb[1:2:1:5]               | failed  | 0.91817 seconds        |
+./spec/controllers/users_controller_spec.rb[1:3:1:1]               | failed  | 1.04 seconds           |
+./spec/controllers/users_controller_spec.rb[1:3:1:2]               | failed  | 0.9466 seconds         |
+./spec/controllers/users_controller_spec.rb[1:3:1:3]               | passed  | 1.88 seconds           |
+./spec/controllers/users_controller_spec.rb[1:4:1:1:1]             | passed  | 1.09 seconds           |
+./spec/controllers/users_controller_spec.rb[1:4:1:1:2]             | passed  | 0.92481 seconds        |
+./spec/controllers/users_controller_spec.rb[1:4:1:1:3:1]           | failed  | 0.89445 seconds        |
+./spec/controllers/users_controller_spec.rb[1:4:1:1:3:2]           | failed  | 0.91758 seconds        |
+./spec/controllers/users_controller_spec.rb[1:4:1:2:1]             | passed  | 0.89765 seconds        |
+./spec/controllers/users_controller_spec.rb[1:4:1:2:2]             | failed  | 0.87819 seconds        |
+./spec/controllers/users_controller_spec.rb[1:4:1:2:3]             | failed  | 0.91197 seconds        |
+./spec/controllers/users_controller_spec.rb[1:4:1:3]               | passed  | 1.75 seconds           |
+./spec/controllers/users_controller_spec.rb[1:5:1:1]               | passed  | 1.9 seconds            |
+./spec/controllers/users_controller_spec.rb[1:5:1:2]               | failed  | 1.77 seconds           |
+./spec/models/card_spec.rb[1:1:1]                                  | passed  | 0.00486 seconds        |
+./spec/models/card_spec.rb[1:1:2]                                  | passed  | 0.00559 seconds        |
+./spec/models/card_spec.rb[1:1:3]                                  | passed  | 0.00419 seconds        |
+./spec/models/card_spec.rb[1:2:1]                                  | passed  | 0.00247 seconds        |
+./spec/models/card_spec.rb[1:2:2]                                  | passed  | 0.00215 seconds        |
+./spec/models/card_spec.rb[1:3:1:1]                                | passed  | 0.00137 seconds        |
+./spec/models/card_spec.rb[1:3:2:1]                                | passed  | 0.0014 seconds         |
+./spec/models/card_spec.rb[1:3:3:1]                                | passed  | 0.00198 seconds        |
+./spec/models/card_spec.rb[1:3:4:1]                                | passed  | 0.00151 seconds        |
+./spec/models/card_version_spec.rb[1:1:1]                          | passed  | 0.00117 seconds        |
+./spec/models/card_version_spec.rb[1:1:2]                          | passed  | 0.00112 seconds        |
+./spec/models/card_version_spec.rb[1:1:3]                          | passed  | 0.00102 seconds        |
+./spec/models/card_version_spec.rb[1:2:1]                          | passed  | 0.00223 seconds        |
+./spec/models/card_version_spec.rb[1:2:2]                          | passed  | 0.00249 seconds        |
+./spec/models/card_version_spec.rb[1:2:3]                          | passed  | 0.00283 seconds        |
+./spec/models/card_version_spec.rb[1:2:4]                          | passed  | 0.00246 seconds        |
+./spec/models/card_version_spec.rb[1:2:5]                          | passed  | 0.00246 seconds        |
+./spec/models/card_version_spec.rb[1:2:6]                          | passed  | 0.00221 seconds        |
+./spec/models/card_version_spec.rb[1:3:1]                          | passed  | 0.00311 seconds        |
+./spec/models/card_version_spec.rb[1:3:2:1]                        | passed  | 4.38 seconds           |
+./spec/models/card_version_spec.rb[1:3:2:2]                        | passed  | 0.00769 seconds        |
+./spec/models/card_version_spec.rb[1:3:2:3]                        | passed  | 0.00367 seconds        |
+./spec/models/card_version_spec.rb[1:3:2:4]                        | passed  | 0.00416 seconds        |
+./spec/models/card_version_spec.rb[1:3:2:5]                        | passed  | 0.01022 seconds        |
+./spec/models/card_version_spec.rb[1:4:1]                          | passed  | 0.00532 seconds        |
+./spec/models/card_version_spec.rb[1:4:2]                          | passed  | 0.00466 seconds        |
+./spec/models/card_version_spec.rb[1:4:3]                          | passed  | 0.00945 seconds        |
+./spec/models/card_version_spec.rb[1:4:4]                          | passed  | 0.00424 seconds        |
+./spec/models/chatroom_spec.rb[1:1:1]                              | passed  | 0.00213 seconds        |
+./spec/models/chatroom_spec.rb[1:1:2]                              | passed  | 0.00534 seconds        |
+./spec/models/chatroom_spec.rb[1:1:3]                              | passed  | 0.0038 seconds         |
+./spec/models/chatroom_spec.rb[1:2:1]                              | passed  | 0.0081 seconds         |
+./spec/models/chatroom_spec.rb[1:2:2]                              | passed  | 0.00666 seconds        |
+./spec/models/chatroom_spec.rb[1:3:1:1]                            | passed  | 2 seconds              |
+./spec/models/chatroom_spec.rb[1:3:1:2]                            | passed  | 0.94 seconds           |
+./spec/models/chatroom_spec.rb[1:3:2:1]                            | passed  | 2.27 seconds           |
+./spec/models/chatroom_spec.rb[1:3:2:2]                            | passed  | 1.82 seconds           |
+./spec/models/chatroom_spec.rb[1:3:2:3]                            | passed  | 1.97 seconds           |
+./spec/models/chatroom_spec.rb[1:4:1:1]                            | passed  | 2.75 seconds           |
+./spec/models/chatroom_spec.rb[1:5:1]                              | passed  | 2.24 seconds           |
+./spec/models/chatroom_spec.rb[1:5:2]                              | passed  | 1.79 seconds           |
+./spec/models/chatroom_spec.rb[1:6:1]                              | passed  | 2.49 seconds           |
+./spec/models/chatroom_spec.rb[1:7:1]                              | passed  | 1.88 seconds           |
+./spec/models/extension_spec.rb[1:1:1]                             | passed  | 0.00501 seconds        |
+./spec/models/extension_spec.rb[1:1:2]                             | passed  | 0.00575 seconds        |
+./spec/models/extension_spec.rb[1:1:3]                             | passed  | 0.00372 seconds        |
+./spec/models/extension_spec.rb[1:1:4]                             | passed  | 0.00436 seconds        |
+./spec/models/extension_spec.rb[1:2:1]                             | passed  | 0.00105 seconds        |
+./spec/models/extension_spec.rb[1:3:1:1]                           | passed  | 0.00129 seconds        |
+./spec/models/extension_spec.rb[1:3:1:2]                           | passed  | 0.00496 seconds        |
+./spec/models/extension_spec.rb[1:3:1:3]                           | passed  | 0.00368 seconds        |
+./spec/models/extension_spec.rb[1:3:2:1]                           | passed  | 0.0111 seconds         |
+./spec/models/extension_spec.rb[1:3:3:1]                           | passed  | 0.00235 seconds        |
+./spec/models/extension_spec.rb[1:3:4:1]                           | passed  | 0.00262 seconds        |
+./spec/models/extension_spec.rb[1:3:5:1]                           | passed  | 0.02456 seconds        |
+./spec/models/extension_spec.rb[1:3:5:2]                           | passed  | 0.0345 seconds         |
+./spec/models/extension_spec.rb[1:3:6:1]                           | passed  | 0.00936 seconds        |
+./spec/models/extension_spec.rb[1:3:7:1]                           | passed  | 0.01005 seconds        |
+./spec/models/extension_spec.rb[1:3:7:2]                           | passed  | 0.00891 seconds        |
+./spec/models/extension_spec.rb[1:3:8:1]                           | passed  | 0.0088 seconds         |
+./spec/models/extension_spec.rb[1:3:8:2]                           | passed  | 0.00845 seconds        |
+./spec/models/extension_spec.rb[1:3:9:1]                           | passed  | 0.03713 seconds        |
+./spec/models/match_spec.rb[1:1:1]                                 | passed  | 0.00172 seconds        |
+./spec/models/match_spec.rb[1:1:2]                                 | passed  | 0.00192 seconds        |
+./spec/models/match_spec.rb[1:1:3]                                 | passed  | 0.0021 seconds         |
+./spec/models/match_spec.rb[1:2:1]                                 | passed  | 0.00861 seconds        |
+./spec/models/match_spec.rb[1:3:1]                                 | passed  | 1.87 seconds           |
+./spec/models/message_spec.rb[1:1:1]                               | passed  | 0.00494 seconds        |
+./spec/models/message_spec.rb[1:1:2]                               | passed  | 0.00714 seconds        |
+./spec/models/message_spec.rb[1:2:1]                               | passed  | 0.02249 seconds        |
+./spec/models/message_spec.rb[1:2:2]                               | passed  | 0.00453 seconds        |
+./spec/models/message_spec.rb[1:3:1:1]                             | passed  | 2.78 seconds           |
+./spec/models/message_spec.rb[1:3:1:2]                             | passed  | 1.81 seconds           |
+./spec/models/message_spec.rb[1:4:1:1]                             | passed  | 5.87 seconds           |
+./spec/models/message_spec.rb[1:5:1]                               | passed  | 2.72 seconds           |
+./spec/models/message_spec.rb[1:6:1]                               | passed  | 0.01393 seconds        |
+./spec/models/message_spec.rb[1:6:2]                               | passed  | 0.01225 seconds        |
+./spec/models/message_spec.rb[1:7:1:1]                             | passed  | 0.01191 seconds        |
+./spec/models/message_spec.rb[1:7:2:1]                             | passed  | 0.01029 seconds        |
+./spec/models/message_spec.rb[1:8:1:1]                             | passed  | 0.00801 seconds        |
+./spec/models/message_spec.rb[1:8:2:1]                             | passed  | 0.00934 seconds        |
+./spec/models/notification_spec.rb[1:1:1]                          | passed  | 0.00457 seconds        |
+./spec/models/notification_spec.rb[1:1:2]                          | passed  | 0.00396 seconds        |
+./spec/models/notification_spec.rb[1:2:1]                          | passed  | 0.00179 seconds        |
+./spec/models/notification_spec.rb[1:3:1:1]                        | passed  | 0.97961 seconds        |
+./spec/models/notification_spec.rb[1:3:2:1]                        | passed  | 0.87929 seconds        |
+./spec/models/notification_spec.rb[1:3:3:1]                        | passed  | 0.96486 seconds        |
+./spec/models/notification_spec.rb[1:3:4:1]                        | passed  | 1.01 seconds           |
+./spec/models/notification_spec.rb[1:3:5:1]                        | passed  | 1.62 seconds           |
+./spec/models/notification_spec.rb[1:3:6:1]                        | passed  | 0.89453 seconds        |
+./spec/models/notification_spec.rb[1:4:1:1]                        | passed  | 0.87812 seconds        |
+./spec/models/notification_spec.rb[1:4:1:2]                        | passed  | 0.8938 seconds         |
+./spec/models/notification_spec.rb[1:4:1:3]                        | passed  | 0.00436 seconds        |
+./spec/models/notification_spec.rb[1:4:2:1]                        | passed  | 0.90377 seconds        |
+./spec/models/notification_spec.rb[1:4:2:2]                        | passed  | 1.98 seconds           |
+./spec/models/notification_spec.rb[1:5:1:1]                        | passed  | 1.34 seconds           |
+./spec/models/notification_spec.rb[1:5:1:2]                        | passed  | 1.01 seconds           |
+./spec/models/notification_spec.rb[1:5:1:3]                        | passed  | 0.94322 seconds        |
+./spec/models/notification_spec.rb[1:5:2:1]                        | passed  | 0.94108 seconds        |
+./spec/models/notification_spec.rb[1:5:2:2]                        | passed  | 0.89239 seconds        |
+./spec/models/notification_spec.rb[1:5:3:1]                        | passed  | 0.95447 seconds        |
+./spec/models/notification_spec.rb[1:5:3:2]                        | passed  | 2.01 seconds           |
+./spec/models/notification_spec.rb[1:6:1]                          | passed  | 1.05 seconds           |
+./spec/models/notification_spec.rb[1:6:2]                          | passed  | 1.02 seconds           |
+./spec/models/trade_spec.rb[1:1:1]                                 | passed  | 0.00416 seconds        |
+./spec/models/trade_spec.rb[1:1:2]                                 | passed  | 0.00439 seconds        |
+./spec/models/trade_spec.rb[1:1:3]                                 | passed  | 0.00259 seconds        |
+./spec/models/trade_spec.rb[1:1:4]                                 | passed  | 0.0054 seconds         |
+./spec/models/trade_spec.rb[1:2:1]                                 | passed  | 0.00908 seconds        |
+./spec/models/trade_spec.rb[1:3:1:1]                               | passed  | 5.46 seconds           |
+./spec/models/trade_spec.rb[1:3:2:1]                               | passed  | 6.34 seconds           |
+./spec/models/trade_spec.rb[1:3:3:1]                               | passed  | 5.52 seconds           |
+./spec/models/trade_spec.rb[1:3:4:1]                               | passed  | 9.14 seconds           |
+./spec/models/trade_spec.rb[1:4:1:1]                               | passed  | 4.24 seconds           |
+./spec/models/trade_spec.rb[1:4:1:2]                               | passed  | 3.86 seconds           |
+./spec/models/trade_spec.rb[1:4:1:3]                               | passed  | 3.92 seconds           |
+./spec/models/trade_spec.rb[1:4:2:1]                               | passed  | 3.69 seconds           |
+./spec/models/trade_spec.rb[1:4:2:2]                               | passed  | 3.68 seconds           |
+./spec/models/trade_spec.rb[1:4:3:1]                               | passed  | 3.57 seconds           |
+./spec/models/trade_spec.rb[1:4:3:2]                               | passed  | 7.12 seconds           |
+./spec/models/trade_spec.rb[1:4:4:1]                               | passed  | 3.66 seconds           |
+./spec/models/trade_spec.rb[1:5:1:1]                               | passed  | 1.89 seconds           |
+./spec/models/trade_spec.rb[1:5:1:2]                               | passed  | 2 seconds              |
+./spec/models/trade_spec.rb[1:5:1:3]                               | passed  | 3.26 seconds           |
+./spec/models/trade_user_card_spec.rb[1:1:1]                       | passed  | 0.00122 seconds        |
+./spec/models/trade_user_card_spec.rb[1:1:2]                       | passed  | 0.18618 seconds        |
+./spec/models/trade_user_card_spec.rb[1:2:1]                       | passed  | 0.09609 seconds        |
+./spec/models/trade_user_card_spec.rb[1:3:1]                       | passed  | 0.0057 seconds         |
+./spec/models/trade_user_card_spec.rb[1:3:2]                       | passed  | 0.00568 seconds        |
+./spec/models/trade_user_card_spec.rb[1:3:3]                       | passed  | 0.0108 seconds         |
+./spec/models/trade_user_card_spec.rb[1:4:1]                       | passed  | 0.01708 seconds        |
+./spec/models/trade_user_card_spec.rb[1:4:2]                       | passed  | 0.0252 seconds         |
+./spec/models/trade_user_card_spec.rb[1:4:3]                       | passed  | 0.02206 seconds        |
+./spec/models/trade_user_card_spec.rb[1:5:1]                       | passed  | 3.85 seconds           |
+./spec/models/user_card_spec.rb[1:1:1]                             | passed  | 0.00184 seconds        |
+./spec/models/user_card_spec.rb[1:1:2]                             | passed  | 0.0023 seconds         |
+./spec/models/user_card_spec.rb[1:1:3]                             | passed  | 0.00142 seconds        |
+./spec/models/user_card_spec.rb[1:2:1]                             | passed  | 0.00501 seconds        |
+./spec/models/user_card_spec.rb[1:2:2]                             | passed  | 0.00797 seconds        |
+./spec/models/user_card_spec.rb[1:2:3]                             | passed  | 0.00572 seconds        |
+./spec/models/user_card_spec.rb[1:2:4]                             | passed  | 0.00361 seconds        |
+./spec/models/user_card_spec.rb[1:3:1]                             | passed  | 0.00218 seconds        |
+./spec/models/user_card_spec.rb[1:3:2]                             | passed  | 0.0026 seconds         |
+./spec/models/user_card_spec.rb[1:4:1:1]                           | passed  | 0.87591 seconds        |
+./spec/models/user_card_spec.rb[1:4:2:1:1]                         | passed  | 0.92536 seconds        |
+./spec/models/user_card_spec.rb[1:4:2:2:1]                         | passed  | 1.38 seconds           |
+./spec/models/user_card_spec.rb[1:5:1:1]                           | passed  | 0.97533 seconds        |
+./spec/models/user_card_spec.rb[1:5:1:2]                           | passed  | 0.99008 seconds        |
+./spec/models/user_card_spec.rb[1:5:1:3]                           | passed  | 1.03 seconds           |
+./spec/models/user_card_spec.rb[1:5:1:4]                           | passed  | 1.02 seconds           |
+./spec/models/user_spec.rb[1:1:1]                                  | passed  | 0.92758 seconds        |
+./spec/models/user_spec.rb[1:1:2]                                  | passed  | 0.94683 seconds        |
+./spec/models/user_spec.rb[1:1:3]                                  | passed  | 0.89954 seconds        |
+./spec/models/user_spec.rb[1:1:4]                                  | passed  | 1.84 seconds           |
+./spec/models/user_spec.rb[1:1:5]                                  | passed  | 0.93151 seconds        |
+./spec/models/user_spec.rb[1:2:1]                                  | passed  | 0.00333 seconds        |
+./spec/models/user_spec.rb[1:2:2]                                  | passed  | 0.0037 seconds         |
+./spec/models/user_spec.rb[1:2:3]                                  | passed  | 0.00763 seconds        |
+./spec/models/user_spec.rb[1:2:4]                                  | passed  | 0.0029 seconds         |
+./spec/models/user_spec.rb[1:2:5]                                  | passed  | 0.00343 seconds        |
+./spec/models/user_spec.rb[1:2:6]                                  | passed  | 0.00412 seconds        |
+./spec/models/user_spec.rb[1:2:7]                                  | passed  | 0.00272 seconds        |
+./spec/models/user_spec.rb[1:2:8]                                  | passed  | 0.0032 seconds         |
+./spec/models/user_spec.rb[1:2:9]                                  | passed  | 0.00956 seconds        |
+./spec/models/user_spec.rb[1:2:10]                                 | passed  | 0.00282 seconds        |
+./spec/models/user_spec.rb[1:2:11]                                 | passed  | 0.03088 seconds        |
+./spec/models/user_spec.rb[1:3:1]                                  | passed  | 0.00475 seconds        |
+./spec/models/user_spec.rb[1:4:1]                                  | passed  | 6.72 seconds           |
+./spec/models/user_spec.rb[1:4:2]                                  | passed  | 7.74 seconds           |
+./spec/models/user_spec.rb[1:5:1]                                  | passed  | 5.93 seconds           |
+./spec/models/user_spec.rb[1:6:1]                                  | failed  | 4.74 seconds           |
+./spec/models/user_spec.rb[1:6:2]                                  | passed  | 7 seconds              |
+./spec/models/user_spec.rb[1:7:1]                                  | failed  | 2.78 seconds           |
+./spec/models/user_spec.rb[1:8:1]                                  | passed  | 7.24 seconds           |
+./spec/models/user_spec.rb[1:9:1]                                  | passed  | 4.08 seconds           |
+./spec/models/user_spec.rb[1:10:1:1]                               | passed  | 1.32 seconds           |
+./spec/models/user_spec.rb[1:10:2:1]                               | passed  | 1.15 seconds           |
+./spec/models/user_wanted_card_spec.rb[1:1:1]                      | passed  | 0.00281 seconds        |
+./spec/models/user_wanted_card_spec.rb[1:1:2]                      | passed  | 0.00301 seconds        |
+./spec/models/user_wanted_card_spec.rb[1:1:3]                      | passed  | 0.003 seconds          |
+./spec/models/user_wanted_card_spec.rb[1:1:4]                      | passed  | 0.00181 seconds        |
+./spec/models/user_wanted_card_spec.rb[1:2:1]                      | passed  | 0.0056 seconds         |
+./spec/models/user_wanted_card_spec.rb[1:2:2]                      | passed  | 0.01078 seconds        |
+./spec/models/user_wanted_card_spec.rb[1:2:3]                      | passed  | 0.00582 seconds        |
+./spec/models/user_wanted_card_spec.rb[1:2:4]                      | passed  | 0.00364 seconds        |
+./spec/models/user_wanted_card_spec.rb[1:3:1]                      | passed  | 0.00351 seconds        |
+./spec/models/user_wanted_card_spec.rb[1:3:2]                      | passed  | 0.00414 seconds        |
+./spec/models/user_wanted_card_spec.rb[1:4:1:1]                    | passed  | 6.45 seconds           |
+./spec/models/user_wanted_card_spec.rb[1:4:2:1]                    | passed  | 6.81 seconds           |
+./spec/models/user_wanted_card_spec.rb[1:4:3:1]                    | passed  | 6.57 seconds           |
+./spec/models/user_wanted_card_spec.rb[1:4:4:1]                    | passed  | 6.47 seconds           |
+./spec/models/user_wanted_card_spec.rb[1:5:1:1]                    | passed  | 3.96 seconds           |
+./spec/models/user_wanted_card_spec.rb[1:5:2:1]                    | passed  | 1.84 seconds           |
+./spec/models/user_wanted_card_spec.rb[1:5:3:1:1]                  | passed  | 0.94672 seconds        |
+./spec/models/user_wanted_card_spec.rb[1:5:3:2:1]                  | passed  | 0.87976 seconds        |
+./spec/models/user_wanted_card_spec.rb[1:6:1:1]                    | passed  | 1.85 seconds           |
+./spec/models/user_wanted_card_spec.rb[1:6:2:1]                    | passed  | 0.93312 seconds        |
+./spec/models/user_wanted_card_spec.rb[1:6:2:2]                    | passed  | 0.91773 seconds        |
