@@ -4,7 +4,6 @@ class UsersController < ApplicationController
   before_action :ensure_current_user, only: [:edit, :update]
 
   def show
-    @user = User.find(params[:id])
     @stats = @user.matching_stats if @user == current_user
     @editing = params[:field] == "info"
     @editing_preferences = params[:field] == "preferences"
@@ -12,10 +11,32 @@ class UsersController < ApplicationController
 
   def edit
     @stats = current_user.matching_stats
+    @editing = params[:field] == "info"
+    @editing_preferences = params[:field] == "preferences"
+    
+    respond_to do |format|
+      format.html { render :edit }
+      format.turbo_stream do
+        if params[:field] == "info"
+          render turbo_stream: turbo_stream.replace(
+            "profile_info",
+            partial: "users/profile_info",
+            locals: { user: @user, editing: true }
+          )
+        elsif params[:field] == "preferences"
+          render turbo_stream: turbo_stream.replace(
+            "trading_preferences",
+            partial: "users/trading_preferences",
+            locals: { user: @user, editing_preferences: true }
+          )
+        end
+      end
+    end
   end
 
   def update
     @user = User.find(params[:id])
+    updating_preferences = user_params.keys.any? { |k| %w[address area preference].include?(k) }
     updating_avatar = user_params.key?(:avatar)
     
     if @user.update(user_params)
@@ -27,30 +48,60 @@ class UsersController < ApplicationController
               partial: "users/avatar",
               locals: { user: @user }
             )
+          elsif updating_preferences
+            render turbo_stream: turbo_stream.replace(
+              "trading_preferences",
+              partial: "users/trading_preferences",
+              locals: { user: @user, editing_preferences: false }
+            )
           else
-            # Refresh the entire profile section for other updates
-            render turbo_stream: [
-              turbo_stream.replace(
-                "profile_info",
-                partial: "users/profile_info",
-                locals: { user: @user, editing: false }
-              ),
-              turbo_stream.replace(
-                "trading_preferences",
-                partial: "users/trading_preferences",
-                locals: { user: @user, editing_preferences: false }
-              )
-            ]
+            render turbo_stream: turbo_stream.replace(
+              "profile_info",
+              partial: "users/profile_info",
+              locals: { user: @user, editing: false }
+            )
           end
         end
-        format.html { redirect_to user_path(@user), notice: "Profile updated successfully." }
+        format.html { redirect_to user_path(@user), notice: t('.update_success') }
       end
     else
       respond_to do |format|
         format.turbo_stream do
-          render turbo_stream: turbo_stream.update("flash_messages", "Une erreur est survenue"), status: 422
+          if updating_avatar
+            render turbo_stream: turbo_stream.replace(
+              "profile_avatar",
+              partial: "users/avatar",
+              locals: { user: @user }
+            )
+          elsif updating_preferences
+            render turbo_stream: [
+              turbo_stream.replace(
+                "trading_preferences",
+                partial: "users/trading_preferences",
+                locals: { user: @user, editing_preferences: true }
+              ),
+              turbo_stream.update(
+                "flash_messages",
+                partial: "shared/flash_messages",
+                locals: { messages: @user.errors.full_messages }
+              )
+            ]
+          else
+            render turbo_stream: [
+              turbo_stream.replace(
+                "profile_info",
+                partial: "users/profile_info",
+                locals: { user: @user, editing: true }
+              ),
+              turbo_stream.update(
+                "flash_messages",
+                partial: "shared/flash_messages",
+                locals: { messages: @user.errors.full_messages }
+              )
+            ]
+          end
         end
-        format.html { render :show, status: 422 }
+        format.html { render :edit }
       end
     end
   end
@@ -60,16 +111,20 @@ class UsersController < ApplicationController
   def set_user
     @user = User.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    redirect_to root_path, alert: "User not found."
+    redirect_to root_path, alert: t('.user_not_found')
   end
 
   def ensure_current_user
     unless @user == current_user
       respond_to do |format|
         format.turbo_stream do
-          render turbo_stream: turbo_stream.update("flash_messages", "You're not authorized to perform this action."), status: 403
+          render turbo_stream: turbo_stream.update(
+            "flash_messages",
+            partial: "shared/flash_messages",
+            locals: { messages: [t('.unauthorized')] }
+          ), status: :forbidden
         end
-        format.html { redirect_to root_path, alert: "You're not authorized to perform this action." }
+        format.html { redirect_to root_path, alert: t('.unauthorized') }
       end
     end
   end

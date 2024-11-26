@@ -1,0 +1,30 @@
+<div class="relative group" data-controller="avatar-upload">
+  <% if user.avatar.attached? %>
+    <%= image_tag user.avatar, class: "h-24 w-24 rounded-full object-cover border-4 border-white shadow-md transition duration-200", data: { avatar_upload_target: "preview" } %>
+  <% else %>
+    <%= image_tag user.avatar_thumbnail, class: "h-24 w-24 rounded-full object-cover border-4 border-white shadow-md transition duration-200", data: { avatar_upload_target: "preview" } %>
+  <% end %>
+
+  <% if current_user == user %>
+    <div class="hidden group-hover:flex absolute inset-0 items-center justify-center bg-black bg-opacity-50 rounded-full transition-all duration-200 ease-in-out">
+      <%= form_with(model: user, local: true, data: { turbo: true }) do |f| %>
+        <%= f.file_field :avatar, 
+            direct_upload: true,
+            accept: 'image/*',
+            class: "hidden",
+            data: {
+              avatar_upload_target: "input",
+              action: "change->avatar-upload#upload"
+            } %>
+        <button type="button" 
+                class="text-white text-sm hover:text-blue-200 transform hover:scale-110 transition duration-200"
+                data-action="click->avatar-upload#triggerInput">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+      <% end %>
+    </div>
+  <% end %>
+</div>

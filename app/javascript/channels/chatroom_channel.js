@@ -1,5 +1,3 @@
-import consumer from "./consumer"
-
 const ChatroomSubscription = {
   initialize() {
     this.setupChatroom()
@@ -12,7 +10,7 @@ const ChatroomSubscription = {
 
     const chatroomId = messagesContainer.dataset.chatroomId
     
-    consumer.subscriptions.create(
+    window.App.cable.subscriptions.create(
       { channel: "ChatroomChannel", id: chatroomId },
       {
         connected() {
@@ -71,7 +69,7 @@ const ChatroomSubscription = {
     if (!messageInput) return
 
     const chatroomId = document.getElementById('messages').dataset.chatroomId
-    const subscription = consumer.subscriptions.create(
+    const subscription = window.App.cable.subscriptions.create(
       { channel: "ChatroomChannel", id: chatroomId },
       {}
     )

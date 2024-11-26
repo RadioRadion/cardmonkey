@@ -1,105 +1,46 @@
+<%# app/views/users/edit.html.erb %>
 <div class="container mx-auto px-4 py-8">
   <div class="max-w-3xl mx-auto">
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
       <!-- Profile Header -->
-      <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
-        <h1 class="text-2xl font-bold text-white">Profile Settings</h1>
+      <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-8">
+        <div class="flex items-center space-x-4">
+          <%= turbo_frame_tag "profile_avatar" do %>
+            <%= render "users/avatar", user: @user %>
+          <% end %>
+          
+          <%= turbo_frame_tag "profile_info" do %>
+            <%= render "users/profile_info", user: @user, editing: @editing %>
+          <% end %>
+        </div>
       </div>
 
-      <%= form_for(@user, html: { class: "space-y-6" }) do |f| %>
-        <% if @user.errors.any? %>
-          <div class="bg-red-50 p-4 rounded-md">
-            <div class="text-sm text-red-700">
-              <h2><%= pluralize(@user.errors.count, "error") %> prohibited this profile from being saved:</h2>
-              <ul class="list-disc pl-5 mt-2">
-                <% @user.errors.full_messages.each do |message| %>
-                  <li><%= message %></li>
-                <% end %>
-              </ul>
-            </div>
-          </div>
-        <% end %>
-
-        <div class="p-6 space-y-6">
-          <!-- Basic Information Section -->
-          <div>
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Basic Information</h2>
-            <div class="grid grid-cols-1 gap-4">
-              <div>
-                <%= f.label :username, class: "block text-sm font-medium text-gray-700" %>
-                <%= f.text_field :username, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
-              </div>
-              <div>
-                <%= f.label :email, class: "block text-sm font-medium text-gray-700" %>
-                <%= f.email_field :email, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
-              </div>
-            </div>
-          </div>
-
-          <!-- Location Settings -->
-          <div>
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Location Settings</h2>
-            <div class="grid grid-cols-1 gap-4">
-              <div>
-                <%= f.label :address, class: "block text-sm font-medium text-gray-700" %>
-                <%= f.text_field :address, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
-                <p class="mt-1 text-sm text-gray-500">This helps find trading partners near you</p>
-              </div>
-              <div>
-                <%= f.label :area, "Trading Area (km)", class: "block text-sm font-medium text-gray-700" %>
-                <%= f.number_field :area, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
-                <p class="mt-1 text-sm text-gray-500">Maximum distance for finding trading partners</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Trading Preferences -->
-          <div>
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Trading Preferences</h2>
-            <div>
-              <%= f.label :preference, class: "block text-sm font-medium text-gray-700 mb-2" %>
-              <div class="space-y-2">
-                <div class="flex items-center">
-                  <%= f.radio_button :preference, :value_based, class: "h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" %>
-                  <%= f.label :preference_value_based, "Value Based Trading", class: "ml-2 block text-sm text-gray-700" %>
-                </div>
-                <div class="flex items-center">
-                  <%= f.radio_button :preference, :quantity_based, class: "h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" %>
-                  <%= f.label :preference_quantity_based, "Quantity Based Trading", class: "ml-2 block text-sm text-gray-700" %>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Trading Statistics -->
-        <div class="border-t border-gray-200 px-6 py-4">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Your Trading Statistics</h2>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="bg-gray-50 p-4 rounded-lg text-center">
-              <div class="text-2xl font-bold text-blue-600"><%= @stats[:total_matches] %></div>
-              <div class="text-sm text-gray-500">Total Matches</div>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg text-center">
-              <div class="text-2xl font-bold text-blue-600"><%= @stats[:unique_matched_users] %></div>
-              <div class="text-sm text-gray-500">Trading Partners</div>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg text-center">
-              <div class="text-2xl font-bold text-blue-600"><%= @user.user_cards.count %></div>
-              <div class="text-sm text-gray-500">Cards Listed</div>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg text-center">
-              <div class="text-2xl font-bold text-blue-600"><%= @user.user_wanted_cards.count %></div>
-              <div class="text-sm text-gray-500">Cards Wanted</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Submit Button -->
-        <div class="px-6 py-4 bg-gray-50 text-right">
-          <%= f.submit "Update Profile", class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" %>
-        </div>
+      <%= turbo_frame_tag "trading_preferences" do %>
+        <%= render "users/trading_preferences", user: @user, editing_preferences: @editing_preferences %>
       <% end %>
+
+      <!-- Trading Statistics -->
+      <div class="p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4"><%= t('users.profile.trading_statistics') %></h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-gray-50 p-4 rounded-lg text-center transition-all duration-200 hover:shadow-md">
+            <div class="text-2xl font-bold text-blue-600"><%= @stats[:total_matches] %></div>
+            <div class="text-sm text-gray-500"><%= t('users.profile.total_matches') %></div>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg text-center">
+            <div class="text-2xl font-bold text-blue-600"><%= @stats[:unique_matched_users] %></div>
+            <div class="text-sm text-gray-500"><%= t('users.profile.trading_partners') %></div>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg text-center">
+            <div class="text-2xl font-bold text-blue-600"><%= @user.user_cards.count %></div>
+            <div class="text-sm text-gray-500"><%= t('users.profile.cards_listed') %></div>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg text-center">
+            <div class="text-2xl font-bold text-blue-600"><%= @user.user_wanted_cards.count %></div>
+            <div class="text-sm text-gray-500"><%= t('users.profile.cards_wanted') %></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

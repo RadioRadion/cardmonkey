@@ -4,12 +4,14 @@ export default class extends Controller {
   static targets = ["menu"]
 
   connect() {
-    this.closeOnClickOutside = this.closeOnClickOutside.bind(this)
-    document.addEventListener("click", this.closeOnClickOutside)
+    // Add event listener to close dropdown when clicking outside
+    document.addEventListener("click", this.handleClickOutside.bind(this))
+    document.addEventListener("turbo:click", this.hide.bind(this))
   }
 
   disconnect() {
-    document.removeEventListener("click", this.closeOnClickOutside)
+    document.removeEventListener("click", this.handleClickOutside.bind(this))
+    document.removeEventListener("turbo:click", this.hide.bind(this))
   }
 
   toggle(event) {
@@ -17,9 +19,13 @@ export default class extends Controller {
     this.menuTarget.classList.toggle("hidden")
   }
 
-  closeOnClickOutside(event) {
+  hide() {
+    this.menuTarget.classList.add("hidden")
+  }
+
+  handleClickOutside(event) {
     if (!this.element.contains(event.target)) {
-      this.menuTarget.classList.add("hidden")
+      this.hide()
     }
   }
 }

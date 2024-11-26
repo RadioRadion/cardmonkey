@@ -6,76 +6,12 @@
       <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-8">
         <div class="flex items-center space-x-4">
           <%= turbo_frame_tag "profile_avatar" do %>
-            <div class="relative group">
-              <% if @user.avatar.attached? %>
-                <%= image_tag @user.avatar, class: "h-24 w-24 rounded-full object-cover border-4 border-white shadow-md transition duration-200" %>
-              <% else %>
-                <%= image_tag @user.avatar_thumbnail, class: "h-24 w-24 rounded-full object-cover border-4 border-white shadow-md transition duration-200" %>
-              <% end %>
-
-              <% if current_user == @user %>
-                <div data-controller="avatar-upload" class="hidden group-hover:flex absolute inset-0 items-center justify-center bg-black bg-opacity-50 rounded-full transition-all duration-200 ease-in-out">
-                  <%= form_with(model: @user, class: "contents") do |f| %>
-                    <%= f.file_field :avatar, 
-                        direct_upload: true,
-                        class: "hidden",
-                        data: {
-                          avatar_upload_target: "input",
-                          action: "change->avatar-upload#upload"
-                        } %>
-                    <button type="button" 
-                            class="text-white text-sm hover:text-blue-200 transform hover:scale-110 transition duration-200"
-                            data-action="click->avatar-upload#triggerInput">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </button>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
+            <%= render "users/avatar", user: @user %>
           <% end %>
           
           <!-- Username et Email éditable -->
           <%= turbo_frame_tag "profile_info" do %>
-            <% if @editing %>
-              <%= form_with(model: @user, class: "space-y-3 bg-white/10 p-3 rounded-lg transition-all duration-200", data: { turbo_frame: "_top" }) do |f| %>
-                <div class="space-y-2">
-                  <%= f.text_field :username, 
-                      class: "block w-full rounded-md border-0 bg-white/80 shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-300 text-gray-900",
-                      placeholder: t('activerecord.attributes.user.username') %>
-                  <%= f.email_field :email, 
-                      class: "block w-full rounded-md border-0 bg-white/80 shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-300 text-gray-900",
-                      placeholder: t('activerecord.attributes.user.email') %>
-                </div>
-                <div class="flex space-x-2">
-                  <%= f.button type: "submit", 
-                      class: "px-3 py-1.5 bg-white/90 text-blue-600 rounded-md hover:bg-white transition-colors duration-200 font-medium text-sm" do %>
-                    <span><%= t('users.profile.save_changes') %></span>
-                  <% end %>
-                  <%= link_to t('users.profile.cancel'), 
-                      user_path(@user), 
-                      class: "px-3 py-1.5 text-white/90 hover:text-white transition-colors duration-200 text-sm" %>
-                </div>
-              <% end %>
-            <% else %>
-              <div class="transition-all duration-200">
-                <h1 class="text-2xl font-bold text-white group relative inline-flex items-center">
-                  <%= @user.username %>
-                  <% if current_user == @user %>
-                    <%= link_to edit_user_path(@user, field: "info"), 
-                        class: "ml-2 text-white/70 hover:text-white transition-colors duration-200 opacity-0 group-hover:opacity-100",
-                        title: t('users.profile.edit_profile') do %>
-                      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                    <% end %>
-                  <% end %>
-                </h1>
-                <p class="text-blue-100"><%= @user.email %></p>
-              </div>
-            <% end %>
+            <%= render "users/profile_info", user: @user, editing: @editing %>
           <% end %>
         </div>
       </div>

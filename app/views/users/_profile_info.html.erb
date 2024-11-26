@@ -1,0 +1,39 @@
+<% if editing %>
+  <%= form_with(model: user, class: "space-y-3 bg-white/10 p-3 rounded-lg transition-all duration-200") do |f| %>
+    <div class="space-y-2">
+      <%= f.text_field :username, 
+          class: "block w-full rounded-md border-0 bg-white/80 shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-300 text-gray-900",
+          placeholder: t('activerecord.attributes.user.username') %>
+      <%= f.email_field :email, 
+          class: "block w-full rounded-md border-0 bg-white/80 shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-300 text-gray-900",
+          placeholder: t('activerecord.attributes.user.email') %>
+    </div>
+    <div class="flex space-x-2">
+      <%= f.button type: "submit", 
+          class: "px-3 py-1.5 bg-white/90 text-blue-600 rounded-md hover:bg-white transition-colors duration-200 font-medium text-sm" do %>
+        <span><%= t('users.profile.save_changes') %></span>
+      <% end %>
+      <%= link_to t('users.profile.cancel'), 
+          user_path(user),
+          data: { turbo_frame: "profile_info" },
+          class: "px-3 py-1.5 text-white/90 hover:text-white transition-colors duration-200 text-sm" %>
+    </div>
+  <% end %>
+<% else %>
+  <div class="transition-all duration-200">
+    <h1 class="text-2xl font-bold text-white group relative inline-flex items-center">
+      <%= user.username %>
+      <% if current_user == user %>
+        <%= link_to edit_user_path(user, field: "info"), 
+            class: "ml-2 text-white/70 hover:text-white transition-colors duration-200 opacity-0 group-hover:opacity-100",
+            data: { turbo_frame: "profile_info" },
+            title: t('users.profile.edit_profile') do %>
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+        <% end %>
+      <% end %>
+    </h1>
+    <p class="text-blue-100"><%= user.email %></p>
+  </div>
+<% end %>

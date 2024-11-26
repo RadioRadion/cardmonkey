@@ -1,5 +1,8 @@
 // app/javascript/application.js
 import { Application } from "@hotwired/stimulus"
+import "@hotwired/turbo-rails"
+import * as ActiveStorage from "@rails/activestorage"
+import { createConsumer } from "@rails/actioncable"
 
 // Importez chaque contrôleur spécifiquement
 import HelloController from "./controllers/hello_controller"
@@ -16,6 +19,13 @@ import CardQuantityController from "./controllers/card_quantity_controller"
 import TradeSummaryController from "./controllers/trade_summary_controller"
 import CardPreviewController from "./controllers/card_preview_controller"
 import FiltersController from "./controllers/filters_controller"
+
+// Start ActiveStorage
+ActiveStorage.start()
+
+// Create ActionCable consumer
+window.App = window.App || {}
+window.App.cable = createConsumer()
 
 // Démarrage de l'application Stimulus
 window.Stimulus = Application.start()

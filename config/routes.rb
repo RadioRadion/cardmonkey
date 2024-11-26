@@ -2,6 +2,9 @@ Rails.application.routes.draw do
   devise_for :users
   root to: 'home#index'
 
+  # Active Storage direct uploads
+  post '/rails/active_storage/direct_uploads', to: 'active_storage/direct_uploads#create'
+
   # Routes pour matches
   resources :matches, only: [:index, :show] do
     collection do

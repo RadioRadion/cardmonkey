@@ -1,6 +1,6 @@
 <div class="p-6 border-b">
   <% if editing_preferences %>
-    <%= form_with(model: user, class: "space-y-6", data: { turbo_frame: "_top" }) do |f| %>
+    <%= form_with(model: user, class: "space-y-6") do |f| %>
       <div class="space-y-4">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-medium text-gray-900"><%= t('users.profile.edit_preferences') %></h2>
@@ -44,7 +44,8 @@
             <%= t('users.profile.save_preferences') %>
           <% end %>
           <%= link_to t('users.profile.cancel'), 
-              user_path(user), 
+              user_path(user),
+              data: { turbo_frame: "trading_preferences" },
               class: "rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-colors duration-200" %>
         </div>
       </div>
@@ -56,6 +57,7 @@
           <h2 class="text-lg font-medium text-gray-900"><%= t('users.profile.trading_preferences') %></h2>
           <% if current_user == user %>
             <%= link_to edit_user_path(user, field: "preferences"), 
+                data: { turbo_frame: "trading_preferences" },
                 class: "inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-colors duration-200" do %>
               <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
