@@ -14,11 +14,65 @@ fr:
       sign_in: "Connexion"
       sign_up: "Inscription"
 
+  datetime:
+    distance_in_words:
+      x_seconds:
+        one: "il y a 1 seconde"
+        other: "il y a %{count} secondes"
+      x_minutes:
+        one: "il y a 1 minute"
+        other: "il y a %{count} minutes"
+      x_hours:
+        one: "il y a 1 heure"
+        other: "il y a %{count} heures"
+      x_days:
+        one: "il y a 1 jour"
+        other: "il y a %{count} jours"
+      x_months:
+        one: "il y a 1 mois"
+        other: "il y a %{count} mois"
+      x_years:
+        one: "il y a 1 an"
+        other: "il y a %{count} ans"
+      about_x_hours:
+        one: "environ 1 heure"
+        other: "environ %{count} heures"
+      about_x_months:
+        one: "environ 1 mois"
+        other: "environ %{count} mois"
+      about_x_years:
+        one: "environ 1 an"
+        other: "environ %{count} ans"
+
   footer:
     about: "À propos"
     privacy_policy: "Politique de confidentialité"
     licensing: "Licences"
     contact: "Contact"
+
+  wants:
+    collection:
+      add_card: "Ajouter une carte"
+    table:
+      headers:
+        card: "Carte"
+        min_condition: "État minimum"
+        extension: "Extension"
+        language: "Langue"
+        foil: "Foil"
+        quantity: "Quantité"
+        matches: "Matches"
+        scan: "Scan"
+        actions: "Actions"
+      actions:
+        edit: "Modifier"
+        delete: "Supprimer"
+    conditions:
+      unimportant: "Sans importance"
+    languages:
+      any: "Toutes"
+    attributes:
+      foil: "Foil"
 
   trades:
     show:
@@ -192,31 +246,6 @@ fr:
         preference:
           value_based: "Basé sur la valeur"
           quantity_based: "Basé sur la quantité"
-      wants:
-        extensions:
-          any: "N'importe quelle extension"
-        collection:
-          add_card: "Ajouter une carte recherchée"
-        table:
-          headers:
-            card: "Carte"
-            min_condition: "État minimum"
-            extension: "Extension"
-            language: "Langue"
-            foil: "Foil"
-            quantity: "Quantité"
-            matches: "Matches"
-            scan: "Scan"
-            actions: "Actions"
-          actions:
-            edit: "Modifier"
-            delete: "Supprimer"
-        conditions:
-          unimportant: "Sans importance"
-        languages:
-          any: "Toutes"
-        attributes:
-          foil: "Foil"
 
   cards:
     conditions:
