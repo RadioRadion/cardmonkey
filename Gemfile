@@ -16,8 +16,8 @@ gem 'jbuilder', '~> 2.7'
 # Use Redis adapter to run Action Cable in production
 gem 'redis', '~> 4.0'
 
-gem "turbo-rails"
-gem "stimulus-rails"
+gem "turbo-rails", "~> 1.5.0"
+gem "stimulus-rails", "~> 1.3.0"
 gem "tailwindcss-rails"
 gem "importmap-rails"
 

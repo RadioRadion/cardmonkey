@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html data-turbo="true">
 <head>
   <title>Cardmonkey</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="turbo-cache-control" content="no-cache">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  
+  <%= stylesheet_link_tag "application", data: { turbo_track: "reload" } %>
   <%= javascript_importmap_tags %>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <%= stylesheet_link_tag "application", data: { turbo_track: "reload" } %>
 </head>
-<body class="bg-gray-50 flex flex-col min-h-screen">
+<body class="bg-gray-50 flex flex-col min-h-screen" data-turbo-preserve-scroll>
   <div class="flex-grow">
     <%= render 'shared/navbar' %> 
     <%= render 'shared/flashes' %> 
