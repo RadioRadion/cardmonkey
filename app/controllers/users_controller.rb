@@ -42,25 +42,31 @@ class UsersController < ApplicationController
     if @user.update(user_params)
       respond_to do |format|
         format.turbo_stream do
+          streams = []
+          
           if updating_avatar
-            render turbo_stream: turbo_stream.replace(
-              "profile_avatar",
+            streams << turbo_stream.replace("profile_avatar",
               partial: "users/avatar",
               locals: { user: @user }
             )
+            # Also update the navbar avatar
+            streams << turbo_stream.replace("navbar_avatar",
+              partial: "shared/navbar_avatar",
+              locals: { user: @user }
+            )
           elsif updating_preferences
-            render turbo_stream: turbo_stream.replace(
-              "trading_preferences",
+            streams << turbo_stream.replace("trading_preferences",
               partial: "users/trading_preferences",
               locals: { user: @user, editing_preferences: false }
             )
           else
-            render turbo_stream: turbo_stream.replace(
-              "profile_info",
+            streams << turbo_stream.replace("profile_info",
               partial: "users/profile_info",
               locals: { user: @user, editing: false }
             )
           end
+
+          render turbo_stream: streams
         end
         format.html { redirect_to user_path(@user), notice: t('.update_success') }
       end
@@ -68,33 +74,34 @@ class UsersController < ApplicationController
       respond_to do |format|
         format.turbo_stream do
           if updating_avatar
-            render turbo_stream: turbo_stream.replace(
-              "profile_avatar",
-              partial: "users/avatar",
-              locals: { user: @user }
-            )
+            render turbo_stream: [
+              turbo_stream.replace("profile_avatar",
+                partial: "users/avatar",
+                locals: { user: @user }
+              ),
+              turbo_stream.update("flash_messages",
+                partial: "shared/flash_messages",
+                locals: { messages: @user.errors.full_messages }
+              )
+            ]
           elsif updating_preferences
             render turbo_stream: [
-              turbo_stream.replace(
-                "trading_preferences",
+              turbo_stream.replace("trading_preferences",
                 partial: "users/trading_preferences",
                 locals: { user: @user, editing_preferences: true }
               ),
-              turbo_stream.update(
-                "flash_messages",
+              turbo_stream.update("flash_messages",
                 partial: "shared/flash_messages",
                 locals: { messages: @user.errors.full_messages }
               )
             ]
           else
             render turbo_stream: [
-              turbo_stream.replace(
-                "profile_info",
+              turbo_stream.replace("profile_info",
                 partial: "users/profile_info",
                 locals: { user: @user, editing: true }
               ),
-              turbo_stream.update(
-                "flash_messages",
+              turbo_stream.update("flash_messages",
                 partial: "shared/flash_messages",
                 locals: { messages: @user.errors.full_messages }
               )

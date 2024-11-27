@@ -29,7 +29,9 @@
             <button type="button" 
                     class="flex rounded-full bg-gray-100 p-1"
                     data-action="click->dropdown#toggle">
-              <%= image_tag "https://via.placeholder.com/64", class: "h-8 w-8 rounded-full", alt: "Profile" %>
+              <div id="navbar_avatar">
+                <%= render "shared/navbar_avatar", user: current_user %>
+              </div>
             </button>
 
             <!-- Menu dropdown avec z-index élevé -->
