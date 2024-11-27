@@ -101,7 +101,14 @@
   <%# Barre de résumé fixe %>
   <div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
     <div class="max-w-7xl mx-auto px-4 py-4">
-      <%= form_with model: @trade, url: trade_path(@trade), method: :patch, class: "w-full", data: { action: "submit->trade-selection#submitTrade" } do |f| %>
+      <%= form_with model: @trade, 
+                    url: trade_path(@trade), 
+                    method: :patch, 
+                    class: "w-full", 
+                    data: { 
+                      turbo: false,
+                      action: "submit->trade-selection#submitTrade" 
+                    } do |f| %>
         <%= f.hidden_field :offer %>
         <%= f.hidden_field :target %>
         
@@ -131,12 +138,17 @@
 
           <%# Boutons d'action %>
           <div class="flex gap-4 items-center">
-            <%= link_to "Annuler", trade_path(@trade), 
-                      class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50" %>
+            <%= link_to "Annuler", 
+                      trade_path(@trade), 
+                      class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50",
+                      data: { turbo: false } %>
             
             <%= f.submit "Mettre à jour l'échange", 
                       class: "text-white bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
-                      data: { trade_selection_target: "submitButton" } %>
+                      data: { 
+                        trade_selection_target: "submitButton",
+                        disable_with: "Mise à jour en cours..."
+                      } %>
           </div>
         </div>
       <% end %>
@@ -149,29 +161,26 @@
 document.addEventListener('DOMContentLoaded', function() {
   const controller = document.querySelector('[data-controller="trade-selection"]')?._stimulus
   if (controller) {
-    <%# Pré-sélectionner les cartes du trade actuel %>
-    <% @trade_data[:trade_cards][:mine].each do |card| %>
-      const myEvent = new CustomEvent('card-quantity:changed', {
+    // Fonction pour créer et dispatcher un événement de carte
+    function dispatchCardEvent(cardId, side, price) {
+      const event = new CustomEvent('cardQuantityChanged', {
         detail: {
-          cardId: <%= card.id %>,
-          side: 'user',
+          cardId: cardId,
+          side: side,
           quantity: 1,
-          price: <%= card.card_version.eur_price || 0 %>
+          price: price || 0
         }
       })
-      controller.element.dispatchEvent(myEvent)
+      controller.element.dispatchEvent(event)
+    }
+
+    // Pré-sélectionner les cartes du trade actuel
+    <% @trade_data[:trade_cards][:mine].each do |card| %>
+      dispatchCardEvent(<%= card.id %>, 'user', <%= card.card_version.eur_price || 0 %>)
     <% end %>
 
     <% @trade_data[:trade_cards][:theirs].each do |card| %>
-      const theirEvent = new CustomEvent('card-quantity:changed', {
-        detail: {
-          cardId: <%= card.id %>,
-          side: 'partner',
-          quantity: 1,
-          price: <%= card.card_version.eur_price || 0 %>
-        }
-      })
-      controller.element.dispatchEvent(theirEvent)
+      dispatchCardEvent(<%= card.id %>, 'partner', <%= card.card_version.eur_price || 0 %>)
     <% end %>
   }
 })

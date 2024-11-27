@@ -18,7 +18,11 @@ export default class extends Controller {
     this.partnerId = this.element.dataset.tradeSelectionPartnerIdValue
     
     // Écouter les changements de quantité
-    this.element.addEventListener("card-quantity:changed", this.handleQuantityChange.bind(this))
+    this.element.addEventListener("cardQuantityChanged", this.handleQuantityChange.bind(this))
+  }
+
+  disconnect() {
+    this.element.removeEventListener("cardQuantityChanged", this.handleQuantityChange.bind(this))
   }
 
   handleQuantityChange(event) {
@@ -87,7 +91,7 @@ export default class extends Controller {
   }
 
   // Nouvelle méthode de recherche avec fetch
-  async search(event) {
+  search(event) {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout)
     }
@@ -98,17 +102,8 @@ export default class extends Controller {
 
     // Si le champ est vide, on recharge toutes les cartes
     if (query === '') {
-      this.searchTimeout = setTimeout(async () => {
-        try {
-          const response = await fetch(`/trades/search_cards?query=&side=${side}&partner_id=${this.partnerId}`)
-          if (!response.ok) throw new Error('Erreur réseau')
-          
-          const html = await response.text()
-          const target = side === 'user' ? this.userCardsGridTarget : this.partnerCardsGridTarget
-          target.innerHTML = html
-        } catch (error) {
-          console.error('Erreur lors du rechargement:', error)
-        }
+      this.searchTimeout = setTimeout(() => {
+        this.performSearch(side, '')
       }, 100) // Délai plus court pour le reset
       return
     }
@@ -119,18 +114,30 @@ export default class extends Controller {
     }
 
     // Recherche normale avec 3 caractères ou plus
-    this.searchTimeout = setTimeout(async () => {
-      try {
-        const response = await fetch(`/trades/search_cards?query=${encodeURIComponent(query)}&side=${side}&partner_id=${this.partnerId}`)
-        if (!response.ok) throw new Error('Erreur réseau')
-        
-        const html = await response.text()
-        const target = side === 'user' ? this.userCardsGridTarget : this.partnerCardsGridTarget
-        target.innerHTML = html
-      } catch (error) {
-        console.error('Erreur lors de la recherche:', error)
-      }
+    this.searchTimeout = setTimeout(() => {
+      this.performSearch(side, query)
     }, 300)
+  }
+
+  async performSearch(side, query) {
+    try {
+      const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+      const response = await fetch(`/trades/search_cards?query=${encodeURIComponent(query)}&side=${side}&partner_id=${this.partnerId}`, {
+        headers: {
+          'Accept': 'text/html',
+          'X-CSRF-Token': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      
+      if (!response.ok) throw new Error('Erreur réseau')
+      
+      const html = await response.text()
+      const target = side === 'user' ? this.userCardsGridTarget : this.partnerCardsGridTarget
+      target.innerHTML = html
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error)
+    }
   }
 
   // Soumission du trade
