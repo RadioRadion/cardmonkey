@@ -1,24 +1,77 @@
-<%# app/views/user_cards/_user_card.html.erb %>
-<tr class="bg-white hover:bg-gray-50" 
-    data-controller="user-card" 
-    data-user-card-id="<%= user_card.id %>" 
-    data-user-id="<%= user_card.user_id %>">
-  
-  <th scope="row" class="px-4 py-3 font-medium text-gray-900">
-    <%= user_card.card_version.card.name_en %>
-  </th>
-  
-  <td class="px-4 py-3 text-gray-600">
-    <%= condition_label(user_card.condition) %>
-  </td>
-  
-  <td class="px-4 py-3">
-    <% if user_card.card_version.extension.icon_uri.present? %>
-      <%= image_tag user_card.card_version.extension.icon_uri, 
-                  alt: user_card.card_version.extension.name, 
-                  class: "w-8 h-8" %>
+<td class="px-4 py-3 font-medium text-gray-900">
+  <%= user_card.card_version.card.name_en %>
+</td>
+
+<td class="px-4 py-3 text-gray-600 bg-gray-50">
+  <%= condition_label(user_card.condition) %>
+</td>
+
+<td class="px-4 py-3">
+  <% if user_card.card_version.extension.icon_uri.present? %>
+    <%= image_tag user_card.card_version.extension.icon_uri, 
+                alt: user_card.card_version.extension.name, 
+                class: "w-8 h-8" %>
+  <% end %>
+</td>
+
+<td class="px-4 py-3 text-gray-600 bg-gray-50">
+  <%= language_label(user_card.language) %>
+</td>
+
+<td class="px-4 py-3">
+  <% if user_card.foil %>
+    <%= image_tag "star.svg", alt: t('cards.attributes.foil'), class: "w-6 h-6" %>
+  <% end %>
+</td>
+
+<td class="px-4 py-3 text-gray-600 bg-gray-50">
+  <%= user_card.quantity %>
+</td>
+
+<td class="px-4 py-3 text-gray-600">
+  <% price = user_card.foil ? user_card.card_version.eur_foil_price : user_card.card_version.eur_price %>
+  <%= number_to_currency(price, unit: "€", format: "%n %u") %>
+</td>
+
+<td class="px-4 py-3 text-gray-600 bg-gray-50">
+  <%= user_card.card_version.collector_number %>
+</td>
+
+<td class="px-4 py-3">
+  <span class="inline-block w-4 h-4 rounded-full <%= rarity_color(user_card.card_version.rarity) %>"
+        title="<%= rarity_label(user_card.card_version.rarity) %>">
+  </span>
+</td>
+
+<td class="px-4 py-3 bg-gray-50">
+  <div class="relative flex justify-center group">
+    <button class="text-gray-600 hover:text-gray-900">
+      <i class="fas fa-eye"></i>
+    </button>
+    <div class="absolute hidden group-hover:block w-52 h-72 top-full mt-2 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg overflow-hidden z-10 border border-gray-200">
+      <%= image_tag user_card.card_version.img_uri, 
+                  alt: user_card.card_version.card.name_en, 
+                  class: "w-full h-full object-cover" %>
+    </div>
+  </div>
+</td>
+
+<td class="px-4 py-3">
+  <div class="flex items-center space-x-2">
+    <%= link_to edit_user_user_card_path(user_card.user, user_card),
+                class: "p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full transition-colors",
+                title: t('cards.table.actions.edit') do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+      </svg>
     <% end %>
-  </td>
-  
-  <%# ... reste du code de la ligne ... %>
-</tr>
+    
+    <button data-action="user-card#delete"
+            class="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full transition-colors"
+            title="<%= t('cards.table.actions.delete') %>">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+      </svg>
+    </button>
+  </div>
+</td>

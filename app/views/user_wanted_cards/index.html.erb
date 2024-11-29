@@ -38,18 +38,22 @@
       <thead class="text-xs uppercase bg-gray-100">
         <tr>
           <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.card') %></th>
-          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.min_condition') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700 bg-gray-50"><%= t('wants.table.headers.min_condition') %></th>
           <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.extension') %></th>
-          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.language') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700 bg-gray-50"><%= t('wants.table.headers.language') %></th>
           <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.foil') %></th>
-          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.quantity') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700 bg-gray-50"><%= t('wants.table.headers.quantity') %></th>
           <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.matches') %></th>
-          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.scan') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700 bg-gray-50"><%= t('wants.table.headers.scan') %></th>
           <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('wants.table.headers.actions') %></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-200">
-        <%= render partial: "user_wanted_card", collection: @user_wanted_cards %>
+      <tbody>
+        <% @user_wanted_cards.each do |user_wanted_card| %>
+          <tr>
+            <%= render partial: "user_wanted_card", locals: { user_wanted_card: user_wanted_card } %>
+          </tr>
+        <% end %>
       </tbody>
     </table>
   </div>

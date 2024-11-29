@@ -44,100 +44,28 @@
     </div>
   </div>
 
-  <%# Ta table originale qui fonctionnait bien %>
+  <%# Table %>
   <div class="relative overflow-x-auto rounded-lg border border-gray-200">
     <table class="w-full text-sm text-left">
       <thead class="text-xs uppercase bg-gray-100">
         <tr>
           <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('cards.table.headers.card') %></th>
-          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('cards.table.headers.condition') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700 bg-gray-50"><%= t('cards.table.headers.condition') %></th>
           <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('cards.table.headers.extension') %></th>
-          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('cards.table.headers.language') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700 bg-gray-50"><%= t('cards.table.headers.language') %></th>
           <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('cards.table.headers.foil') %></th>
-          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('cards.table.headers.quantity') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700 bg-gray-50"><%= t('cards.table.headers.quantity') %></th>
           <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('cards.table.headers.price') %></th>
-          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('cards.table.headers.collector_number') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700 bg-gray-50"><%= t('cards.table.headers.collector_number') %></th>
           <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('cards.table.headers.rarity') %></th>
-          <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('cards.table.headers.scan') %></th>
+          <th scope="col" class="px-4 py-3 font-medium text-gray-700 bg-gray-50"><%= t('cards.table.headers.scan') %></th>
           <th scope="col" class="px-4 py-3 font-medium text-gray-700"><%= t('cards.table.headers.actions') %></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-200">
+      <tbody>
         <% @user_cards.each do |user_card| %>
-          <tr class="bg-white hover:bg-gray-50" 
-              data-controller="user-card" 
-              data-user-card-id="<%= user_card.id %>" 
-              data-user-id="<%= user_card.user_id %>">
-            
-            <th scope="row" class="px-4 py-3 font-medium text-gray-900">
-              <%= user_card.card_version.card.name_en %>
-            </th>
-            
-            <td class="px-4 py-3 text-gray-600">
-              <%= condition_label(user_card.condition) %>
-            </td>
-            
-            <td class="px-4 py-3">
-              <% if user_card.card_version.extension.icon_uri.present? %>
-                <%= image_tag user_card.card_version.extension.icon_uri, 
-                            alt: user_card.card_version.extension.name, 
-                            class: "w-8 h-8" %>
-              <% end %>
-            </td>
-            
-            <td class="px-4 py-3 text-gray-600">
-              <%= language_label(user_card.language) %>
-            </td>
-            
-            <td class="px-4 py-3">
-              <% if user_card.foil %>
-                <%= image_tag "star.svg", alt: t('cards.attributes.foil'), class: "w-6 h-6" %>
-              <% end %>
-            </td>
-            
-            <td class="px-4 py-3 text-gray-600">
-              <%= user_card.quantity %>
-            </td>
-            
-            <td class="px-4 py-3 text-gray-600">
-              <% price = user_card.foil ? user_card.card_version.eur_foil_price : user_card.card_version.eur_price %>
-              <%= number_to_currency(price, unit: "€", format: "%n %u") %>
-            </td>
-            
-            <td class="px-4 py-3 text-gray-600">
-              <%= user_card.card_version.collector_number %>
-            </td>
-            
-            <td class="px-4 py-3">
-              <span class="inline-block w-4 h-4 rounded-full <%= rarity_color(user_card.card_version.rarity) %>"
-                    title="<%= rarity_label(user_card.card_version.rarity) %>">
-              </span>
-            </td>
-            
-            <td class="px-4 py-3">
-              <div class="relative flex justify-center group">
-                <button class="text-gray-600 hover:text-gray-900">
-                  <i class="fas fa-eye"></i>
-                </button>
-                <div class="absolute hidden group-hover:block w-52 h-72 top-full mt-2 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg overflow-hidden z-10 border border-gray-200">
-                  <%= image_tag user_card.card_version.img_uri, 
-                              alt: user_card.card_version.card.name_en, 
-                              class: "w-full h-full object-cover" %>
-                </div>
-              </div>
-            </td>
-            
-            <td class="px-4 py-3">
-              <div class="flex items-center space-x-4">
-                <%= link_to t('cards.table.actions.edit'), 
-                          edit_user_user_card_path(user_card.user, user_card), 
-                          class: "text-blue-600 hover:text-blue-800 font-medium" %>
-                <button data-action="user-card#delete" 
-                        class="text-red-600 hover:text-red-800 font-medium">
-                  <%= t('cards.table.actions.delete') %>
-                </button>
-              </div>
-            </td>
+          <tr>
+            <%= render partial: "user_card", locals: { user_card: user_card } %>
           </tr>
         <% end %>
       </tbody>
