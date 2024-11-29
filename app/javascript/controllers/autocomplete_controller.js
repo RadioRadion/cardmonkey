@@ -11,6 +11,10 @@ export default class extends Controller {
     // Si nous sommes en mode édition, le formulaire est déjà visible
     if (this.formFieldsTarget.classList.contains('hidden') === false) {
       this.isEditing = true
+      // En mode édition, on applique directement le style des extensions
+      if (this.hasExtensionTarget) {
+        this.styleExtensionSelect(this.extensionTarget)
+      }
     }
 
     // Gestion des touches clavier pour la navigation
@@ -176,7 +180,7 @@ export default class extends Controller {
           const response = await fetch(`/cards/versions?oracle_id=${this.selectedCard.oracle_id}`)
           const versions = await response.json()
           if (versions && versions.length > 0) {
-            this.updateWantedVersions(versions)
+            this.updateExtensionSelect(versions, true)
           }
         } catch (error) {
           console.error("Erreur lors de la récupération des versions:", error)
@@ -187,7 +191,7 @@ export default class extends Controller {
         const response = await fetch(`/cards/versions?oracle_id=${this.selectedCard.oracle_id}`)
         const versions = await response.json()
         if (versions && versions.length > 0) {
-          this.updateCardVersions(versions)
+          this.updateExtensionSelect(versions, false)
           this.scryfallOracleIdTarget.value = versions[0].scryfall_id
         }
       } catch (error) {
@@ -201,182 +205,99 @@ export default class extends Controller {
     this.hideSuggestions()
   }
 
-  updateCardVersions(versions) {
-    if (this.isEditing) return
-    
-    // Créer un wrapper pour le select personnalisé
-    const selectWrapper = document.createElement('div')
-    selectWrapper.className = 'relative'
-    
-    // Créer le select caché qui contiendra la valeur réelle
-    const hiddenSelect = document.createElement('select')
-    hiddenSelect.name = this.extensionTarget.name
-    hiddenSelect.style.display = 'none'
-    
-    // Créer le div qui affichera la sélection actuelle
-    const selectedDisplay = document.createElement('div')
-    selectedDisplay.className = 'flex items-center gap-2 px-6 py-4 border border-gray-300 rounded-lg shadow-sm bg-white cursor-pointer transition duration-150 ease-in-out hover:border-indigo-500'
-    selectedDisplay.innerHTML = `
-      <span class="text-gray-500">Sélectionnez une extension</span>
-      <svg class="w-5 h-5 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-      </svg>
-    `
-    
-    // Créer le conteneur des options
-    const optionsContainer = document.createElement('div')
-    optionsContainer.className = 'absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden z-50 max-h-60 overflow-y-auto'
-    
-    // Ajouter les options
+  updateExtensionSelect(versions, isWanted) {
+    const select = this.extensionTarget
+    select.innerHTML = ''
+
+    if (isWanted) {
+      const defaultOption = document.createElement('option')
+      defaultOption.value = ''
+      defaultOption.textContent = "N'importe quelle extension"
+      select.appendChild(defaultOption)
+    }
+
     versions.forEach(version => {
-      const option = document.createElement('div')
-      option.className = 'flex items-center gap-2 px-6 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150'
-      option.innerHTML = `
-        ${version.extension.icon_uri ? 
-          `<img src="${version.extension.icon_uri}" alt="${version.extension.name}" class="w-5 h-5 object-contain">` 
-          : ''
-        }
-        <span class="text-sm text-gray-700">${version.extension.name}</span>
-      `
-      option.dataset.value = version.id
-      
-      option.addEventListener('click', () => {
-        hiddenSelect.value = version.id
-        selectedDisplay.innerHTML = `
-          <div class="flex items-center gap-2">
-            ${version.extension.icon_uri ? 
-              `<img src="${version.extension.icon_uri}" alt="${version.extension.name}" class="w-5 h-5 object-contain">` 
-              : ''
-            }
-            <span class="text-gray-700">${version.extension.name}</span>
-          </div>
-          <svg class="w-5 h-5 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        `
-        optionsContainer.classList.add('hidden')
-      })
-      
-      optionsContainer.appendChild(option)
+      const option = document.createElement('option')
+      option.value = version.id
+      option.textContent = version.extension.name
+      option.dataset.iconUri = version.extension.icon_uri
+      select.appendChild(option)
     })
-    
-    // Gérer l'affichage/masquage du conteneur d'options
-    selectedDisplay.addEventListener('click', () => {
-      optionsContainer.classList.toggle('hidden')
-    })
-    
-    // Fermer le conteneur d'options en cliquant en dehors
-    document.addEventListener('click', (e) => {
-      if (!selectWrapper.contains(e.target)) {
-        optionsContainer.classList.add('hidden')
-      }
-    })
-    
-    // Assembler tous les éléments
-    selectWrapper.appendChild(hiddenSelect)
-    selectWrapper.appendChild(selectedDisplay)
-    selectWrapper.appendChild(optionsContainer)
-    
-    // Remplacer le select original
-    this.extensionTarget.replaceWith(selectWrapper)
+
+    this.styleExtensionSelect(select)
   }
 
-  updateWantedVersions(versions) {
-    if (this.isEditing) return
+  styleExtensionSelect(select) {
+    const wrapper = document.createElement('div')
+    wrapper.className = 'relative'
+    select.parentNode.insertBefore(wrapper, select)
+    wrapper.appendChild(select)
+
+    // Créer l'affichage personnalisé
+    const display = document.createElement('div')
+    display.className = 'flex items-center gap-2 px-6 py-4 border border-gray-300 rounded-lg shadow-sm bg-white cursor-pointer'
     
-    // Créer un wrapper pour le select personnalisé
-    const selectWrapper = document.createElement('div')
-    selectWrapper.className = 'relative'
-    
-    // Créer le select caché qui contiendra la valeur réelle
-    const hiddenSelect = document.createElement('select')
-    hiddenSelect.name = this.extensionTarget.name
-    hiddenSelect.style.display = 'none'
-    
-    // Créer le div qui affichera la sélection actuelle
-    const selectedDisplay = document.createElement('div')
-    selectedDisplay.className = 'flex items-center gap-2 px-6 py-4 border border-gray-300 rounded-lg shadow-sm bg-white cursor-pointer transition duration-150 ease-in-out hover:border-indigo-500'
-    selectedDisplay.innerHTML = `
-      <span class="text-gray-500">N'importe quelle extension</span>
-      <svg class="w-5 h-5 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-      </svg>
-    `
-    
-    // Créer le conteneur des options
-    const optionsContainer = document.createElement('div')
-    optionsContainer.className = 'absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden z-50 max-h-60 overflow-y-auto'
-    
-    // Ajouter l'option "N'importe quelle extension"
-    const defaultOption = document.createElement('div')
-    defaultOption.className = 'flex items-center gap-2 px-6 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150'
-    defaultOption.innerHTML = '<span class="text-sm text-gray-700">N\'importe quelle extension</span>'
-    defaultOption.dataset.value = ''
-    
-    defaultOption.addEventListener('click', () => {
-      hiddenSelect.value = ''
-      selectedDisplay.innerHTML = `
-        <span class="text-gray-700">N'importe quelle extension</span>
-        <svg class="w-5 h-5 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    // Mettre à jour l'affichage en fonction de l'option sélectionnée
+    const updateDisplay = () => {
+      const selectedOption = select.options[select.selectedIndex]
+      const iconUri = selectedOption?.dataset?.iconUri
+
+      display.innerHTML = `
+        <div class="flex items-center gap-2 flex-grow">
+          ${iconUri ? `<img src="${iconUri}" alt="" class="w-5 h-5 object-contain">` : ''}
+          <span class="text-gray-700">${selectedOption?.textContent || 'Sélectionnez une extension'}</span>
+        </div>
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
       `
-      optionsContainer.classList.add('hidden')
-    })
+    }
+
+    // Créer la liste déroulante
+    const dropdown = document.createElement('div')
+    dropdown.className = 'absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden z-50 max-h-60 overflow-y-auto'
     
-    optionsContainer.appendChild(defaultOption)
-    
-    // Ajouter les autres options
-    versions.forEach(version => {
-      const option = document.createElement('div')
-      option.className = 'flex items-center gap-2 px-6 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150'
-      option.innerHTML = `
-        ${version.extension.icon_uri ? 
-          `<img src="${version.extension.icon_uri}" alt="${version.extension.name}" class="w-5 h-5 object-contain">` 
-          : ''
-        }
-        <span class="text-sm text-gray-700">${version.extension.name}</span>
+    // Ajouter les options à la liste déroulante
+    Array.from(select.options).forEach((option, index) => {
+      const item = document.createElement('div')
+      item.className = 'flex items-center gap-2 px-6 py-3 hover:bg-gray-50 cursor-pointer'
+      const iconUri = option.dataset?.iconUri
+
+      item.innerHTML = `
+        ${iconUri ? `<img src="${iconUri}" alt="" class="w-5 h-5 object-contain">` : ''}
+        <span class="text-gray-700">${option.textContent}</span>
       `
-      option.dataset.value = version.id
-      
-      option.addEventListener('click', () => {
-        hiddenSelect.value = version.id
-        selectedDisplay.innerHTML = `
-          <div class="flex items-center gap-2">
-            ${version.extension.icon_uri ? 
-              `<img src="${version.extension.icon_uri}" alt="${version.extension.name}" class="w-5 h-5 object-contain">` 
-              : ''
-            }
-            <span class="text-gray-700">${version.extension.name}</span>
-          </div>
-          <svg class="w-5 h-5 ml-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        `
-        optionsContainer.classList.add('hidden')
+
+      item.addEventListener('click', () => {
+        select.selectedIndex = index
+        updateDisplay()
+        dropdown.classList.add('hidden')
       })
-      
-      optionsContainer.appendChild(option)
+
+      dropdown.appendChild(item)
     })
-    
-    // Gérer l'affichage/masquage du conteneur d'options
-    selectedDisplay.addEventListener('click', () => {
-      optionsContainer.classList.toggle('hidden')
+
+    // Gérer l'affichage/masquage de la liste déroulante
+    display.addEventListener('click', (e) => {
+      e.stopPropagation()
+      dropdown.classList.toggle('hidden')
     })
-    
-    // Fermer le conteneur d'options en cliquant en dehors
-    document.addEventListener('click', (e) => {
-      if (!selectWrapper.contains(e.target)) {
-        optionsContainer.classList.add('hidden')
-      }
+
+    document.addEventListener('click', () => {
+      dropdown.classList.add('hidden')
     })
+
+    // Cacher le select original
+    select.style.display = 'none'
     
-    // Assembler tous les éléments
-    selectWrapper.appendChild(hiddenSelect)
-    selectWrapper.appendChild(selectedDisplay)
-    selectWrapper.appendChild(optionsContainer)
-    
-    // Remplacer le select original
-    this.extensionTarget.replaceWith(selectWrapper)
+    // Ajouter les éléments au DOM
+    wrapper.appendChild(display)
+    wrapper.appendChild(dropdown)
+
+    // Initialiser l'affichage
+    updateDisplay()
+
+    // Mettre à jour l'affichage quand la valeur change
+    select.addEventListener('change', updateDisplay)
   }
 }
