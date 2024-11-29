@@ -1,4 +1,4 @@
-<div class="bg-white shadow-xl rounded-lg w-full">
+<div class="bg-white shadow-xl rounded-lg w-full max-w-2xl mx-auto">
   <div class="p-4 sm:p-6">
     <%= simple_form_for(@form,
                       as: :user_card,
@@ -25,22 +25,40 @@
       <div class="space-y-6">
         <% unless editing %>
           <div>
-            <%= f.input :card_name,
-                        label: t('user_cards.form.card_name'),
-                        wrapper_html: { class: "relative" },
-                        label_html: { class: "block text-sm font-medium text-gray-700 mb-2" },
-                        placeholder: "Rechercher une carte...",
-                        input_html: { 
-                          class: "block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm",
-                          data: {
-                            autocomplete_target: "input",
-                            action: "keyup->autocomplete#search"
-                          }
-                        } %>
+            <div class="flex items-center mb-2">
+              <svg class="h-5 w-5 text-gray-400 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+              </svg>
+              <label class="block text-sm font-medium text-gray-700">
+                <%= t('user_cards.form.card_name') %>
+              </label>
+            </div>
+
+            <div class="relative">
+              <%= f.input :card_name,
+                          label: false,
+                          wrapper_html: { class: "relative" },
+                          placeholder: "Rechercher une carte...",
+                          input_html: { 
+                            class: "block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm",
+                            data: {
+                              autocomplete_target: "input",
+                              action: "keyup->autocomplete#search"
+                            }
+                          } %>
+
+              <!-- Indicateur de chargement -->
+              <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none hidden" data-autocomplete-target="loader">
+                <svg class="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+            </div>
 
             <div id="card-suggestions" 
                  data-autocomplete-target="suggestions" 
-                 class="hidden suggestions-list bg-white border border-gray-200 rounded-lg shadow-sm max-h-60 overflow-y-auto absolute w-full z-10">
+                 class="hidden mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96 overflow-y-auto absolute w-full z-10">
             </div>
           </div>
         <% end %>
@@ -48,7 +66,8 @@
         <%= f.input :scryfall_id, as: :hidden, 
                     input_html: { data: { autocomplete_target: "scryfallOracleId" } } %>
 
-        <div data-autocomplete-target="formFields" class="<%= editing ? '' : 'hidden' %> space-y-6">
+        <div data-autocomplete-target="formFields" 
+             class="<%= editing ? '' : 'hidden' %> space-y-6">
           <div>
             <label for="card_version_id" class="block text-sm font-medium text-gray-700 mb-2">
               <%= t('user_cards.form.extension') %>
@@ -82,10 +101,10 @@
                         class: "block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm"
                       } %>
 
-          <div class="flex items-center">
+          <div class="flex items-center bg-gray-50 rounded-lg p-4">
             <%= f.input :foil, 
                         as: :boolean,
-                        wrapper_html: { class: "flex items-center" },
+                        wrapper_html: { class: "flex items-center m-0" },
                         label_html: { class: "ml-2 text-sm font-medium text-gray-700" },
                         input_html: { 
                           class: "h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded transition duration-150 ease-in-out"
@@ -109,3 +128,25 @@
     <% end %>
   </div>
 </div>
+
+<% content_for :head do %>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+
+    .animate-slide-down {
+      animation: slideDown 0.3s ease-out forwards;
+    }
+  </style>
+<% end %>

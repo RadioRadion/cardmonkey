@@ -26,13 +26,25 @@ class CardsController < ApplicationController
   def search
     query = params[:query]
     cards = Card.where('name_fr ILIKE :query OR name_en ILIKE :query', query: "%#{query}%")
-                .select(:scryfall_oracle_id, :name_fr, :name_en)
+                .includes(card_versions: :extension)
                 .limit(5)
+    
     cards = cards.map do |card|
       {
+        id: card.id,
         oracle_id: card.scryfall_oracle_id,
         name_fr: card.name_fr,
-        name_en: card.name_en
+        name_en: card.name_en,
+        card_versions: card.card_versions.map do |version|
+          {
+            id: version.id,
+            img_uri: version.img_uri,
+            extension: {
+              name: version.extension.name,
+              code: version.extension.code
+            }
+          }
+        end
       }
     end
     render json: cards
