@@ -44,6 +44,13 @@ fr:
         one: "environ 1 an"
         other: "environ %{count} ans"
 
+  notifications:
+    trade:
+      card_removed: "La carte %{card_name} a été retirée d'un échange en cours"
+      card_removed_chat: "La carte %{card_name} a été retirée de l'échange"
+      wanted_card_removed: "La carte %{card_name} a été retirée de la liste de souhaits de %{username}"
+      wanted_card_removed_chat: "La carte %{card_name} n'est plus recherchée par %{username}"
+
   footer:
     about: "À propos"
     privacy_policy: "Politique de confidentialité"

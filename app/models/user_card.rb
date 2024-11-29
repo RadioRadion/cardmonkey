@@ -4,6 +4,8 @@ class UserCard < ApplicationRecord
   belongs_to :user
   belongs_to :card_version
   has_many :matches, dependent: :destroy
+  has_many :trade_user_cards, dependent: :delete_all
+  has_many :trades, through: :trade_user_cards
 
   # Validations
   validates :quantity, :condition, :language, presence: true
@@ -36,8 +38,31 @@ class UserCard < ApplicationRecord
   # Callbacks
   after_create :create_matches
   after_update :update_matches, if: :relevant_attributes_changed?
+  before_destroy :notify_trade_partners
 
   private
+
+  def notify_trade_partners
+    # Récupère tous les trades actifs où cette carte est utilisée
+    affected_trades = trades.active
+
+    affected_trades.each do |trade|
+      # Notifie le partenaire de l'échange
+      partner = trade.partner_for(user)
+      next unless partner # Skip si le partenaire n'existe plus
+
+      # Crée une notification pour informer de la suppression de la carte
+      card_name = card_version.card.name
+      notification_message = I18n.t('notifications.trade.card_removed', card_name: card_name)
+      chat_message = I18n.t('notifications.trade.card_removed_chat', card_name: card_name)
+      
+      # Crée la notification
+      Notification.create_notification(partner.id, notification_message)
+      
+      # Ajoute un message dans le chat de l'échange
+      Trade.save_message(user.id, partner.id, chat_message)
+    end
+  end
 
   def create_matches
     potential_matches = find_potential_matches

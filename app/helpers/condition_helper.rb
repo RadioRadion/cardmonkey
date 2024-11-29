@@ -1,23 +1,42 @@
 module ConditionHelper
-    def condition(condition)
-      case condition
-      when "poor"
-        content_tag(:span, "P", class: "px-2 py-1 text-white bg-red-600 rounded")
-      when "played"
-        content_tag(:span, "PL", class: "px-2 py-1 text-white bg-red-400 rounded")
-      when "light_played"
-        content_tag(:span, "LP", class: "px-2 py-1 text-white bg-orange-400 rounded")
-      when "good"
-        content_tag(:span, "G", class: "px-2 py-1 text-white bg-yellow-400 rounded")
-      when "excellent"
-        content_tag(:span, "E", class: "px-2 py-1 text-white bg-green-300 rounded")
-      when "near_mint"
-        content_tag(:span, "NM", class: "px-2 py-1 text-white bg-green-500 rounded")
-      when "mint"
-        content_tag(:span, "M", class: "px-2 py-1 text-white bg-green-700 rounded")
-      else
-        condition
-      end
+  def condition_icon(condition)
+    case condition&.to_sym
+    when :mint
+      "✨" # Étincelles pour neuf
+    when :near_mint
+      "🌟" # Étoile pour quasi neuf
+    when :excellent
+      "⭐" # Étoile pour excellent
+    when :good
+      "👍" # Pouce levé pour bon
+    when :light_played
+      "📝" # Crayon pour légèrement joué
+    when :played
+      "⚡" # Éclair pour joué
+    when :poor
+      "💢" # Symbole de collision pour mauvais
+    else
+      "❓" # Point d'interrogation pour condition inconnue
     end
   end
-  
+
+  def condition_with_icon(condition)
+    return "" if condition.blank?
+    
+    icon = condition_icon(condition)
+    text = t("cards.conditions.#{condition}")
+    "#{icon} #{text}"
+  end
+
+  def condition_options_for_select(form_type = :user_card)
+    conditions = UserCard.conditions.keys.map do |condition|
+      [condition_with_icon(condition), condition]
+    end
+
+    if form_type == :user_wanted_card
+      conditions.unshift([t("user_wanted_cards.form.any_condition"), ""])
+    end
+
+    conditions
+  end
+end

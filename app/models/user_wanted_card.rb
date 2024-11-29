@@ -40,6 +40,7 @@ class UserWantedCard < ApplicationRecord
   # Callbacks
   after_create :create_matches
   after_update :update_matches, if: :relevant_attributes_changed?
+  before_destroy :notify_trade_partners
 
   # Scopes
   scope :by_min_condition, ->(condition) { where(min_condition: condition) }
@@ -60,6 +61,38 @@ class UserWantedCard < ApplicationRecord
   end
 
   private
+
+  def notify_trade_partners
+    # Trouve tous les trades actifs où cette carte est potentiellement impliquée
+    matching_cards = UserCard.joins(card_version: :card)
+                           .where(cards: { id: card_id })
+                           .where(language: language == 'any' ? UserCard.languages.keys : language)
+    
+    return if matching_cards.empty?
+
+    # Pour chaque carte correspondante, vérifie si elle est dans un trade actif
+    matching_cards.each do |matching_card|
+      matching_card.trades.active.each do |trade|
+        # Si le trade est avec l'utilisateur qui possède la carte
+        next if trade.user_id == matching_card.user_id && trade.user_id_invit != user_id
+        next if trade.user_id_invit == matching_card.user_id && trade.user_id != user_id
+
+        # Notifie le propriétaire de la carte que la carte n'est plus recherchée
+        notification_message = I18n.t('notifications.trade.wanted_card_removed',
+                                    card_name: card.name,
+                                    username: user.username)
+        chat_message = I18n.t('notifications.trade.wanted_card_removed_chat',
+                             card_name: card.name,
+                             username: user.username)
+
+        # Crée la notification
+        Notification.create_notification(matching_card.user_id, notification_message)
+
+        # Ajoute un message dans le chat de l'échange
+        Trade.save_message(user.id, matching_card.user_id, chat_message)
+      end
+    end
+  end
 
   def create_matches
     potential_matches = find_potential_matches
