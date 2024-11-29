@@ -40,7 +40,7 @@
                     <p class="text-sm text-gray-500">Démarrer une conversation</p>
                   <% end %>
 
-                  <% unread_count = chatroom.unread_messages_count(current_user) %>
+                  <% unread_count = chatroom.unread_count_for(current_user) %>
                   <% if unread_count > 0 %>
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       <%= unread_count %> nouveau<%= 's' if unread_count > 1 %>

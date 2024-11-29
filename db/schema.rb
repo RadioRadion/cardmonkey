@@ -113,6 +113,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_21_134500) do
     t.index ["user_wanted_card_id"], name: "index_matches_on_user_wanted_card_id"
   end
 
+  create_table "message_reactions", force: :cascade do |t|
+    t.bigint "message_id", null: false
+    t.bigint "user_id", null: false
+    t.string "emoji", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["message_id", "user_id", "emoji"], name: "index_message_reactions_uniqueness", unique: true
+    t.index ["message_id"], name: "index_message_reactions_on_message_id"
+    t.index ["user_id"], name: "index_message_reactions_on_user_id"
+  end
+
   create_table "messages", force: :cascade do |t|
     t.string "content"
     t.bigint "user_id", null: false
@@ -120,10 +131,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_21_134500) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "read_at"
+    t.datetime "edited_at"
+    t.datetime "delivered_at"
+    t.bigint "parent_id"
+    t.jsonb "metadata", default: {}, null: false
     t.index ["chatroom_id", "created_at"], name: "index_messages_on_chatroom_id_and_created_at"
     t.index ["chatroom_id"], name: "index_messages_on_chatroom_id"
+    t.index ["created_at"], name: "index_messages_on_created_at"
+    t.index ["metadata"], name: "index_messages_on_metadata", using: :gin
+    t.index ["parent_id"], name: "index_messages_on_parent_id"
     t.index ["read_at"], name: "index_messages_on_read_at"
     t.index ["user_id", "chatroom_id"], name: "index_messages_on_user_id_and_chatroom_id"
+    t.index ["user_id", "created_at"], name: "index_messages_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_messages_on_user_id"
   end
 
@@ -223,6 +242,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_21_134500) do
   add_foreign_key "card_versions", "cards"
   add_foreign_key "card_versions", "extensions"
   add_foreign_key "chatrooms", "users"
+  add_foreign_key "message_reactions", "messages"
+  add_foreign_key "message_reactions", "users"
   add_foreign_key "messages", "chatrooms"
   add_foreign_key "messages", "users"
   add_foreign_key "notifications", "users"

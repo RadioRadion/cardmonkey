@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
-  skip_before_action :authenticate_user!, only: [:index]
-  
+  skip_before_action :authenticate_user!, only: :index
+
   def index
     if user_signed_in?
       @recent_trades = current_user.trades
@@ -13,6 +13,9 @@ class HomeController < ApplicationController
       @user_cards = current_user.user_cards
         .includes(card_version: :card)
         .limit(4)
+      render 'index'
+    else
+      render 'landing'
     end
   end
 end

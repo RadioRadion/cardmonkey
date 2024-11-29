@@ -1,69 +1,60 @@
 Rails.application.routes.draw do
   devise_for :users
-  root to: 'home#index'
+  
+  root 'home#index'
 
-  # Active Storage direct uploads
-  post '/rails/active_storage/direct_uploads', to: 'active_storage/direct_uploads#create'
-
-  # Routes pour matches
-  resources :matches, only: [:index, :show] do
-    collection do
-      get 'by_user/:user_id', to: 'matches#by_user', as: :by_user
+  resources :users do
+    member do
+      get :profile
+      get :dashboard
     end
+    resources :chatrooms do
+      resources :messages do
+        member do
+          post :toggle_reaction
+          post :mark_delivered
+        end
+      end
+    end
+    resources :user_cards
+    resources :user_wanted_cards
   end
 
-  # Routes pour trades unifiées
   resources :trades do
     member do
-      patch :accept
-      patch :reject
-      patch :complete
-    end
-
-    collection do
       get :new_proposition
-      get :update_trade_value
-      get :search_cards
-    end
-
-    resources :trade_user_cards, only: [:create, :destroy], as: :cards
-  end
-
-  # Routes imbriquées dans users
-  resources :users, only: [:show, :edit, :update] do
-    resources :matches, only: [:index]
-    resources :trades, only: [:index]
-    resources :user_cards, only: [:index, :destroy, :new, :edit, :create, :update]
-    resources :user_wanted_cards, only: [:index, :destroy, :new, :edit, :create, :update]
-    resources :chatrooms, only: [:index, :show, :new, :create, :update, :destroy] do
-      resources :messages, only: [:create]
+      post :accept
+      post :decline
+      post :cancel
     end
   end
 
-  # Routes additionnelles
-  get 'dashboard/matches', to: 'dashboard#matches'
-  get 'cards/search', to: 'cards#search', defaults: { format: 'json' }
-  get 'cards/versions', to: 'cards#versions', defaults: { format: 'json' }
-  resources :notifications do
-    member do
-      patch :mark_as_read
-    end
-  end
-  resources :user_cards do
+  resources :matches do
     collection do
-      get :search  # Pour chercher des cartes à ajouter
-      post :import # Optionnel: pour import en masse
+      get :dashboard
     end
   end
-  
-  resources :user_wanted_cards do
+
+  resources :cards, only: [:index, :show] do
     collection do
       get :search
+      get :autocomplete
     end
   end
+
   resources :notifications, only: [:index] do
+    collection do
+      post :mark_all_as_read
+    end
     member do
-      patch :mark_as_read
+      post :mark_as_read
     end
   end
+
+  # API endpoints for real-time features
+  post 'users/update_status', to: 'users#update_status'
+  post 'messages/:id/mark_read', to: 'messages#mark_read'
+  
+  # Websocket mounting
+  mount ActionCable.server => '/cable'
 end

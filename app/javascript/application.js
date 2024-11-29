@@ -1,11 +1,7 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails"
 import "@hotwired/stimulus"
-
-// Initialize Turbo
-addEventListener("turbo:before-cache", () => {
-  // Any cleanup needed before caching
-})
+import "@rails/actioncable"
 
 // Initialize Stimulus
 import "./controllers"
@@ -14,7 +10,5 @@ import "./controllers"
 import * as ActiveStorage from "@rails/activestorage"
 ActiveStorage.start()
 
-// Initialize ActionCable
-import { createConsumer } from "@rails/actioncable"
-window.App = window.App || {}
-window.App.cable = createConsumer()
+// Initialize channels
+import "./channels"

@@ -1,34 +1,179 @@
-<div class="message <%= message.user == current_user ? 'flex justify-end' : 'flex justify-start' %>"
-     id="message_<%= message.id %>">
-  <div class="<%= message.user == current_user ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> 
-              rounded-lg px-4 py-2 max-w-[70%] break-words relative group">
-    <% unless message.user == current_user %>
-      <div class="text-xs text-gray-500 mb-1">
-        <%= message.user.username %>
-      </div>
-    <% end %>
-    
-    <% if message.trade_message? %>
-      <div class="flex flex-col space-y-2">
-        <div class="font-medium"><%= message.display_content %></div>
-        <%= link_to "Voir le trade", trade_path(message.trade_id), 
-            class: "#{message.user == current_user ? 'bg-white text-blue-500' : 'bg-blue-500 text-white'} 
-                   px-4 py-2 rounded-lg inline-block hover:opacity-90 transition-opacity text-center" %>
-      </div>
-    <% else %>
-      <%= message.content %>
-    <% end %>
-    
-    <div class="text-xs <%= message.user == current_user ? 'text-blue-100' : 'text-gray-500' %> mt-1">
-      <%= message.timestamp %>
-      <% if message.user == current_user %>
-        <span class="ml-2">
-          <i class="fas fa-check-double" title="Delivered"></i>
-          <% if message.read_at %>
-            <i class="fas fa-eye ml-1" title="Read"></i>
+<% is_own_message = message.user == current_user %>
+<% show_date = local_assigns.fetch(:show_date, true) %>
+<% previous_message = local_assigns[:previous_message] %>
+<% show_user_info = previous_message.nil? || 
+                    previous_message.user != message.user || 
+                    (message.created_at - previous_message.created_at) > 5.minutes %>
+
+<% if show_date && (!previous_message || !message.created_at.to_date.eql?(previous_message.created_at.to_date)) %>
+  <div class="flex justify-center my-4">
+    <div class="bg-gray-100 text-gray-600 text-sm px-3 py-1 rounded-full">
+      <%= message.created_at.to_date == Date.today ? "Today" : message.created_at.strftime("%B %d, %Y") %>
+    </div>
+  </div>
+<% end %>
+
+<div class="message group <%= is_own_message ? 'flex justify-end' : 'flex justify-start' %> 
+            <%= 'mt-1' unless show_user_info %>"
+     id="message_<%= message.id %>"
+     data-controller="message"
+     data-message-id="<%= message.id %>"
+     data-message-editable="<%= is_own_message %>">
+     
+  <!-- Avatar (only show for first message in group) -->
+  <% unless is_own_message %>
+    <div class="<%= show_user_info ? 'opacity-100' : 'opacity-0' %> flex-shrink-0 w-8 h-8 mr-2">
+      <% if show_user_info %>
+        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+          <% if message.user.avatar.attached? %>
+            <%= image_tag(message.user.avatar, class: "w-8 h-8 rounded-full") %>
+          <% else %>
+            <% display_initial = message.user&.username.present? ? message.user.username[0].upcase : '?' %>
+            <%= content_tag(:span, display_initial, class: "text-gray-600 font-medium") %>
           <% end %>
-        </span>
+        </div>
       <% end %>
+    </div>
+  <% end %>
+
+  <div class="max-w-[70%]">
+    <!-- Username (only show for first message in group) -->
+    <% if show_user_info && !is_own_message %>
+      <div class="text-xs text-gray-500 mb-1 ml-1">
+        <%= message.user&.username || "Utilisateur inconnu" %>
+      </div>
+    <% end %>
+
+    <!-- Message Content -->
+    <div class="relative group">
+      <div class="<%= is_own_message ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> 
+                  rounded-lg px-4 py-2 break-words relative">
+        
+        <!-- Trade Message -->
+        <% if message.trade_message? %>
+          <div class="flex flex-col space-y-2">
+            <div class="font-medium"><%= message.display_content %></div>
+            <%= link_to "Voir le trade", trade_path(message.trade_id), 
+                class: "#{is_own_message ? 'bg-white text-blue-500' : 'bg-blue-500 text-white'} 
+                       px-4 py-2 rounded-lg inline-block hover:opacity-90 transition-opacity text-center" %>
+          </div>
+        
+        <!-- Regular Message -->
+        <% else %>
+          <div data-message-target="content">
+            <%= message.content %>
+          </div>
+          
+          <!-- Edit Form (hidden by default) -->
+          <% if is_own_message %>
+            <div class="hidden" data-message-target="editForm">
+              <%= form_with(model: message, 
+                          url: user_chatroom_message_path(current_user, message.chatroom, message),
+                          class: "flex items-center space-x-2",
+                          data: { action: "submit->message#update" }) do |f| %>
+                <%= f.text_field :content, 
+                               class: "flex-1 rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500",
+                               data: { message_target: "input" } %>
+                <button type="submit" class="text-sm text-blue-500 hover:text-blue-600">Save</button>
+                <button type="button" 
+                        class="text-sm text-gray-500 hover:text-gray-600"
+                        data-action="click->message#cancelEdit">
+                  Cancel
+                </button>
+              <% end %>
+            </div>
+          <% end %>
+          
+          <!-- Attachments -->
+          <% if message.attachments.any? %>
+            <div class="mt-2 space-y-2">
+              <% message.attachments.each do |attachment| %>
+                <% if attachment.image? %>
+                  <%= image_tag attachment, class: "max-w-full rounded-lg" %>
+                <% else %>
+                  <%= link_to attachment.filename, rails_blob_path(attachment, disposition: "attachment"),
+                      class: "flex items-center space-x-2 text-sm #{is_own_message ? 'text-blue-100' : 'text-blue-500'} hover:underline" %>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+
+        <!-- Message Info -->
+        <div class="flex items-center justify-between mt-1">
+          <div class="text-xs <%= is_own_message ? 'text-blue-100' : 'text-gray-500' %>">
+            <%= message.timestamp %>
+          </div>
+          
+          <% if is_own_message %>
+            <div class="flex items-center space-x-1">
+              <% if message.edited? %>
+                <span class="text-xs text-blue-100">(edited)</span>
+              <% end %>
+              <span class="text-blue-100">
+                <i class="fas fa-check<%= message.delivered? ? '-double' : '' %>" 
+                   title="<%= message.delivered? ? 'Delivered' : 'Sent' %>"></i>
+                <% if message.read_at %>
+                  <i class="fas fa-eye ml-1" title="Read"></i>
+                <% end %>
+              </span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Message Actions -->
+      <div class="absolute <%= is_own_message ? 'left-0 -translate-x-full' : 'right-0 translate-x-full' %> 
+                  top-0 hidden group-hover:flex items-center space-x-2 px-2">
+        <!-- Reactions Button -->
+        <button class="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                data-action="click->message#toggleReactions"
+                title="Add reaction">
+          <i class="far fa-smile text-gray-500"></i>
+        </button>
+        
+        <!-- Reply Button -->
+        <button class="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                data-action="click->message#reply"
+                title="Reply">
+          <i class="far fa-reply text-gray-500"></i>
+        </button>
+        
+        <% if is_own_message && !message.trade_message? %>
+          <!-- Edit Button -->
+          <button class="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  data-action="click->message#edit"
+                  title="Edit">
+            <i class="far fa-edit text-gray-500"></i>
+          </button>
+          
+          <!-- Delete Button -->
+          <%= button_to user_chatroom_message_path(current_user, message.chatroom, message),
+                      method: :delete,
+                      class: "p-1 hover:bg-gray-100 rounded-full transition-colors",
+                      data: { 
+                        action: "click->message#delete",
+                        confirm: "Are you sure you want to delete this message?"
+                      },
+                      title: "Delete",
+                      form: { class: "inline-block" } do %>
+            <i class="far fa-trash-alt text-gray-500"></i>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- Reactions Display -->
+      <div class="reactions mt-1 flex flex-wrap gap-1">
+        <% message.reactions.group(:emoji).count.each do |emoji, count| %>
+          <button class="inline-flex items-center space-x-1 bg-gray-100 hover:bg-gray-200 
+                         rounded-full px-2 py-0.5 text-sm transition-colors"
+                  data-action="click->message#toggleReaction"
+                  data-emoji="<%= emoji %>">
+            <span><%= emoji %></span>
+            <span class="text-gray-500"><%= count %></span>
+          </button>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>

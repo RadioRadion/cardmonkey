@@ -28,14 +28,14 @@
               </svg>
             <% end %>
             
-            <%= link_to new_user_card_path, class: "flex items-center justify-between w-full p-3 text-left rounded-xl bg-green-600 text-white hover:bg-green-500 transition-colors duration-200" do %>
+            <%= link_to new_user_user_card_path(current_user), class: "flex items-center justify-between w-full p-3 text-left rounded-xl bg-green-600 text-white hover:bg-green-500 transition-colors duration-200" do %>
               <span class="font-medium">Ajouter des cartes</span>
               <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
               </svg>
             <% end %>
 
-            <%= link_to user_wanted_cards_path, class: "flex items-center justify-between w-full p-3 text-left rounded-xl bg-purple-600 text-white hover:bg-purple-500 transition-colors duration-200" do %>
+            <%= link_to user_user_wanted_cards_path(current_user), class: "flex items-center justify-between w-full p-3 text-left rounded-xl bg-purple-600 text-white hover:bg-purple-500 transition-colors duration-200" do %>
               <span class="font-medium">Liste de souhaits</span>
               <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
@@ -59,7 +59,7 @@
         <div class="bg-white rounded-2xl shadow-sm p-6">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-semibold text-gray-900">Vos cartes</h2>
-            <%= link_to "Voir tout", user_cards_path, class: "text-indigo-600 hover:text-indigo-500" %>
+            <%= link_to "Voir tout", user_user_cards_path(current_user), class: "text-indigo-600 hover:text-indigo-500" %>
           </div>
           
           <% if @user_cards.any? %>
@@ -76,7 +76,7 @@
           <% else %>
             <div class="text-center py-8 bg-gray-50 rounded-xl">
               <p class="text-gray-600 mb-4">Vous n'avez pas encore ajouté de cartes</p>
-              <%= link_to "Ajouter des cartes", new_user_card_path, class: "text-indigo-600 hover:text-indigo-500" %>
+              <%= link_to "Ajouter des cartes", new_user_user_card_path(current_user), class: "text-indigo-600 hover:text-indigo-500" %>
             </div>
           <% end %>
         </div>

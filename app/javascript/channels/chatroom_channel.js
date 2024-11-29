@@ -1,92 +1,62 @@
-const ChatroomSubscription = {
-  initialize() {
-    this.setupChatroom()
-    this.setupTypingIndicator()
-  },
+import { createConsumer } from "@rails/actioncable"
 
-  setupChatroom() {
-    const messagesContainer = document.getElementById('messages')
-    if (!messagesContainer) return
+const consumer = createConsumer()
 
-    const chatroomId = messagesContainer.dataset.chatroomId
-    
-    window.App.cable.subscriptions.create(
-      { channel: "ChatroomChannel", id: chatroomId },
-      {
-        connected() {
-          console.log("Connected to chatroom channel")
-        },
+document.addEventListener("turbo:load", () => {
+  const messagesContainer = document.getElementById('messages')
+  if (!messagesContainer) return
 
-        disconnected() {
-          console.log("Disconnected from chatroom channel")
-        },
+  const chatroomId = messagesContainer.dataset.chatroomId
+  
+  consumer.subscriptions.create(
+    { channel: "ChatroomChannel", id: chatroomId },
+    {
+      connected() {
+        console.log("Connected to chatroom channel")
+      },
 
-        received(data) {
-          if (data.type === 'typing_status') {
-            this.handleTypingStatus(data)
-          } else if (data.type === 'user_status') {
-            this.handleUserStatus(data)
-          } else {
-            messagesContainer.insertAdjacentHTML('beforeend', data)
-            this.scrollToBottom()
-          }
-        },
+      disconnected() {
+        console.log("Disconnected from chatroom channel")
+      },
 
-        handleTypingStatus(data) {
-          const typingIndicator = document.getElementById('typing-indicator')
-          if (!typingIndicator) return
+      received(data) {
+        if (data.type === 'typing_status') {
+          this.handleTypingStatus(data)
+        } else if (data.type === 'user_status') {
+          this.handleUserStatus(data)
+        } else {
+          messagesContainer.insertAdjacentHTML('beforeend', data)
+          this.scrollToBottom()
+        }
+      },
 
-          if (data.is_typing) {
-            typingIndicator.textContent = `${data.username} is typing...`
-            typingIndicator.classList.remove('hidden')
-          } else {
-            typingIndicator.classList.add('hidden')
-          }
-        },
+      handleTypingStatus(data) {
+        const typingIndicator = document.getElementById('typing-indicator')
+        if (!typingIndicator) return
 
-        handleUserStatus(data) {
-          const userStatus = document.querySelector(`[data-user-status="${data.user_id}"]`)
-          if (!userStatus) return
+        if (data.is_typing) {
+          typingIndicator.textContent = `${data.username} is typing...`
+          typingIndicator.classList.remove('hidden')
+        } else {
+          typingIndicator.classList.add('hidden')
+        }
+      },
 
-          userStatus.textContent = data.status
-          userStatus.classList.toggle('text-green-500', data.status === 'online')
-          userStatus.classList.toggle('text-gray-500', data.status === 'offline')
-        },
+      handleUserStatus(data) {
+        const userStatus = document.querySelector(`[data-user-status="${data.user_id}"]`)
+        if (!userStatus) return
 
-        scrollToBottom() {
-          const messages = document.getElementById('messages')
-          if (messages) {
-            messages.scrollTop = messages.scrollHeight
-          }
+        userStatus.textContent = data.status
+        userStatus.classList.toggle('text-green-500', data.status === 'online')
+        userStatus.classList.toggle('text-gray-500', data.status === 'offline')
+      },
+
+      scrollToBottom() {
+        const messages = document.getElementById('messages')
+        if (messages) {
+          messages.scrollTop = messages.scrollHeight
         }
       }
-    )
-  },
-
-  setupTypingIndicator() {
-    let typingTimer
-    const messageInput = document.getElementById('message_content')
-    if (!messageInput) return
-
-    const chatroomId = document.getElementById('messages').dataset.chatroomId
-    const subscription = window.App.cable.subscriptions.create(
-      { channel: "ChatroomChannel", id: chatroomId },
-      {}
-    )
-
-    messageInput.addEventListener('input', () => {
-      clearTimeout(typingTimer)
-      subscription.perform('typing', { typing: true })
-
-      typingTimer = setTimeout(() => {
-        subscription.perform('typing', { typing: false })
-      }, 1000)
-    })
-  }
-}
-
-document.addEventListener('turbo:load', () => {
-  ChatroomSubscription.initialize()
+    }
+  )
 })
-
-export default ChatroomSubscription

@@ -1,0 +1,27 @@
+<div class="reactions mt-1 flex flex-wrap gap-1" data-message-target="reactions">
+  <% message.reactions.group(:emoji).count.each do |emoji, count| %>
+    <% has_reacted = message.reactions.exists?(user: current_user, emoji: emoji) %>
+    <button class="inline-flex items-center space-x-1 
+                   <%= has_reacted ? 'bg-blue-100 hover:bg-blue-200' : 'bg-gray-100 hover:bg-gray-200' %>
+                   rounded-full px-2 py-0.5 text-sm transition-colors"
+            data-action="click->message#toggleReaction"
+            data-emoji="<%= emoji %>"
+            title="<%= message.reactions.where(emoji: emoji).includes(:user).map(&:user).map(&:username).join(', ') %>">
+      <span><%= emoji %></span>
+      <span class="<%= has_reacted ? 'text-blue-500' : 'text-gray-500' %>"><%= count %></span>
+    </button>
+  <% end %>
+</div>
+
+<div class="emoji-picker hidden absolute bottom-full mb-2 bg-white rounded-lg shadow-lg p-2 border"
+     data-message-target="emojiPicker">
+  <div class="grid grid-cols-8 gap-1">
+    <% %w[👍 👎 ❤️ 😂 😮 😢 👏 🎉].each do |emoji| %>
+      <button class="w-8 h-8 hover:bg-gray-100 rounded flex items-center justify-center text-xl"
+              data-action="click->message#addReaction"
+              data-emoji="<%= emoji %>">
+        <%= emoji %>
+      </button>
+    <% end %>
+  </div>
+</div>

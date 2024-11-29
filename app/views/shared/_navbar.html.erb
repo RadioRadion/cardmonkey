@@ -15,7 +15,7 @@
           <% if user_signed_in? %>
             <%= link_to t('navbar.wantlist'), user_user_wanted_cards_path(current_user), class: "text-gray-500 hover:text-gray-900 px-3" %>
             <%= link_to t('navbar.collection'), user_user_cards_path(current_user), class: "text-gray-500 hover:text-gray-900 px-3" %>
-            <%= link_to t('navbar.trades'), user_trades_path(current_user), class: "text-gray-500 hover:text-gray-900 px-3" %>
+            <%= link_to t('navbar.trades'), trades_path, class: "text-gray-500 hover:text-gray-900 px-3" %>
             <%= link_to t('navbar.messages'), user_chatrooms_path(current_user), class: "text-gray-500 hover:text-gray-900 px-3" %>
           <% end %>
         </div>
@@ -76,7 +76,7 @@
         <% if user_signed_in? %>
           <%= link_to t('navbar.wantlist'), user_user_wanted_cards_path(current_user), class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
           <%= link_to t('navbar.collection'), user_user_cards_path(current_user), class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
-          <%= link_to t('navbar.trades'), user_trades_path(current_user), class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
+          <%= link_to t('navbar.trades'), trades_path, class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
           <%= link_to t('navbar.messages'), user_chatrooms_path(current_user), class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
         <% end %>
       </div>

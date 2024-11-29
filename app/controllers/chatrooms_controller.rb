@@ -34,7 +34,11 @@ class ChatroomsController < ApplicationController
       return
     end
 
-    @chatroom.mark_messages_as_read!(current_user) if @chatroom.messages.unread.any?
+    # Mark unread messages as read
+    unread_messages = @chatroom.messages.unread_for(current_user)
+    if unread_messages.any?
+      unread_messages.update_all(read_at: Time.current)
+    end
   end
 
   def create
