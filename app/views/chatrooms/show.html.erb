@@ -67,19 +67,8 @@
 
         <!-- Message Input -->
         <div class="border-t p-4">
-          <%= turbo_frame_tag "message_form" do %>
-            <%= form_with(model: [@chatroom, @message || Message.new],
-                          url: user_chatroom_messages_path(current_user, @chatroom),
-                          class: "flex items-center space-x-2",
-                          data: { chat_target: "form" }) do |f| %>
-              <%= f.text_field :content,
-                             id: "message_content",
-                             data: { chat_target: "input" },
-                             class: "flex-1 rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500",
-                             placeholder: "Écrivez votre message..." %>
-              <%= f.submit "Envoyer",
-                          class: "px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" %>
-            <% end %>
+          <%= turbo_frame_tag "message_form", data: { controller: "reset-form" } do %>
+            <%= render "messages/form", message: Message.new, chatroom: @chatroom %>
           <% end %>
         </div>
       </div>

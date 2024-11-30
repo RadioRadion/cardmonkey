@@ -1,19 +1,10 @@
-<%= turbo_stream.append "message-list", partial: "messages/message", locals: { message: @message, current_user: current_user } %>
-<%= turbo_stream.update "message_content", "" %>
-<%= turbo_stream.replace "message_form" do %>
-  <%= form_with(model: [@chatroom, Message.new],
-                url: user_chatroom_messages_path(current_user, @chatroom),
-                class: "flex items-center space-x-2",
-                data: { 
-                  chat_target: "form",
-                  turbo_frame: "message_form"
-                }) do |f| %>
-    <%= f.text_field :content,
-                    id: "message_content",
-                    data: { chat_target: "input" },
-                    class: "flex-1 rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500",
-                    placeholder: "Écrivez votre message..." %>
-    <%= f.submit "Envoyer",
-                class: "px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" %>
+<% if @message.persisted? %>
+  <%= turbo_stream.append "message-list", partial: "messages/message", locals: { message: @message, current_user: current_user } %>
+  <%= turbo_stream.update "message_form" do %>
+    <%= render "messages/form", message: Message.new, chatroom: @chatroom %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.update "message_form" do %>
+    <%= render "messages/form", message: @message, chatroom: @chatroom %>
   <% end %>
 <% end %>

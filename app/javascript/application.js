@@ -3,12 +3,12 @@ import "@hotwired/turbo-rails"
 import "@hotwired/stimulus"
 import "@rails/actioncable"
 
-// Initialize Stimulus
+// Import controllers
 import "./controllers"
 
-// Initialize ActiveStorage
-import * as ActiveStorage from "@rails/activestorage"
-ActiveStorage.start()
+// Import channels
+import "channels"
 
-// Initialize channels
-import "./channels"
+// Ensure Turbo is properly configured
+import { Turbo } from "@hotwired/turbo-rails"
+Turbo.session.drive = true

@@ -24,11 +24,16 @@ class MessagesController < ApplicationController
       create_notification unless @message.user == @chatroom.other_user(current_user)
       
       respond_to do |format|
-        format.turbo_stream
         format.html { redirect_to user_chatroom_path(current_user, @chatroom) }
+        format.turbo_stream
+        format.json { render json: @message }
       end
     else
-      render json: { errors: @message.errors.full_messages }, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { redirect_to user_chatroom_path(current_user, @chatroom), alert: @message.errors.full_messages.join(", ") }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("message_form", partial: "messages/form", locals: { message: @message, chatroom: @chatroom }) }
+        format.json { render json: { errors: @message.errors.full_messages }, status: :unprocessable_entity }
+      end
     end
   end
 

@@ -61,6 +61,15 @@ Rails.application.configure do
 
   # Serve assets with proper MIME types
   config.public_file_server.enabled = true
+  config.public_file_server.headers = {
+    'Cache-Control' => 'public, max-age=31536000',
+    'Access-Control-Allow-Origin' => '*'
+  }
+
+  # ActionCable configuration
+  config.action_cable.url = "ws://localhost:3000/cable"
+  config.action_cable.allowed_request_origins = [/http:\/\/*/, /https:\/\/*/]
+  config.action_cable.disable_request_forgery_protection = true
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
@@ -72,6 +81,7 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  # Uncomment if you wish to allow Action Cable access from any origin.
-  # config.action_cable.disable_request_forgery_protection = true
+  # Configure importmap to serve JavaScript modules with proper MIME types
+  config.importmap.cache_sweepers << Rails.root.join("app/javascript")
+  config.importmap.javascript_compiler = :esbuild
 end
