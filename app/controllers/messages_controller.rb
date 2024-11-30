@@ -4,35 +4,21 @@ class MessagesController < ApplicationController
   before_action :set_message, only: [:update, :destroy, :toggle_reaction, :mark_delivered]
   before_action :authorize_message_action!, only: [:update, :destroy]
 
-  def index
-    @messages = @chatroom.messages
-                        .includes(:user, :reactions, attachments_attachments: :blob)
-                        .order(created_at: :desc)
-                        .page(params[:page])
-                        .per(25)
-    
-    render @messages.reverse
-  end
-
   def create
     @message = @chatroom.messages.build(message_params)
     @message.user = current_user
 
-    if @message.save
-      process_attachments if params[:message][:attachments].present?
-      broadcast_message
-      create_notification unless @message.user == @chatroom.other_user(current_user)
-      
-      respond_to do |format|
-        format.html { redirect_to user_chatroom_path(current_user, @chatroom) }
+    respond_to do |format|
+      if @message.save
+        process_attachments if params[:message][:attachments].present?
+        broadcast_message
+        create_notification unless @message.user == @chatroom.other_user(current_user)
+        
         format.turbo_stream
-        format.json { render json: @message }
-      end
-    else
-      respond_to do |format|
+        format.html { redirect_to user_chatroom_path(current_user, @chatroom) }
+      else
+        format.turbo_stream
         format.html { redirect_to user_chatroom_path(current_user, @chatroom), alert: @message.errors.full_messages.join(", ") }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("message_form", partial: "messages/form", locals: { message: @message, chatroom: @chatroom }) }
-        format.json { render json: { errors: @message.errors.full_messages }, status: :unprocessable_entity }
       end
     end
   end
@@ -94,13 +80,21 @@ class MessagesController < ApplicationController
 
   def authorize_chatroom!
     unless @chatroom.participant?(current_user)
-      render json: { error: 'Unauthorized' }, status: :unauthorized
+      respond_to do |format|
+        format.turbo_stream { head :unauthorized }
+        format.html { redirect_to root_path, alert: 'Non autorisé' }
+        format.json { render json: { error: 'Non autorisé' }, status: :unauthorized }
+      end
     end
   end
 
   def authorize_message_action!
     unless @message.user == current_user
-      render json: { error: 'Unauthorized' }, status: :unauthorized
+      respond_to do |format|
+        format.turbo_stream { head :unauthorized }
+        format.html { redirect_to root_path, alert: 'Non autorisé' }
+        format.json { render json: { error: 'Non autorisé' }, status: :unauthorized }
+      end
     end
   end
 

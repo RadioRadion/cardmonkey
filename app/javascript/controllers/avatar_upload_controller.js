@@ -1,8 +1,20 @@
 import { Controller } from "@hotwired/stimulus"
 import { DirectUpload } from "@rails/activestorage"
 
+// Ensure DirectUpload is available
+if (!window.DirectUpload) {
+  console.error("DirectUpload not found. Make sure @rails/activestorage is properly imported.")
+}
+
 export default class extends Controller {
   static targets = ["input", "preview"]
+
+  connect() {
+    if (!window.DirectUpload) {
+      console.error("DirectUpload not available")
+      return
+    }
+  }
 
   triggerInput(event) {
     this.inputTarget.click()

@@ -1,8 +1,5 @@
-// Load all the channels within this directory and all subdirectories.
-// Channel files must be named *_channel.js.
+// Import all the channels to be used by Action Cable
+import consumer from "./consumer"
+import { createChatroomSubscription } from "./chatroom_channel"
 
-import { createConsumer } from "@rails/actioncable"
-window.App || (window.App = {});
-window.App.cable = createConsumer();
-
-import "./chatroom_channel"
+export { consumer, createChatroomSubscription }

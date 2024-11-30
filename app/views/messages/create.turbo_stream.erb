@@ -1,10 +1,18 @@
 <% if @message.persisted? %>
   <%= turbo_stream.append "message-list", partial: "messages/message", locals: { message: @message, current_user: current_user } %>
-  <%= turbo_stream.update "message_form" do %>
+  <%= turbo_stream.replace "message_form" do %>
     <%= render "messages/form", message: Message.new, chatroom: @chatroom %>
   <% end %>
+  <%= turbo_stream.replace "typing-indicator" do %>
+    <div id="typing-indicator" class="px-4 py-2 text-sm text-gray-500 hidden"></div>
+  <% end %>
+  <%= turbo_stream.append "messages" do %>
+    <script>
+      document.querySelector('[data-chat-target="messages"]')?.scrollTo(0, document.querySelector('[data-chat-target="messages"]')?.scrollHeight || 0)
+    </script>
+  <% end %>
 <% else %>
-  <%= turbo_stream.update "message_form" do %>
+  <%= turbo_stream.replace "message_form" do %>
     <%= render "messages/form", message: @message, chatroom: @chatroom %>
   <% end %>
 <% end %>

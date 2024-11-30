@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import consumer from "../channels/consumer"
+import { createChatroomSubscription, unsubscribeFromChatroom } from "../channels/chatroom_channel"
 
 export default class extends Controller {
   static targets = ["messages", "messageList", "form"]
@@ -10,25 +10,20 @@ export default class extends Controller {
   }
 
   disconnect() {
-    if (this.channel) {
-      this.channel.unsubscribe()
+    const chatroomId = this.messagesTarget?.dataset.chatroomId
+    if (chatroomId) {
+      unsubscribeFromChatroom(chatroomId)
     }
   }
 
   setupSubscription() {
-    const chatroomId = this.messagesTarget.dataset.chatroomId
+    if (!this.messagesTarget) return
     
-    this.channel = consumer.subscriptions.create(
-      { 
-        channel: "ChatroomChannel",
-        id: chatroomId
-      },
-      {
-        received: this.#received.bind(this),
-        connected: this.#connected.bind(this),
-        disconnected: this.#disconnected.bind(this)
-      }
-    )
+    const chatroomId = this.messagesTarget.dataset.chatroomId
+    if (!chatroomId) return
+    
+    this.subscription = createChatroomSubscription(chatroomId)
+    this.subscription.received = this.#received.bind(this)
   }
 
   scrollToBottom() {
@@ -48,6 +43,8 @@ export default class extends Controller {
   }
 
   #received(data) {
+    if (!data) return
+
     if (data.type === 'typing_status') {
       this.#handleTypingStatus(data)
     } else if (data.type === 'user_status') {
@@ -59,26 +56,15 @@ export default class extends Controller {
     } else if (data.type === 'delivery_status') {
       this.#handleDeliveryStatus(data)
     } else {
-      const shouldScroll = this.#isScrolledToBottom()
       if (data.html) {
         this.messageListTarget.insertAdjacentHTML('beforeend', data.html)
-        if (shouldScroll) {
-          this.scrollToBottom()
-        }
+        this.scrollToBottom()
         if (data.message_id) {
           this.#markMessageAsDelivered(data.message_id)
         }
         this.resetForm()
       }
     }
-  }
-
-  #connected() {
-    console.log("Connected to chatroom channel")
-  }
-
-  #disconnected() {
-    console.log("Disconnected from chatroom channel")
   }
 
   #handleTypingStatus(data) {
@@ -136,13 +122,8 @@ export default class extends Controller {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content,
+        'X-CSRF-Token': document.querySelector('[name="csrf-token"]')?.content
       }
     }).catch(error => console.error('Error marking message as delivered:', error))
-  }
-
-  #isScrolledToBottom() {
-    const { scrollTop, scrollHeight, clientHeight } = this.messagesTarget
-    return Math.abs(scrollHeight - clientHeight - scrollTop) < 10
   }
 }
