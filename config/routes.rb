@@ -3,6 +3,9 @@ Rails.application.routes.draw do
   
   root 'home#index'
 
+  # Direct messaging route
+  get 'messages', to: redirect { |p, req| "/users/#{req.env['warden'].user.id}/chatrooms" }, as: :messages
+  
   resources :users do
     member do
       get :profile

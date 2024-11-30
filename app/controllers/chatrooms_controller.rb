@@ -5,26 +5,17 @@ class ChatroomsController < ApplicationController
   before_action :authorize_chatroom_access, only: [:show]
 
   def index
-    @chatrooms = Chatroom
-      .includes(:messages, :user, :user_invit)
-      .where("chatrooms.user_id = :user_id OR chatrooms.user_id_invit = :user_id", user_id: @user.id)
-      .left_joins(:messages)
-      .select("chatrooms.*, MAX(messages.created_at) as last_message_at")
-      .group("chatrooms.id, chatrooms.user_id, chatrooms.user_id_invit, chatrooms.created_at, chatrooms.updated_at")
-      .order(Arel.sql("MAX(messages.created_at) DESC NULLS LAST"))
+    @chatrooms = load_chatrooms
+
+    # Redirect to the most recent chatroom if one exists
+    if @chatrooms.any? && !request.xhr?
+      redirect_to user_chatroom_path(current_user, @chatrooms.first)
+      return
+    end
   end
 
   def show
-    # Load all chatrooms for the sidebar with proper eager loading
-    @chatrooms = Chatroom
-      .includes(:messages, :user, :user_invit)
-      .where("chatrooms.user_id = :user_id OR chatrooms.user_id_invit = :user_id", user_id: @user.id)
-      .left_joins(:messages)
-      .select("chatrooms.*, MAX(messages.created_at) as last_message_at")
-      .group("chatrooms.id, chatrooms.user_id, chatrooms.user_id_invit, chatrooms.created_at, chatrooms.updated_at")
-      .order(Arel.sql("MAX(messages.created_at) DESC NULLS LAST"))
-
-    # Load messages and ensure other_user is properly set
+    @chatrooms = load_chatrooms
     @messages = @chatroom.messages.includes(:user).order(created_at: :asc)
     @message = Message.new
     @other_user = @chatroom.other_user(current_user)
@@ -53,6 +44,16 @@ class ChatroomsController < ApplicationController
   end
 
   private
+
+  def load_chatrooms
+    Chatroom
+      .includes(:messages, :user, :user_invit)
+      .where("chatrooms.user_id = :user_id OR chatrooms.user_id_invit = :user_id", user_id: @user.id)
+      .left_joins(:messages)
+      .select("chatrooms.*, MAX(messages.created_at) as last_message_at")
+      .group("chatrooms.id, chatrooms.user_id, chatrooms.user_id_invit, chatrooms.created_at, chatrooms.updated_at")
+      .order(Arel.sql("MAX(messages.created_at) DESC NULLS LAST"))
+  end
 
   def set_user
     @user = User.find(params[:user_id])
