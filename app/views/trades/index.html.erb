@@ -12,11 +12,11 @@
   <%# Quick Actions - Centered %>
   <div class="flex justify-center mb-8">
     <div class="flex flex-wrap gap-4 justify-center">
-      <%= link_to new_user_card_path, class: "flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-md" do %>
+      <%= link_to new_user_user_card_path(current_user), class: "flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-md" do %>
         <i class="fas fa-plus-circle mr-2"></i>
         Ajouter des cartes à échanger
       <% end %>
-      <%= link_to new_user_wanted_card_path, class: "flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md" do %>
+      <%= link_to new_user_user_wanted_card_path(current_user), class: "flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md" do %>
         <i class="fas fa-search mr-2"></i>
         Ajouter des cartes recherchées
       <% end %>
@@ -129,13 +129,13 @@
                     <p class="text-xs text-gray-500">Possédée par <%= match.user_card.user.username %></p>
                   </div>
                 </div>
-                <%= link_to "Voir", new_proposition_trades_path(partner_id: match.user_card.user.id), class: "text-sm text-blue-600 hover:text-blue-800" %>
+                <%= link_to "Voir", new_proposition_trade_path(match.user_card.user, partner_id: match.user_card.user.id), class: "text-sm text-blue-600 hover:text-blue-800" %>
               </div>
             <% end %>
           <% else %>
             <div class="text-center py-4">
               <p class="text-sm text-gray-500">Ajoutez des cartes à votre liste de recherche pour voir les opportunités d'échange</p>
-              <%= link_to "Ajouter des cartes recherchées", new_user_wanted_card_path, class: "mt-2 inline-block text-sm text-blue-600 hover:text-blue-800" %>
+              <%= link_to "Ajouter des cartes recherchées", new_user_user_wanted_card_path(current_user), class: "mt-2 inline-block text-sm text-blue-600 hover:text-blue-800" %>
             </div>
           <% end %>
         </div>
