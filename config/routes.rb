@@ -52,7 +52,6 @@ Rails.application.routes.draw do
   end
 
   # API endpoints for real-time features
-  post 'users/update_status', to: 'users#update_status'
   post 'messages/:id/mark_read', to: 'messages#mark_read'
   
   # Websocket mounting

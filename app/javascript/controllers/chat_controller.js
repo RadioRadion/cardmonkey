@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import consumer from "../channels/consumer"
 
 export default class extends Controller {
-  static targets = ["messages", "messageList"]
+  static targets = ["messages", "messageList", "form"]
 
   connect() {
     this.setupSubscription()
@@ -37,6 +37,16 @@ export default class extends Controller {
     }
   }
 
+  resetForm() {
+    if (this.hasFormTarget && this.formTarget instanceof HTMLFormElement) {
+      this.formTarget.reset()
+      const input = this.formTarget.querySelector("input[type='text']")
+      if (input) {
+        input.focus()
+      }
+    }
+  }
+
   #received(data) {
     if (data.type === 'typing_status') {
       this.#handleTypingStatus(data)
@@ -58,18 +68,17 @@ export default class extends Controller {
         if (data.message_id) {
           this.#markMessageAsDelivered(data.message_id)
         }
+        this.resetForm()
       }
     }
   }
 
   #connected() {
     console.log("Connected to chatroom channel")
-    this.#updateConnectionStatus('online')
   }
 
   #disconnected() {
     console.log("Disconnected from chatroom channel")
-    this.#updateConnectionStatus('offline')
   }
 
   #handleTypingStatus(data) {
@@ -130,17 +139,6 @@ export default class extends Controller {
         'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content,
       }
     }).catch(error => console.error('Error marking message as delivered:', error))
-  }
-
-  #updateConnectionStatus(status) {
-    fetch('/users/update_status', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content,
-      },
-      body: JSON.stringify({ status })
-    }).catch(error => console.error('Error updating connection status:', error))
   }
 
   #isScrolledToBottom() {

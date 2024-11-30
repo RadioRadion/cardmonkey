@@ -67,7 +67,7 @@
 
         <!-- Message Input -->
         <div class="border-t p-4">
-          <%= turbo_frame_tag "message_form", data: { controller: "reset-form" } do %>
+          <%= turbo_frame_tag "message_form" do %>
             <%= render "messages/form", message: Message.new, chatroom: @chatroom %>
           <% end %>
         </div>

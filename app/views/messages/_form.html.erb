@@ -2,7 +2,7 @@
               url: user_chatroom_messages_path(current_user, chatroom),
               class: "flex items-center space-x-2",
               data: { 
-                controller: "reset-form",
+                chat_target: "form",
                 action: "turbo:submit-end->chat#scrollToBottom"
               }) do |f| %>
   <%= f.text_field :content,
