@@ -1,6 +1,7 @@
 class Trade < ApplicationRecord
   belongs_to :user
   belongs_to :user_invit, class_name: 'User', foreign_key: 'user_id_invit', optional: true
+  belongs_to :last_modifier, class_name: 'User', foreign_key: 'last_modifier_id', optional: true
 
   has_many :trade_user_cards, dependent: :destroy
   has_many :user_cards, through: :trade_user_cards
@@ -40,12 +41,50 @@ class Trade < ApplicationRecord
     )
   end
 
+  def accept!(current_user)
+    return false unless can_be_accepted_by?(current_user)
+    
+    transaction do
+      update!(status: "accepted", accepted_at: Time.current)
+      
+      # Send notification to both users
+      notify_acceptance(current_user)
+    end
+    
+    true
+  end
+
+  def can_be_accepted_by?(user)
+    pending? && user_id_invit == user.id
+  end
+
+  def can_be_validated?(current_user)
+    return false if pending? || done?
+    return false unless last_modifier_id.present?
+    
+    # Only the non-modifier can validate
+    if current_user.id == user_id
+      last_modifier_id == user_id_invit
+    else
+      last_modifier_id == user_id
+    end
+  end
+
+  def can_be_modified_by?(current_user)
+    return false if done?
+    current_user.id == user_id || current_user.id == user_id_invit
+  end
+
   def status_badge
     html = case status.to_s
     when "0", "pending"
       '<span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">En attente</span>'
     when "1", "accepted"
-      '<span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Accepté</span>'
+      if last_modifier_id.present?
+        '<span class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">Modification proposée</span>'
+      else
+        '<span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Accepté</span>'
+      end
     when "2", "done"
       '<span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Complété</span>'
     end
@@ -73,6 +112,20 @@ class Trade < ApplicationRecord
   end
 
   private
+
+  def notify_acceptance(current_user)
+    # Notify the trade initiator
+    Notification.create_notification(user_id, "Votre proposition d'échange a été acceptée !")
+    Trade.save_message(current_user.id, user_id, "trade_id:#{id}")
+
+    # Send a message to both users about setting up a meeting
+    chatroom = Trade.find_or_create_chatroom(user_id, user_id_invit)
+    Message.create!(
+      content: "🤝 L'échange a été accepté ! Vous pouvez maintenant discuter pour organiser la rencontre et finaliser l'échange.",
+      user_id: current_user.id,
+      chatroom_id: chatroom.id
+    )
+  end
 
   def self.find_or_create_chatroom(current_user_id, other_user_id)
     chatroom = Chatroom.where(

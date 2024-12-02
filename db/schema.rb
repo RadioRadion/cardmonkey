@@ -183,6 +183,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_21_134500) do
     t.datetime "updated_at", null: false
     t.datetime "accepted_at"
     t.datetime "completed_at"
+    t.integer "last_modifier_id"
+    t.index ["last_modifier_id"], name: "index_trades_on_last_modifier_id"
     t.index ["user_id", "user_id_invit"], name: "index_trades_on_user_and_invit"
     t.index ["user_id"], name: "index_trades_on_user_id"
   end

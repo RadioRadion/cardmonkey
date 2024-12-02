@@ -1,15 +1,13 @@
 class TradesController < ApplicationController
-  before_action :set_trade, only: [:show, :edit, :update, :accept]
+  before_action :set_trade, only: [:show, :edit, :update, :accept, :validate]
   before_action :set_trade_participants, only: [:show, :edit]
   before_action :set_partner, only: [:new_proposition, :update_trade_value, :search_cards]
 
   def index
-    # Load trades with necessary associations
     @trades = current_user.all_trades
       .includes(:user_cards, :trade_user_cards, user_cards: { card_version: [:card, :extension] })
       .group_by(&:status)
 
-    # Load potential matches for trade opportunities
     @matches = current_user.matches
       .includes(
         user_card: { card_version: [:card, :extension], user: {} },
@@ -17,7 +15,6 @@ class TradesController < ApplicationController
       )
       .limit(5)
 
-    # Load trade statistics
     @stats = {
       trades_completed: current_user.trades.done.count,
       cards_available: current_user.user_cards.count,
@@ -28,7 +25,7 @@ class TradesController < ApplicationController
 
   def show
     @cards_by_user = @trade.user_cards
-      .includes(card_version: [:card, :extension])  # Eager load card_version and its associations
+      .includes(card_version: [:card, :extension])
       .group_by(&:user_id)
       .transform_values { |cards| calculate_cards_info(cards) }
   end
@@ -58,11 +55,25 @@ class TradesController < ApplicationController
       handle_trade_acceptance
     when "done"
       handle_trade_completion
+    when "validated"
+      handle_trade_validation
+    when "modified"
+      handle_trade_modification
     else
       handle_trade_modification
     end
 
     redirect_to trade_path(@trade)
+  end
+
+  def validate
+    if @trade.can_be_validated?(current_user)
+      @trade.update!(status: "accepted")
+      notify_trade_validation
+      redirect_to trade_path(@trade), notice: "Modification validée !"
+    else
+      redirect_to trade_path(@trade), alert: "Vous ne pouvez pas valider cette modification."
+    end
   end
 
   def new_proposition
@@ -101,7 +112,6 @@ class TradesController < ApplicationController
       .includes(card_version: [:card, :extension])
       .joins(card_version: :card)
 
-    # Si la requête est vide, on retourne toutes les cartes
     if query.blank?
       @filtered_cards = @filtered_cards.order("cards.name_#{I18n.locale}")
     else
@@ -235,16 +245,35 @@ class TradesController < ApplicationController
   end
 
   def handle_trade_modification
-    return unless @trade.pending?
-
     Trade.transaction do
       @trade.trade_user_cards.destroy_all
       process_trade_cards
+      @trade.update!(last_modifier_id: current_user.id)
       notify_trade_status_change(
-        "Trade modifié ! #{@trade.id}",
-        "Trade modifié !"
+        "Une modification a été proposée pour le trade #{@trade.id}",
+        "Modification proposée !"
       )
     end
+  end
+
+  def handle_trade_validation
+    if @trade.can_be_validated?(current_user)
+      @trade.update!(status: "accepted")
+      notify_trade_validation
+    end
+  end
+
+  def notify_trade_validation
+    other_user = @trade.other_user(current_user)
+    Trade.save_message(current_user.id, other_user.id, "trade_id:#{@trade.id}")
+    Notification.create_notification(other_user.id, "La modification du trade a été validée !")
+    
+    chatroom = Trade.find_or_create_chatroom(current_user.id, other_user.id)
+    Message.create!(
+      content: "✅ La modification de l'échange a été validée ! Vous pouvez maintenant organiser la rencontre.",
+      user_id: current_user.id,
+      chatroom_id: chatroom.id
+    )
   end
 
   def notify_trade_status_change(message, notification_text)
