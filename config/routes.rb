@@ -27,6 +27,9 @@ Rails.application.routes.draw do
   end
 
   resources :trades do
+    collection do
+      get :search_cards
+    end
     member do
       get :new_proposition
       post :accept

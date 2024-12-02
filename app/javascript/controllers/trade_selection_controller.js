@@ -90,7 +90,6 @@ export default class extends Controller {
     }).format(amount)
   }
 
-  // Nouvelle méthode de recherche avec fetch
   search(event) {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout)
@@ -104,7 +103,7 @@ export default class extends Controller {
     if (query === '') {
       this.searchTimeout = setTimeout(() => {
         this.performSearch(side, '')
-      }, 100) // Délai plus court pour le reset
+      }, 100)
       return
     }
 
@@ -124,13 +123,15 @@ export default class extends Controller {
       const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
       const response = await fetch(`/trades/search_cards?query=${encodeURIComponent(query)}&side=${side}&partner_id=${this.partnerId}`, {
         headers: {
-          'Accept': 'text/html',
           'X-CSRF-Token': csrfToken,
           'X-Requested-With': 'XMLHttpRequest'
-        }
+        },
+        credentials: 'same-origin'
       })
       
-      if (!response.ok) throw new Error('Erreur réseau')
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`)
+      }
       
       const html = await response.text()
       const target = side === 'user' ? this.userCardsGridTarget : this.partnerCardsGridTarget
@@ -140,7 +141,6 @@ export default class extends Controller {
     }
   }
 
-  // Soumission du trade
   submitTrade(event) {
     event.preventDefault()
     

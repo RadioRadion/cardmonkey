@@ -8,7 +8,7 @@ class Message < ApplicationRecord
   
   has_many_attached :attachments
 
-  validates :content, presence: true, unless: :has_attachments?
+  validates :content, presence: true, unless: -> { has_attachments? || trade_message? }
   validates :content, length: { maximum: 2000 }
   validate :attachments_size_and_type
 
