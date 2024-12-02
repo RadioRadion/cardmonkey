@@ -188,11 +188,13 @@ export default class extends Controller {
       }
     } else if (formType === 'collection' && this.hasExtensionTarget) {
       try {
+        // Pour la collection, on utilise aussi l'oracle_id pour récupérer les versions
         const response = await fetch(`/cards/versions?oracle_id=${this.selectedCard.oracle_id}`)
         const versions = await response.json()
         if (versions && versions.length > 0) {
           this.updateExtensionSelect(versions, false)
-          this.scryfallOracleIdTarget.value = versions[0].scryfall_id
+          // Mettre à jour le scryfall_id avec l'ID de la version sélectionnée
+          this.scryfallOracleIdTarget.value = this.selectedCard.oracle_id
         }
       } catch (error) {
         console.error("Erreur lors de la récupération des versions:", error)

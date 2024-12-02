@@ -2,9 +2,9 @@
 module CardConditionManagement
   extend ActiveSupport::Concern
 
-  included do
-    CONDITION_ORDER = %w[poor played light_played good excellent near_mint mint].freeze
+  CONDITION_ORDER = %w[poor played light_played good excellent near_mint mint].freeze
 
+  included do
     def condition_value(condition_name)
       CONDITION_ORDER.index(condition_name.to_s)
     end

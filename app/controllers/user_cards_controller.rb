@@ -96,7 +96,7 @@ class UserCardsController < ApplicationController
   def user_card_form_params
     params.require(:user_card)
           .permit(:condition, :foil, :language, :quantity, 
-                 :card_version_id, :scryfall_id)
+                 :card_version_id, :scryfall_id, :card_name)
           .merge(user_id: @user.id)
   end
 

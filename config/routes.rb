@@ -7,6 +7,9 @@ Rails.application.routes.draw do
   get 'messages', to: redirect { |p, req| "/users/#{req.env['warden'].user.id}/chatrooms" }, as: :messages
   
   resources :users do
+    collection do
+      get :search
+    end
     member do
       get :profile
       get :dashboard
@@ -42,6 +45,7 @@ Rails.application.routes.draw do
     collection do
       get :search
       get :autocomplete
+      get :versions
     end
   end
 

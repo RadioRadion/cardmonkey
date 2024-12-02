@@ -23,6 +23,38 @@
     </div>
   </div>
 
+  <%# User Search Section %>
+  <div class="mb-8">
+    <div class="bg-white rounded-lg shadow-sm overflow-visible">
+      <div class="p-4 border-b border-gray-200">
+        <h2 class="text-lg font-medium text-gray-900">Rechercher un utilisateur</h2>
+        <p class="mt-1 text-sm text-gray-500">Trouvez un utilisateur spécifique pour proposer un échange</p>
+      </div>
+      <div class="p-4">
+        <div class="relative" 
+             data-controller="user-search"
+             data-action="click@window->user-search#clickOutside">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-search text-gray-400"></i>
+            </div>
+            <%= text_field_tag :user_search, nil,
+                placeholder: "Entrez un nom d'utilisateur (minimum 3 caractères)...",
+                class: "block w-full rounded-lg border-0 py-3 pl-10 pr-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6",
+                data: {
+                  action: "input->user-search#search blur->user-search#blur",
+                  user_search_target: "input"
+                } %>
+          </div>
+          <div data-user-search-target="results"
+               id="search_results" 
+               class="absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <%# Left Column: Active Trades %>
     <div class="lg:col-span-2 space-y-6">
@@ -126,10 +158,15 @@
                   </div>
                   <div>
                     <p class="text-sm font-medium text-gray-900"><%= match.user_card.card_version.card.name_fr %></p>
-                    <p class="text-xs text-gray-500">Possédée par <%= match.user_card.user.username %></p>
+                    <%= link_to user_path(match.user_card.user), class: "text-xs text-gray-500 hover:text-blue-600" do %>
+                      Possédée par <%= match.user_card.user.username %>
+                    <% end %>
                   </div>
                 </div>
-                <%= link_to "Voir", new_proposition_trade_path(match.user_card.user, partner_id: match.user_card.user.id), class: "text-sm text-blue-600 hover:text-blue-800" %>
+                <%= link_to new_proposition_trade_path(match.user_card.user, partner_id: match.user_card.user.id), class: "text-sm text-blue-600 hover:text-blue-800" do %>
+                  <i class="fas fa-exchange-alt mr-1"></i>
+                  Proposer un échange
+                <% end %>
               </div>
             <% end %>
           <% else %>

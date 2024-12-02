@@ -9,6 +9,20 @@ class UsersController < ApplicationController
     @editing_preferences = params[:field] == "preferences"
   end
 
+  def search
+    query = params[:query].to_s.strip.downcase
+    @users = User.where("LOWER(username) LIKE ?", "%#{query}%")
+      .where.not(id: current_user.id)
+      .limit(5)
+      .includes(:user_cards, :user_wanted_cards)
+
+    render turbo_stream: turbo_stream.update(
+      "search_results",
+      partial: "users/search_results",
+      locals: { users: @users }
+    )
+  end
+
   def edit
     @stats = current_user.matching_stats
     @editing = params[:field] == "info"

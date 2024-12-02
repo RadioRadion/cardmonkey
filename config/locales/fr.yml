@@ -203,6 +203,14 @@ fr:
       enter_location: "Entrez votre lieu d'échange"
       enter_area: "Entrez le rayon en kilomètres"
 
+  activemodel:
+    errors:
+      models:
+        forms/user_card_form:
+          attributes:
+            card_name:
+              blank: "Le nom de la carte est requis"
+
   activerecord:
     models:
       user_card: "Carte de collection"

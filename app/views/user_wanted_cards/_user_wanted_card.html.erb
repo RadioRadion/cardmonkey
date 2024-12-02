@@ -3,8 +3,7 @@
 </td>
 
 <td class="px-4 py-3 text-gray-600 bg-gray-50">
-  <%= condition_label(user_wanted_card.min_condition) unless user_wanted_card.min_condition == 'unimportant' %>
-  <%= t('wants.conditions.unimportant') if user_wanted_card.min_condition == 'unimportant' %>
+  <%= user_wanted_card.min_condition == 'unimportant' ? 'Any condition' : user_wanted_card.min_condition %>
 </td>
 
 <td class="px-4 py-3">

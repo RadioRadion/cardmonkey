@@ -41,7 +41,8 @@ class CardsController < ApplicationController
             img_uri: version.img_uri,
             extension: {
               name: version.extension.name,
-              code: version.extension.code
+              code: version.extension.code,
+              icon_uri: version.extension.icon_uri
             }
           }
         end

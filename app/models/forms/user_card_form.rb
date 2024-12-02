@@ -102,10 +102,13 @@ module Forms
     end
 
     def find_card_version
-      @card_version ||= if scryfall_id.present?
-        CardVersion.find_by!(scryfall_id: scryfall_id)
-      else
+      @card_version ||= if card_version_id.present?
         CardVersion.find(card_version_id)
+      elsif scryfall_id.present?
+        # Si scryfall_id est en fait un oracle_id
+        card = Card.find_by!(scryfall_oracle_id: scryfall_id)
+        # Prendre la première version disponible
+        card.card_versions.first
       end
     end
 

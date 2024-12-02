@@ -3,7 +3,7 @@
 </td>
 
 <td class="px-4 py-3 text-gray-600 bg-gray-50">
-  <%= condition_label(user_card.condition) %>
+  <%= user_card.condition&.humanize || 'Not specified' %>
 </td>
 
 <td class="px-4 py-3">
