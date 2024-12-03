@@ -10,13 +10,17 @@ export default class extends Controller {
   }
 
   connect() {
+    if (!this.hasQuantityTarget || !this.hasIncrementTarget || !this.hasDecrementTarget) {
+      return
+    }
+
     // Initialize with 1 if selected, 0 otherwise
     this.currentValue = this.selectedValue ? 1 : 0
     
     // Update the display and trigger the event if selected
     if (this.selectedValue) {
       this.updateDisplay()
-      this.element.classList.add('ring-2', 'ring-blue-500')
+      this.element.closest('.group').classList.add('ring-2', 'ring-blue-500')
       this.updateSelectionBadge()
     }
     
@@ -31,6 +35,8 @@ export default class extends Controller {
   }
 
   handleKeydown(event) {
+    if (!this.hasQuantityTarget) return
+
     if (event.key === 'ArrowUp') {
       event.preventDefault()
       this.increment()
@@ -41,28 +47,31 @@ export default class extends Controller {
   }
 
   increment() {
+    if (!this.hasQuantityTarget) return
     if (this.currentValue < this.maxValue) {
       this.currentValue++
       this.updateDisplay()
       this.updateButtonStates()
       this.updateSelectionBadge()
-      this.element.classList.add('ring-2', 'ring-blue-500')
+      this.element.closest('.group').classList.add('ring-2', 'ring-blue-500')
     }
   }
 
   decrement() {
+    if (!this.hasQuantityTarget) return
     if (this.currentValue > 0) {
       this.currentValue--
       this.updateDisplay()
       this.updateButtonStates()
       this.updateSelectionBadge()
       if (this.currentValue === 0) {
-        this.element.classList.remove('ring-2', 'ring-blue-500')
+        this.element.closest('.group').classList.remove('ring-2', 'ring-blue-500')
       }
     }
   }
 
   updateDisplay() {
+    if (!this.hasQuantityTarget) return
     this.quantityTarget.textContent = this.currentValue
     
     // Émettre un événement personnalisé avec toutes les informations nécessaires
@@ -73,14 +82,16 @@ export default class extends Controller {
         side: this.element.dataset.side,
         quantity: this.currentValue,
         price: parseFloat(this.priceValue) || 0,
-        name: this.element.dataset.cardName,
-        set: this.element.dataset.cardSet
+        name: this.element.closest('.group').dataset.cardName,
+        set: this.element.closest('.group').dataset.cardSet
       }
     })
     this.element.dispatchEvent(cardQuantityEvent)
   }
 
   updateButtonStates() {
+    if (!this.hasIncrementTarget || !this.hasDecrementTarget) return
+
     // Mise à jour de l'état des boutons
     const isMaxed = this.currentValue >= this.maxValue
     const isZero = this.currentValue <= 0
@@ -101,17 +112,17 @@ export default class extends Controller {
   }
 
   updateSelectionBadge() {
-    if (this.hasSelectionBadgeTarget) {
-      const isSelected = this.currentValue > 0
-      this.selectionBadgeTarget.classList.toggle("hidden", !isSelected)
-      
-      // Animation du badge
-      if (isSelected) {
-        this.selectionBadgeTarget.classList.add("scale-110")
-        setTimeout(() => {
-          this.selectionBadgeTarget.classList.remove("scale-110")
-        }, 200)
-      }
+    if (!this.hasSelectionBadgeTarget) return
+
+    const isSelected = this.currentValue > 0
+    this.selectionBadgeTarget.classList.toggle("hidden", !isSelected)
+    
+    // Animation du badge
+    if (isSelected) {
+      this.selectionBadgeTarget.classList.add("scale-110")
+      setTimeout(() => {
+        this.selectionBadgeTarget.classList.remove("scale-110")
+      }, 200)
     }
   }
 }
