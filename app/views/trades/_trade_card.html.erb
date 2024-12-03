@@ -1,4 +1,10 @@
 <div class="relative group" 
+     data-controller="card-quantity"
+     data-card-quantity-max-value="<%= trade_card.quantity %>"
+     data-card-quantity-price-value="<%= trade_card.card_version.eur_price %>"
+     data-card-quantity-selected-value="<%= local_assigns[:selected] == true %>"
+     data-card-id="<%= trade_card.id %>"
+     data-side="<%= local_assigns[:side] %>"
      data-preview-image="<%= trade_card.card_version.img_uri %>"
      data-card-name="<%= trade_card.card_version.card.name_fr %>"
      data-card-set="<%= trade_card.card_version.extension.name %>"
@@ -33,13 +39,7 @@
 
   <%# Contrôles de quantité - uniquement si pas en lecture seule %>
   <% unless local_assigns[:readonly] %>
-    <div class="absolute bottom-2 right-2 space-x-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-lg shadow-lg p-1 flex items-center"
-         data-controller="card-quantity"
-         data-card-quantity-max-value="<%= trade_card.quantity %>"
-         data-card-quantity-price-value="<%= trade_card.card_version.eur_price %>"
-         data-card-id="<%= trade_card.id %>"
-         data-side="<%= local_assigns[:side] %>">
-      
+    <div class="absolute bottom-2 right-2 space-x-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-lg shadow-lg p-1 flex items-center">
       <button data-action="click->card-quantity#decrement"
               data-card-quantity-target="decrement"
               class="p-1 hover:bg-gray-100 rounded">
@@ -58,14 +58,14 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
       </button>
+    </div>
 
-      <%# Badge de sélection %>
-      <div data-card-quantity-target="selectionBadge" 
-           class="absolute -top-2 -right-2 bg-green-500 text-white p-1 rounded-full shadow-md hidden">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-      </div>
+    <%# Badge de sélection %>
+    <div data-card-quantity-target="selectionBadge" 
+         class="absolute -top-2 -right-2 bg-green-500 text-white p-1 rounded-full shadow-md hidden">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
     </div>
   <% end %>
 </div>

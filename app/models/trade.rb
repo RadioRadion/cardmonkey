@@ -6,17 +6,6 @@ class Trade < ApplicationRecord
   has_many :trade_user_cards, dependent: :destroy
   has_many :user_cards, through: :trade_user_cards
 
-  # Disable broadcasts in test environment
-  unless Rails.env.test?
-    broadcasts_to ->(trade) { [trade.user, :trades] }
-    broadcasts_to ->(trade) { [trade.user_invit, :trades] }
-
-    after_update_commit -> {
-      broadcast_replace_to [user, :trades]
-      broadcast_replace_to [user_invit, :trades] if user_invit
-    }
-  end
-
   scope :pending, -> { where(status: "0") }
   scope :accepted, -> { where(status: "1") }
   scope :done, -> { where(status: "2") }
@@ -76,7 +65,7 @@ class Trade < ApplicationRecord
   end
 
   def status_badge
-    html = case status.to_s
+    case status.to_s
     when "0", "pending"
       '<span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">En attente</span>'
     when "1", "accepted"
@@ -87,9 +76,7 @@ class Trade < ApplicationRecord
       end
     when "2", "done"
       '<span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Complété</span>'
-    end
-    return html.to_s if Rails.env.test?
-    html&.html_safe
+    end.html_safe
   end
 
   def partner_for(current_user)

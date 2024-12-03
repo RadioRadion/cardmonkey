@@ -16,10 +16,11 @@ export default class extends Controller {
     // Update the display and trigger the event if selected
     if (this.selectedValue) {
       this.updateDisplay()
+      this.element.classList.add('ring-2', 'ring-blue-500')
+      this.updateSelectionBadge()
     }
     
     this.updateButtonStates()
-    this.updateSelectionBadge()
 
     // Ajouter des gestionnaires d'événements pour le clavier
     this.element.addEventListener('keydown', this.handleKeydown.bind(this))
@@ -68,7 +69,7 @@ export default class extends Controller {
     const cardQuantityEvent = new CustomEvent("cardQuantityChanged", {
       bubbles: true,
       detail: {
-        cardId: this.element.dataset.cardId,
+        cardId: parseInt(this.element.dataset.cardId),
         side: this.element.dataset.side,
         quantity: this.currentValue,
         price: parseFloat(this.priceValue) || 0,

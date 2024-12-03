@@ -19,10 +19,32 @@ export default class extends Controller {
     
     // Écouter les changements de quantité
     this.element.addEventListener("cardQuantityChanged", this.handleQuantityChange.bind(this))
+
+    // Initialize pre-selected cards
+    this.initializePreselectedCards()
   }
 
   disconnect() {
     this.element.removeEventListener("cardQuantityChanged", this.handleQuantityChange.bind(this))
+  }
+
+  initializePreselectedCards() {
+    // Process pre-selected user cards
+    this.element.querySelectorAll('[data-side="user"][data-card-quantity-selected-value="true"]').forEach(card => {
+      const cardId = parseInt(card.dataset.cardId)
+      const price = parseFloat(card.dataset.cardQuantityPriceValue) || 0
+      this.userCards.set(cardId, { quantity: 1, price })
+    })
+
+    // Process pre-selected partner cards
+    this.element.querySelectorAll('[data-side="partner"][data-card-quantity-selected-value="true"]').forEach(card => {
+      const cardId = parseInt(card.dataset.cardId)
+      const price = parseFloat(card.dataset.cardQuantityPriceValue) || 0
+      this.partnerCards.set(cardId, { quantity: 1, price })
+    })
+
+    // Update totals after processing pre-selected cards
+    this.updateTotals()
   }
 
   handleQuantityChange(event) {
@@ -69,7 +91,9 @@ export default class extends Controller {
 
     // Activer/désactiver le bouton de soumission
     const hasCards = this.userCards.size > 0 || this.partnerCards.size > 0
-    this.submitButtonTarget.disabled = !hasCards
+    if (this.hasSubmitButtonTarget) {
+      this.submitButtonTarget.disabled = !hasCards
+    }
   }
 
   calculateTotal(cards) {
@@ -136,20 +160,22 @@ export default class extends Controller {
       const html = await response.text()
       const target = side === 'user' ? this.userCardsGridTarget : this.partnerCardsGridTarget
       target.innerHTML = html
+
+      // Re-initialize pre-selected cards after search
+      this.initializePreselectedCards()
     } catch (error) {
       console.error('Erreur lors de la recherche:', error)
     }
   }
 
   submitTrade(event) {
-    event.preventDefault()
-    
     if (this.userCards.size === 0 && this.partnerCards.size === 0) {
+      event.preventDefault()
       alert("Veuillez sélectionner au moins une carte pour l'échange")
       return
     }
 
-    const form = event.currentTarget
+    const form = event.target
     
     // Préparation des cartes pour la soumission
     const offerCards = this.formatCardsForSubmission(this.userCards)
@@ -158,9 +184,6 @@ export default class extends Controller {
     // Mise à jour des champs cachés
     form.querySelector('input[name="trade[offer]"]').value = offerCards
     form.querySelector('input[name="trade[target]"]').value = targetCards
-
-    // Soumission du formulaire
-    form.submit()
   }
 
   formatCardsForSubmission(cards) {

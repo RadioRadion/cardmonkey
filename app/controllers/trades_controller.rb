@@ -63,7 +63,10 @@ class TradesController < ApplicationController
       handle_trade_modification
     end
 
-    redirect_to trade_path(@trade)
+    respond_to do |format|
+      format.html { redirect_to trade_path(@trade) }
+      format.json { head :ok }
+    end
   end
 
   def validate
@@ -136,7 +139,7 @@ class TradesController < ApplicationController
     @trade_balance = @values[:user_total] - @values[:partner_total]
 
     respond_to do |format|
-      format.turbo_stream
+      format.html { head :ok }
       format.json { render json: @values }
     end
   end

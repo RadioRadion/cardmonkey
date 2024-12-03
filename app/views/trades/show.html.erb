@@ -92,25 +92,35 @@
         <div class="flex gap-4 items-center">
           <% if @trade.pending? %>
             <% if @trade.user_id == current_user.id %>
-              <%= link_to "Modifier", edit_trade_path(@trade),
-                        class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50" %>
+              <%= link_to "Modifier", 
+                        edit_trade_path(@trade),
+                        class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50",
+                        data: { turbo: false } %>
             <% else %>
-              <%= button_to trade_path(@trade, status: "accepted"),
-                          method: :patch,
-                          class: "text-white bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700" do %>
-                Accepter
+              <%= form_with model: @trade, 
+                          method: :patch, 
+                          local: true,
+                          class: "inline" do |f| %>
+                <%= f.hidden_field :status, value: "accepted" %>
+                <%= f.submit "Accepter",
+                          class: "text-white bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700 cursor-pointer" %>
               <% end %>
             <% end %>
           <% elsif @trade.accepted? %>
-            <%= button_to trade_path(@trade, status: "done"),
-                        method: :patch,
-                        class: "text-white bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700" do %>
-              Marquer comme terminé
+            <%= form_with model: @trade, 
+                        method: :patch, 
+                        local: true,
+                        class: "inline" do |f| %>
+              <%= f.hidden_field :status, value: "done" %>
+              <%= f.submit "Marquer comme terminé",
+                        class: "text-white bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700 cursor-pointer" %>
             <% end %>
           <% end %>
           
-          <%= link_to "Retour", trades_path,
-                    class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50" %>
+          <%= link_to "Retour", 
+                    trades_path,
+                    class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50",
+                    data: { turbo: false } %>
         </div>
       </div>
     </div>

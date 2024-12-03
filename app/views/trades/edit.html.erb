@@ -104,9 +104,9 @@
       <%= form_with model: @trade, 
                     url: trade_path(@trade), 
                     method: :patch, 
+                    local: true,
                     class: "w-full", 
                     data: { 
-                      turbo: false,
                       action: "submit->trade-selection#submitTrade" 
                     } do |f| %>
         <%= f.hidden_field :offer %>
@@ -141,31 +141,26 @@
           <div class="flex gap-4 items-center">
             <%= link_to "Annuler", 
                       trade_path(@trade), 
-                      class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50",
-                      data: { turbo: false } %>
+                      class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50" %>
             
             <% if @trade.can_be_accepted_by?(current_user) %>
-              <%= button_to trade_path(@trade, status: "accepted"),
-                          method: :patch,
-                          class: "text-white bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700",
-                          form: { data: { turbo: false } } do %>
-                Accepter l'échange
+              <%= form_with url: trade_path(@trade), method: :patch, local: true do |f| %>
+                <%= hidden_field_tag :status, "accepted" %>
+                <%= f.submit "Accepter l'échange",
+                          class: "text-white bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700" %>
               <% end %>
             <% end %>
 
             <% if @trade.can_be_validated?(current_user) %>
-              <%= button_to validate_trade_path(@trade),
-                          method: :patch,
-                          class: "text-white bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700",
-                          form: { data: { turbo: false } } do %>
-                Valider la modification
+              <%= form_with url: validate_trade_path(@trade), method: :patch, local: true do |f| %>
+                <%= f.submit "Valider la modification",
+                          class: "text-white bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700" %>
               <% end %>
             <% elsif @trade.can_be_modified_by?(current_user) %>
               <%= f.submit "Mettre à jour l'échange", 
                         class: "text-white bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
                         data: { 
-                          trade_selection_target: "submitButton",
-                          disable_with: "Mise à jour en cours..."
+                          trade_selection_target: "submitButton"
                         } %>
             <% end %>
           </div>

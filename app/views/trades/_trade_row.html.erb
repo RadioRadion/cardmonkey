@@ -27,7 +27,7 @@
     <div class="flex items-center gap-4">
       <%= link_to trade_path(trade), 
           class: "inline-flex items-center rounded-lg text-sm font-semibold text-blue-600 hover:text-blue-800",
-          data: { turbo_frame: "_top" } do %>
+          data: { turbo: false } do %>
         <%= t('.view_details') %>
         <svg class="ml-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
@@ -39,16 +39,16 @@
   <%# Actions pour les trades en attente %>
   <% if trade.status == "0" && trade.user_id_invit == current_user.id %>
     <div class="mt-4 flex items-center gap-3">
-      <%= button_to trade_path(trade, status: "accepted"),
-          method: :patch,
-          class: "rounded-md bg-blue-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500" do %>
-        <%= t('.accept_trade') %>
+      <%= form_with model: trade, method: :patch, local: true, class: "inline" do |f| %>
+        <%= f.hidden_field :status, value: "accepted" %>
+        <%= f.submit t('.accept_trade'),
+                  class: "rounded-md bg-blue-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 cursor-pointer" %>
       <% end %>
 
-      <%= button_to trade_path(trade, status: "rejected"),
-          method: :patch,
-          class: "rounded-md bg-white px-3.5 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" do %>
-        <%= t('.reject') %>
+      <%= form_with model: trade, method: :patch, local: true, class: "inline" do |f| %>
+        <%= f.hidden_field :status, value: "rejected" %>
+        <%= f.submit t('.reject'),
+                  class: "rounded-md bg-white px-3.5 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 cursor-pointer" %>
       <% end %>
     </div>
   <% end %>
