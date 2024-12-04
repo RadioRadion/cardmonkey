@@ -215,6 +215,7 @@ fr:
     models:
       user_card: "Carte de collection"
       user_wanted_card: "Carte recherchée"
+      trade: "Échange"
     attributes:
       user_card:
         condition: "État"
@@ -236,6 +237,14 @@ fr:
         address: "Adresse"
         area: "Zone d'échange"
         preference: "Préférence d'échange"
+      trade:
+        status: "Statut"
+    errors:
+      models:
+        trade:
+          attributes:
+            status:
+              blank: "Le statut ne peut pas être vide"
     enums:
       user_card:
         condition:
@@ -261,6 +270,13 @@ fr:
         preference:
           value_based: "Basé sur la valeur"
           quantity_based: "Basé sur la quantité"
+      trade:
+        status:
+          pending: "En attente"
+          modified: "Modifié"
+          accepted: "Accepté"
+          done: "Terminé"
+          cancelled: "Annulé"
 
   cards:
     conditions:

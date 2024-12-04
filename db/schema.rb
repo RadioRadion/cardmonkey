@@ -176,7 +176,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_21_134500) do
   end
 
   create_table "trades", force: :cascade do |t|
-    t.string "status"
+    t.integer "status"
     t.bigint "user_id", null: false
     t.integer "user_id_invit"
     t.datetime "created_at", null: false

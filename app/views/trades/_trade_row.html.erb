@@ -3,7 +3,7 @@
   <div class="flex items-center justify-between">
     <div class="min-w-0 flex-1">
       <div class="flex items-center gap-2">
-        <%= trade.status_badge %>
+        <%= trade_status_badge(trade) %>
         <p class="truncate font-medium text-gray-900">
           <%= t('.with') %> <%= trade.partner_name_for(current_user) %>
         </p>
@@ -37,7 +37,7 @@
   </div>
 
   <%# Actions pour les trades en attente %>
-  <% if trade.status == "0" && trade.user_id_invit == current_user.id %>
+  <% if trade.pending? && trade.user_id_invit == current_user.id %>
     <div class="mt-4 flex items-center gap-3">
       <%= form_with model: trade, method: :patch, local: true, class: "inline" do |f| %>
         <%= f.hidden_field :status, value: "accepted" %>
@@ -46,7 +46,7 @@
       <% end %>
 
       <%= form_with model: trade, method: :patch, local: true, class: "inline" do |f| %>
-        <%= f.hidden_field :status, value: "rejected" %>
+        <%= f.hidden_field :status, value: "cancelled" %>
         <%= f.submit t('.reject'),
                   class: "rounded-md bg-white px-3.5 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 cursor-pointer" %>
       <% end %>

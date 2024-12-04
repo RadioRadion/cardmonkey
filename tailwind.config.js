@@ -29,14 +29,5 @@ module.exports = {
       },
     },
   },
-  variants: {
-    extend: {
-      opacity: ['loading-input'],
-      backgroundColor: ['active', 'hover'],
-      borderColor: ['active', 'hover'],
-      transform: ['hover', 'focus'],
-      scale: ['hover', 'active'],
-    },
-  },
   plugins: [],
 }

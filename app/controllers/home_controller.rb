@@ -3,8 +3,9 @@ class HomeController < ApplicationController
 
   def index
     if user_signed_in?
-      @recent_trades = current_user.trades
+      @recent_trades = current_user.all_trades
         .includes(:user, :user_invit, user_cards: [:card_version])
+        .order(updated_at: :desc)
         .limit(5)
       @potential_matches = current_user.matches
         .includes(:user_card, :user_wanted_card)

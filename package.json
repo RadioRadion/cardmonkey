@@ -10,9 +10,5 @@
     "browserslist": "^4.24.2",
     "caniuse-lite": "^1.0.30001680"
   },
-  "version": "0.1.0",
-  "scripts": {
-    "watch:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --watch",
-    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify"
-  }
+  "version": "0.1.0"
 }

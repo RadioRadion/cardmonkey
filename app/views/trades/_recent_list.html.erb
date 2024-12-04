@@ -14,7 +14,7 @@
               </h4>
               <p class="text-sm text-gray-500">
                 <%= pluralize(trade.user_cards.count, 'carte') %> · 
-                <%= trade.status_badge %>
+                <%= trade_status_badge(trade) %>
               </p>
             </div>
           </div>

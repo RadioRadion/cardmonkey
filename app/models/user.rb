@@ -13,8 +13,12 @@ class User < ApplicationRecord
   has_many :received_chatrooms, class_name: 'Chatroom', foreign_key: 'user_id_invit'
   has_many :messages
   
-  # Other associations
+  # Trade associations
   has_many :trades
+  has_many :received_trades, class_name: 'Trade', foreign_key: 'user_id_invit'
+  has_many :modified_trades, class_name: 'Trade', foreign_key: 'last_modifier_id'
+  
+  # Other associations
   has_many :user_cards
   has_many :card_versions, through: :user_cards
   has_many :cards, through: :card_versions

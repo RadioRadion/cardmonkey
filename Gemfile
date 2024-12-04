@@ -9,8 +9,6 @@ gem 'rails', '7.1.3.1'
 gem 'pg', '>= 0.18', '< 2.0'
 # Use Puma as the app server
 gem 'puma', '6.4.2'
-# Use SCSS for stylesheets
-gem 'sass-rails', '>= 6'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.7'
 # Use Redis adapter to run Action Cable in production
@@ -18,8 +16,9 @@ gem 'redis', '~> 4.0'
 
 gem "turbo-rails", "~> 1.5.0"
 gem "stimulus-rails", "~> 1.3.0"
-gem "tailwindcss-rails"
+gem "tailwindcss-rails", "~> 2.3.0"
 gem "importmap-rails"
+gem "sprockets-rails"
 
 gem 'rspec-rails'
 gem 'psych', '< 4'

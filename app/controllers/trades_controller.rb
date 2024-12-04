@@ -35,9 +35,10 @@ class TradesController < ApplicationController
   end
 
   def create
-    @trade = current_user.trades.build(
+    @trade = Trade.new(
+      user: current_user,
       user_id_invit: params[:trade][:user_id_invit],
-      status: "pending"
+      status: :pending
     )
 
     if @trade.save
@@ -71,7 +72,7 @@ class TradesController < ApplicationController
 
   def validate
     if @trade.can_be_validated?(current_user)
-      @trade.update!(status: "accepted")
+      @trade.update!(status: :accepted)
       notify_trade_validation
       redirect_to trade_path(@trade), notice: "Modification validée !"
     else
@@ -97,7 +98,8 @@ class TradesController < ApplicationController
 
     @trade = Trade.new(
       user: current_user,
-      user_id_invit: @partner.id
+      user_id_invit: @partner.id,
+      status: :pending
     )
   end
 
@@ -224,15 +226,17 @@ class TradesController < ApplicationController
 
   def notify_trade_creation
     Notification.create_notification(@trade.user_id_invit, "Nouveau trade proposé !")
-    Trade.save_message(
-      current_user.id, 
-      @trade.user_id_invit, 
-      "trade_id:#{@trade.id}"
+    chatroom = Trade.find_or_create_chatroom(current_user.id, @trade.user_id_invit)
+    Message.create!(
+      content: "#{current_user.username} a proposé un échange",
+      user_id: current_user.id,
+      chatroom_id: chatroom.id,
+      metadata: { type: 'trade', trade_id: @trade.id }
     )
   end
 
   def handle_trade_acceptance
-    @trade.update!(status: "accepted")
+    @trade.update!(status: :accepted)
     notify_trade_status_change(
       "Trade accepté ! Discutez-ici pour vous donner rendez-vous.",
       "Trade accepté !"
@@ -240,7 +244,7 @@ class TradesController < ApplicationController
   end
 
   def handle_trade_completion
-    @trade.update!(status: "done")
+    @trade.update!(status: :done)
     notify_trade_status_change(
       "Trade terminé, bon jeu !",
       "Trade réalisé !"
@@ -251,7 +255,7 @@ class TradesController < ApplicationController
     Trade.transaction do
       @trade.trade_user_cards.destroy_all
       process_trade_cards
-      @trade.update!(last_modifier_id: current_user.id)
+      @trade.update!(status: :modified, last_modifier_id: current_user.id)
       notify_trade_status_change(
         "Une modification a été proposée pour le trade #{@trade.id}",
         "Modification proposée !"
@@ -261,27 +265,32 @@ class TradesController < ApplicationController
 
   def handle_trade_validation
     if @trade.can_be_validated?(current_user)
-      @trade.update!(status: "accepted")
+      @trade.update!(status: :accepted)
       notify_trade_validation
     end
   end
 
   def notify_trade_validation
     other_user = @trade.other_user(current_user)
-    Trade.save_message(current_user.id, other_user.id, "trade_id:#{@trade.id}")
-    Notification.create_notification(other_user.id, "La modification du trade a été validée !")
-    
     chatroom = Trade.find_or_create_chatroom(current_user.id, other_user.id)
     Message.create!(
       content: "✅ La modification de l'échange a été validée ! Vous pouvez maintenant organiser la rencontre.",
       user_id: current_user.id,
-      chatroom_id: chatroom.id
+      chatroom_id: chatroom.id,
+      metadata: { type: 'trade', trade_id: @trade.id }
     )
+    Notification.create_notification(other_user.id, "La modification du trade a été validée !")
   end
 
   def notify_trade_status_change(message, notification_text)
     other_user = @trade.other_user(current_user)
-    Trade.save_message(current_user.id, other_user.id, "trade_id:#{@trade.id}")
+    chatroom = Trade.find_or_create_chatroom(current_user.id, other_user.id)
+    Message.create!(
+      content: message,
+      user_id: current_user.id,
+      chatroom_id: chatroom.id,
+      metadata: { type: 'trade', trade_id: @trade.id }
+    )
     Notification.create_notification(other_user.id, notification_text)
   end
 end
