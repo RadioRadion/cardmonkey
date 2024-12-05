@@ -1,5 +1,6 @@
 fr:
   navbar:
+    notifications: "Notifications"
     home: "Accueil"
     wantlist: "Liste de souhaits"
     collection: "Collection"
@@ -13,6 +14,18 @@ fr:
     auth:
       sign_in: "Connexion"
       sign_up: "Inscription"
+
+  notifications:
+    notifications:
+      no_notifications: "Aucune notification"
+      mark_all_as_read: "Tout marquer comme lu"
+    notification:
+      mark_as_read: "Marquer comme lu"
+    trade:
+      card_removed: "La carte %{card_name} a été retirée d'un échange en cours"
+      card_removed_chat: "La carte %{card_name} a été retirée de l'échange"
+      wanted_card_removed: "La carte %{card_name} a été retirée de la liste de souhaits de %{username}"
+      wanted_card_removed_chat: "La carte %{card_name} n'est plus recherchée par %{username}"
 
   datetime:
     distance_in_words:
@@ -43,13 +56,6 @@ fr:
       about_x_years:
         one: "environ 1 an"
         other: "environ %{count} ans"
-
-  notifications:
-    trade:
-      card_removed: "La carte %{card_name} a été retirée d'un échange en cours"
-      card_removed_chat: "La carte %{card_name} a été retirée de l'échange"
-      wanted_card_removed: "La carte %{card_name} a été retirée de la liste de souhaits de %{username}"
-      wanted_card_removed_chat: "La carte %{card_name} n'est plus recherchée par %{username}"
 
   footer:
     about: "À propos"

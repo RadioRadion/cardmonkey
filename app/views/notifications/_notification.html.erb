@@ -1,13 +1,20 @@
-<div id="<%= dom_id(notification) %>" class="notification <%= notification.unread? ? 'bg-blue-50' : '' %> p-4 mb-2 rounded-lg shadow">
-  <div class="flex items-center justify-between">
-    <div class="flex-1">
-      <p class="text-sm text-gray-800"><%= notification.content %></p>
+<div id="<%= dom_id(notification) %>" class="p-4 hover:bg-gray-50 <%= notification.unread? ? 'bg-blue-50' : '' %>">
+  <div class="flex items-start">
+    <div class="flex-1 min-w-0">
+      <p class="text-sm text-gray-900">
+        <%= notification.content %>
+      </p>
       <p class="text-xs text-gray-500 mt-1">
-        <%= time_ago_in_words(notification.created_at) %> <%= t('general.ago') %>
+        <%= time_ago_in_words(notification.created_at) %> ago
       </p>
     </div>
     <% if notification.unread? %>
-      <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+      <%= button_to mark_as_read_notification_path(notification), 
+          method: :patch,
+          class: "ml-2 text-gray-400 hover:text-gray-500",
+          data: { turbo_stream: true } do %>
+        <i class="fas fa-check text-xs"></i>
+      <% end %>
     <% end %>
   </div>
 </div>

@@ -1,0 +1,22 @@
+<div id="notifications_list" class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+  <% if notifications.any? %>
+    <% notifications.each do |notification| %>
+      <%= render 'notifications/notification', notification: notification %>
+    <% end %>
+  <% else %>
+    <div class="p-4 text-center text-gray-500">
+      <%= t('.no_notifications') %>
+    </div>
+  <% end %>
+</div>
+
+<% if notifications.unread.any? %>
+  <div class="p-2 border-t">
+    <%= button_to mark_all_as_read_notifications_path,
+        method: :post,
+        class: "w-full text-sm text-blue-600 hover:text-blue-800 text-center",
+        data: { turbo_stream: true } do %>
+      <%= t('.mark_all_as_read') %>
+    <% end %>
+  </div>
+<% end %>
