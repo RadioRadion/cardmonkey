@@ -15,6 +15,14 @@ class TradesController < ApplicationController
       )
       .limit(5)
 
+    # Get users with most matches
+    @top_matching_users = Match.where(user: current_user)
+      .group(:user_id_target)
+      .select('user_id_target, COUNT(*) as match_count')
+      .order('match_count DESC')
+      .limit(4)
+      .map { |m| [User.find(m.user_id_target), m.match_count] }
+
     @stats = {
       trades_completed: current_user.trades.done.count,
       cards_available: current_user.user_cards.count,

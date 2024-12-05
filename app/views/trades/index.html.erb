@@ -21,41 +21,74 @@
     </div>
   </div>
 
-  <%# User Search Section %>
-  <div class="mb-8">
-    <div class="bg-white rounded-lg shadow-sm overflow-visible">
-      <div class="p-4 border-b border-gray-200">
-        <h2 class="text-lg font-medium text-gray-900">Rechercher un utilisateur</h2>
-        <p class="mt-1 text-sm text-gray-500">Trouvez un utilisateur spécifique pour proposer un échange</p>
-      </div>
-      <div class="p-4">
-        <div class="relative" 
-             data-controller="user-search"
-             data-action="click@window->user-search#clickOutside">
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <i class="fas fa-search text-gray-400"></i>
+  <%# User Search and Stats Section %>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+    <%# User Search %>
+    <div class="md:col-span-2">
+      <div class="bg-white rounded-lg shadow-sm overflow-visible">
+        <div class="p-4 border-b border-gray-200">
+          <h2 class="text-lg font-medium text-gray-900">Rechercher un utilisateur</h2>
+          <p class="mt-1 text-sm text-gray-500">Trouvez un utilisateur spécifique pour proposer un échange</p>
+        </div>
+        <div class="p-4">
+          <div class="relative" 
+               data-controller="user-search"
+               data-action="click@window->user-search#clickOutside">
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+              </div>
+              <%= text_field_tag :user_search, nil,
+                  placeholder: "Entrez un nom d'utilisateur (minimum 3 caractères)...",
+                  class: "block w-full rounded-lg border-0 py-3 pl-10 pr-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6",
+                  data: {
+                    action: "input->user-search#search blur->user-search#blur",
+                    user_search_target: "input"
+                  } %>
             </div>
-            <%= text_field_tag :user_search, nil,
-                placeholder: "Entrez un nom d'utilisateur (minimum 3 caractères)...",
-                class: "block w-full rounded-lg border-0 py-3 pl-10 pr-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6",
-                data: {
-                  action: "input->user-search#search blur->user-search#blur",
-                  user_search_target: "input"
-                } %>
+            <div data-user-search-target="results"
+                 id="search_results" 
+                 class="absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+            </div>
           </div>
-          <div data-user-search-target="results"
-               id="search_results" 
-               class="absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+        </div>
+      </div>
+    </div>
+
+    <%# Statistics %>
+    <div>
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
+          <h2 class="text-lg font-medium text-gray-900">Vos statistiques</h2>
+        </div>
+        <div class="p-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="text-center">
+              <p class="text-2xl font-bold text-gray-900"><%= @stats[:trades_completed] %></p>
+              <p class="text-sm text-gray-500">Échanges réalisés</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-bold text-gray-900"><%= @stats[:cards_available] %></p>
+              <p class="text-sm text-gray-500">Cartes disponibles</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-bold text-gray-900"><%= @stats[:cards_wanted] %></p>
+              <p class="text-sm text-gray-500">Cartes recherchées</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-bold text-gray-900"><%= @stats[:potential_matches] %></p>
+              <p class="text-sm text-gray-500">Matchs potentiels</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <%# Left Column: Active Trades %>
-    <div class="lg:col-span-2 space-y-6">
+  <%# Main Content Grid %>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <%# Left Side: Trades %>
+    <div class="md:col-span-2 space-y-6">
       <%# Trades en attente %>
       <% if @trades['0'].present? %>
         <section class="bg-white rounded-lg shadow overflow-hidden">
@@ -127,7 +160,7 @@
       <% end %>
     </div>
 
-    <%# Right Column: Trade Opportunities & Stats %>
+    <%# Right Side: Opportunities and Tips %>
     <div class="space-y-6">
       <%# Opportunités d'échange %>
       <section class="bg-white rounded-lg shadow overflow-hidden">
@@ -135,7 +168,34 @@
           <h2 class="text-lg font-medium text-gray-900">Opportunités d'échange</h2>
         </div>
         <div class="p-4">
-          <% if current_user.user_wanted_cards.any? %>
+          <% if !current_user.user_wanted_cards.any? %>
+            <div class="text-center py-6">
+              <div class="mx-auto h-12 w-12 text-gray-400 mb-4">
+                <i class="fas fa-search text-2xl"></i>
+              </div>
+              <p class="text-sm text-gray-500 mb-4">Ajoutez des cartes à votre liste de recherche pour voir les opportunités d'échange</p>
+              <%= link_to new_user_user_wanted_card_path(current_user), 
+                        class: "inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors",
+                        data: { turbo: false } do %>
+                <i class="fas fa-plus-circle mr-2"></i>
+                Ajouter des cartes recherchées
+              <% end %>
+            </div>
+          <% elsif @matches.empty? %>
+            <div class="text-center py-6">
+              <div class="mx-auto h-12 w-12 text-gray-400 mb-4">
+                <i class="fas fa-exclamation-circle text-2xl"></i>
+              </div>
+              <p class="text-sm text-gray-500 mb-2">Pas de match pour le moment</p>
+              <p class="text-sm text-gray-500">Pensez à enrichir votre collection pour augmenter vos chances de trouver des correspondances !</p>
+              <%= link_to new_user_user_card_path(current_user), 
+                        class: "mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors",
+                        data: { turbo: false } do %>
+                <i class="fas fa-plus-circle mr-2"></i>
+                Ajouter des cartes à échanger
+              <% end %>
+            </div>
+          <% else %>
             <% @matches.each do |match| %>
               <div class="flex items-center justify-between py-3 border-b border-gray-200 last:border-0">
                 <div class="flex items-center space-x-3">
@@ -157,42 +217,7 @@
                 <% end %>
               </div>
             <% end %>
-          <% else %>
-            <div class="text-center py-4">
-              <p class="text-sm text-gray-500">Ajoutez des cartes à votre liste de recherche pour voir les opportunités d'échange</p>
-              <%= link_to "Ajouter des cartes recherchées", 
-                        new_user_user_wanted_card_path(current_user), 
-                        class: "mt-2 inline-block text-sm text-blue-600 hover:text-blue-800",
-                        data: { turbo: false } %>
-            </div>
           <% end %>
-        </div>
-      </section>
-
-      <%# Statistiques d'échange %>
-      <section class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="p-4 border-b border-gray-200">
-          <h2 class="text-lg font-medium text-gray-900">Vos statistiques</h2>
-        </div>
-        <div class="p-4">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="text-center">
-              <p class="text-2xl font-bold text-gray-900"><%= @stats[:trades_completed] %></p>
-              <p class="text-sm text-gray-500">Échanges réalisés</p>
-            </div>
-            <div class="text-center">
-              <p class="text-2xl font-bold text-gray-900"><%= @stats[:cards_available] %></p>
-              <p class="text-sm text-gray-500">Cartes disponibles</p>
-            </div>
-            <div class="text-center">
-              <p class="text-2xl font-bold text-gray-900"><%= @stats[:cards_wanted] %></p>
-              <p class="text-sm text-gray-500">Cartes recherchées</p>
-            </div>
-            <div class="text-center">
-              <p class="text-2xl font-bold text-gray-900"><%= @stats[:potential_matches] %></p>
-              <p class="text-sm text-gray-500">Matchs potentiels</p>
-            </div>
-          </div>
         </div>
       </section>
 
