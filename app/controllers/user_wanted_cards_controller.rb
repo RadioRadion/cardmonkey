@@ -1,6 +1,7 @@
 class UserWantedCardsController < ApplicationController
   before_action :set_user
   before_action :set_user_wanted_card, only: [:edit, :update, :destroy]
+  before_action :set_versions, only: [:edit, :update]
 
   def index
     @user_wanted_cards = @user.user_wanted_cards
@@ -29,9 +30,6 @@ class UserWantedCardsController < ApplicationController
   end
 
   def edit
-    @user_wanted_card = @user.user_wanted_cards.find(params[:id])
-    # Charger les versions de la carte pour le select
-    @versions = @user_wanted_card.card.card_versions.includes(:extension).order('extensions.name ASC')
     @form = Forms::UserWantedCardForm.from_model(@user_wanted_card)
   end
 
@@ -88,6 +86,10 @@ class UserWantedCardsController < ApplicationController
 
   def set_user_wanted_card
     @user_wanted_card = @user.user_wanted_cards.find(params[:id])
+  end
+
+  def set_versions
+    @versions = @user_wanted_card.card.card_versions.includes(:extension).order('extensions.name ASC')
   end
 
   def user_wanted_card_form_params

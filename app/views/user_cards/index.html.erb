@@ -127,7 +127,8 @@
     <% @user_cards.each do |user_card| %>
       <div class="relative group bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow animate-fade-in"
            data-cards-target="card"
-           data-card-name="<%= user_card.card_version.card.name_en %>"
+           data-card-name-en="<%= user_card.card_version.card.name_en %>"
+           data-card-name-fr="<%= user_card.card_version.card.name_fr %>"
            data-language="<%= user_card.language %>"
            data-condition="<%= user_card.condition %>"
            data-foil="<%= user_card.foil %>">

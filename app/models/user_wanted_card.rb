@@ -57,7 +57,10 @@ class UserWantedCard < ApplicationRecord
   end
 
   def img_uri
-    card_version&.img_uri || card.card_versions.first&.img_uri
+    # If a specific card version is selected, use its image
+    return card_version.img_uri if card_version.present?
+    # Otherwise, use the image from any version of the card
+    card.card_versions.first&.img_uri
   end
 
   private

@@ -1,41 +1,136 @@
-<%# Informations de la carte - Section modifiée uniquement %>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-controller="wanted-cards">
+  <%# Header avec titre et stats %>
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Ma Liste de Souhaits</h1>
+    
+    <%= link_to new_user_user_wanted_card_path(@user), 
+        class: "inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 focus:outline-none transition-colors" do %>
+      <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/>
+      </svg>
+      Ajouter une carte
+    <% end %>
+  </div>
+
+  <%# Filtres et recherche %>
+  <div class="bg-white rounded-lg shadow p-4 border border-gray-200 mb-6 animate-slide-down">
+    <div class="flex flex-col md:flex-row gap-4">
+      <div class="flex-1">
+        <input type="text" 
+               placeholder="Rechercher une carte..." 
+               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-300"
+               data-action="input->wanted-cards#search">
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-300"
+                data-action="change->wanted-cards#filterByLanguage">
+          <option value="">Toutes les langues</option>
+          <% @user_wanted_cards.pluck(:language).uniq.compact.each do |lang| %>
+            <option value="<%= lang %>"><%= language_label(lang) %></option>
+          <% end %>
+        </select>
+        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-300"
+                data-action="change->wanted-cards#filterByMinCondition">
+          <option value="">Tous états</option>
+          <option value="mint">Mint</option>
+          <option value="near_mint">Near Mint</option>
+          <option value="excellent">Excellent</option>
+          <option value="good">Good</option>
+          <option value="light_played">Light Played</option>
+          <option value="played">Played</option>
+          <option value="poor">Poor</option>
+        </select>
+        <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg focus:ring-2 focus:ring-gray-300 focus:outline-none transition-colors"
+                data-action="click->wanted-cards#toggleFoilFilter">
+          <svg class="w-5 h-5 mr-2 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+          </svg>
+          Foil uniquement
+        </button>
+        <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg focus:ring-2 focus:ring-gray-300 focus:outline-none transition-colors"
+                data-action="click->wanted-cards#toggleMatchesFilter">
+          <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+          </svg>
+          Avec matchs uniquement
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <%# Grille de cartes %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+    <% @user_wanted_cards.each do |user_wanted_card| %>
+      <div class="relative group bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow animate-fade-in"
+           data-wanted-cards-target="card"
+           data-card-name-en="<%= user_wanted_card.card.name_en %>"
+           data-card-name-fr="<%= user_wanted_card.card.name_fr %>"
+           data-language="<%= user_wanted_card.language %>"
+           data-min-condition="<%= user_wanted_card.min_condition %>"
+           data-foil="<%= user_wanted_card.foil %>"
+           data-matches-count="<%= user_wanted_card.matches.count %>">
+        <%# Image de la carte %>
+        <div class="relative aspect-[63/88] overflow-hidden">
+          <% if user_wanted_card.img_uri.present? %>
+            <%= image_tag user_wanted_card.img_uri, 
+                        alt: user_wanted_card.card.name_en,
+                        class: "w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300" %>
+          <% else %>
+            <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+              <span class="text-gray-400 text-sm">Image non disponible</span>
+            </div>
+          <% end %>
+
+          <%# Badge foil %>
+          <% if user_wanted_card.foil %>
+            <div class="absolute top-2 left-2">
+              <%= image_tag "star.svg", alt: t('cards.attributes.foil'), class: "w-6 h-6 animate-pulse" %>
+            </div>
+          <% end %>
+
+          <%# Badge matches %>
+          <% if user_wanted_card.matches.any? %>
+            <div class="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-sm font-bold">
+              <%= user_wanted_card.matches.count %>
+              <span class="hidden sm:inline">match<%= user_wanted_card.matches.count > 1 ? 's' : '' %></span>
+            </div>
+          <% end %>
+        </div>
+
+        <%# Informations de la carte %>
         <div class="p-4">
           <h3 class="font-medium text-gray-900 truncate" title="<%= user_wanted_card.card.name_en %>">
             <%= user_wanted_card.card.name_en %>
           </h3>
           
-          <div class="flex items-center gap-2 mt-2">
+          <div class="mt-2 flex items-center gap-2">
             <%# Extension icon %>
-            <% if user_wanted_card.card_version_id.present? %>
-              <% if user_wanted_card.card_version&.extension&.icon_uri.present? %>
-                <%= image_tag user_wanted_card.card_version.extension.icon_uri, 
-                            alt: user_wanted_card.card_version.extension.name,
-                            class: "w-6 h-6",
-                            title: user_wanted_card.card_version.extension.name %>
-              <% end %>
+            <% if user_wanted_card.card_version&.extension&.icon_uri.present? %>
+              <%= image_tag user_wanted_card.card_version.extension.icon_uri, 
+                          alt: user_wanted_card.card_version.extension.name,
+                          class: "w-6 h-6",
+                          title: user_wanted_card.card_version.extension.name %>
             <% end %>
 
-            <%# Language badge - Style plus concis %>
-            <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">
-              <%= user_wanted_card.language == 'any' ? '🌐' : user_wanted_card.language.upcase %>
+            <%# Rarity indicator %>
+            <span class="inline-block w-4 h-4 rounded-full <%= rarity_color(user_wanted_card.card_version&.rarity) %>"
+                  title="<%= rarity_label(user_wanted_card.card_version&.rarity) %>">
             </span>
 
-            <%# État minimum - Style plus concis %>
+            <%# Language badge %>
             <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">
-              <%= user_wanted_card.min_condition == 'unimportant' ? 'ANY' : user_wanted_card.min_condition.humanize %>
+              <%= user_wanted_card.language == 'any' ? '🌐' : language_label(user_wanted_card.language) %>
             </span>
           </div>
 
           <div class="flex items-center justify-between mt-3">
             <%# Prix %>
-            <% if user_wanted_card.card_version.present? %>
-              <span class="text-lg font-bold text-gray-900">
-                <% price = user_wanted_card.foil ? user_wanted_card.card_version.eur_foil_price : user_wanted_card.card_version.eur_price %>
-                <%= number_to_currency(price, unit: "€", format: "%n %u") %>
-              </span>
-            <% end %>
+            <span class="text-lg font-bold text-gray-900">
+              <% price = user_wanted_card.foil ? user_wanted_card.card_version&.eur_foil_price : user_wanted_card.card_version&.eur_price %>
+              <%= number_to_currency(price, unit: "€", format: "%n %u") %>
+            </span>
 
-            <%# Actions - Gardées identiques %>
+            <%# Actions %>
             <div class="flex items-center gap-2">
               <%= link_to edit_user_user_wanted_card_path(user_wanted_card.user, user_wanted_card),
                           class: "p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full transition-colors",
@@ -55,3 +150,7 @@
             </div>
           </div>
         </div>
+      </div>
+    <% end %>
+  </div>
+</div>

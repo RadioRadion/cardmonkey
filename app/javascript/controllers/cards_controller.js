@@ -35,12 +35,15 @@ export default class extends Controller {
 
   applyFilters() {
     this.cardTargets.forEach(card => {
-      const cardName = card.dataset.cardName.toLowerCase()
+      const cardNameEn = card.dataset.cardNameEn.toLowerCase()
+      const cardNameFr = card.dataset.cardNameFr.toLowerCase()
       const cardLanguage = card.dataset.language
       const cardCondition = card.dataset.condition
       const isFoil = card.dataset.foil === 'true'
 
-      const matchesSearch = !this.filters.search || cardName.includes(this.filters.search)
+      const matchesSearch = !this.filters.search || 
+                          cardNameEn.includes(this.filters.search) || 
+                          cardNameFr.includes(this.filters.search)
       const matchesLanguage = !this.filters.language || cardLanguage === this.filters.language
       const matchesCondition = !this.filters.condition || cardCondition === this.filters.condition
       const matchesFoil = !this.filters.foilOnly || isFoil

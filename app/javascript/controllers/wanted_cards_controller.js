@@ -42,13 +42,16 @@ export default class extends Controller {
 
   applyFilters() {
     this.cardTargets.forEach(card => {
-      const cardName = card.dataset.cardName.toLowerCase()
+      const cardNameEn = card.dataset.cardNameEn.toLowerCase()
+      const cardNameFr = card.dataset.cardNameFr.toLowerCase()
       const cardLanguage = card.dataset.language
       const cardMinCondition = card.dataset.minCondition
       const isFoil = card.dataset.foil === 'true'
       const matchesCount = parseInt(card.dataset.matchesCount) || 0
 
-      const matchesSearch = !this.filters.search || cardName.includes(this.filters.search)
+      const matchesSearch = !this.filters.search || 
+                          cardNameEn.includes(this.filters.search) || 
+                          cardNameFr.includes(this.filters.search)
       const matchesLanguage = !this.filters.language || cardLanguage === this.filters.language || cardLanguage === 'any'
       const matchesMinCondition = !this.filters.minCondition || cardMinCondition === this.filters.minCondition
       const matchesFoil = !this.filters.foilOnly || isFoil
