@@ -34,52 +34,68 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <%# Quick Actions & Notifications Panel %>
       <div class="lg:col-span-1">
-        <%# Top Matches %>
+        <%# Opportunités d'échange %>
         <div class="bg-white rounded-2xl shadow-sm p-6 mb-8">
-          <h2 class="text-xl font-semibold mb-6 text-gray-900">Meilleures opportunités d'échange</h2>
+          <h2 class="text-xl font-semibold mb-6 text-gray-900">Opportunités d'échange</h2>
           <div class="space-y-4">
-            <% if @matches&.any? %>
-              <% @matches.first(3).each do |match| %>
-                <%= link_to matches_path(user_id: match.user_id_target), class: "block" do %>
-                  <div class="group p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl hover:from-indigo-100 hover:to-purple-100 transition-all duration-200">
-                    <div class="flex items-center gap-4">
-                      <%# User Avatar %>
-                      <div class="w-12 h-12 rounded-full bg-white shadow-sm flex-shrink-0 overflow-hidden">
-                        <%= render "users/avatar", user: User.find(match.user_id_target), size: "small" %>
+            <% if !current_user.user_wanted_cards.any? %>
+              <div class="text-center py-6">
+                <div class="mx-auto h-12 w-12 text-gray-400 mb-4">
+                  <i class="fas fa-search text-2xl"></i>
+                </div>
+                <p class="text-sm text-gray-500 mb-4">Ajoutez des cartes à votre liste de recherche pour voir les opportunités d'échange</p>
+                <%= link_to new_user_user_wanted_card_path(current_user), 
+                          class: "inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors",
+                          data: { turbo: false } do %>
+                  <i class="fas fa-plus-circle mr-2"></i>
+                  Ajouter des cartes recherchées
+                <% end %>
+              </div>
+            <% elsif @potential_matches.empty? %>
+              <div class="text-center py-6">
+                <div class="mx-auto h-12 w-12 text-gray-400 mb-4">
+                  <i class="fas fa-exclamation-circle text-2xl"></i>
+                </div>
+                <p class="text-sm text-gray-500 mb-2">Pas de match pour le moment</p>
+                <p class="text-sm text-gray-500">Pensez à enrichir votre collection pour augmenter vos chances de trouver des correspondances !</p>
+                <%= link_to new_user_user_card_path(current_user), 
+                          class: "mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors",
+                          data: { turbo: false } do %>
+                  <i class="fas fa-plus-circle mr-2"></i>
+                  Ajouter des cartes à échanger
+                <% end %>
+              </div>
+            <% else %>
+              <div class="space-y-4">
+                <% @potential_matches.first(3).each do |match| %>
+                  <div class="flex items-center justify-between py-3 border-b border-gray-200 last:border-0">
+                    <div class="flex items-center space-x-3">
+                      <div class="flex-shrink-0">
+                        <% if match.user_card.card_version.img_uri %>
+                          <%= image_tag match.user_card.card_version.img_uri, 
+                              class: "h-10 w-10 rounded-lg object-cover",
+                              loading: "lazy" %>
+                        <% end %>
                       </div>
-                      
-                      <div class="flex-grow">
-                        <%# User Info %>
-                        <div class="flex items-center justify-between mb-1">
-                          <h3 class="font-medium text-gray-900">
-                            <%= User.find(match.user_id_target).username %>
-                          </h3>
-                          <span class="text-sm text-gray-500">
-                            <%= match.user.distance_to(User.find(match.user_id_target)).round %> km
-                          </span>
-                        </div>
-                        
-                        <%# Match Stats %>
-                        <div class="text-sm text-gray-600">
-                          <span class="text-indigo-600 font-medium"><%= match.user_wanted_card.card.name %></span>
-                          et <%= pluralize(Match.where(user_id: current_user.id, user_id_target: match.user_id_target).count - 1, 'autre carte') %>
-                        </div>
-                      </div>
-
-                      <%# Arrow Icon %>
-                      <div class="text-indigo-600 transform group-hover:translate-x-1 transition-transform duration-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
+                      <div>
+                        <p class="text-sm font-medium text-gray-900"><%= match.user_card.card_version.card.name_fr %></p>
+                        <%= link_to user_path(match.user_card.user), class: "text-xs text-gray-500 hover:text-blue-600" do %>
+                          Possédée par <%= match.user_card.user.username %>
+                        <% end %>
                       </div>
                     </div>
+                    <%= link_to new_proposition_trade_path(match.user_card.user, partner_id: match.user_card.user.id), 
+                              class: "text-sm text-blue-600 hover:text-blue-800",
+                              data: { turbo: false } do %>
+                      <i class="fas fa-exchange-alt mr-1"></i>
+                      Proposer un échange
+                    <% end %>
                   </div>
                 <% end %>
-              <% end %>
-            <% else %>
-              <div class="text-center py-6 bg-gray-50 rounded-xl">
-                <p class="text-gray-600 mb-4">Aucun match pour le moment</p>
-                <p class="text-sm text-gray-500">Ajoutez plus de cartes à votre collection et votre liste de souhaits pour trouver des opportunités d'échange</p>
+                <%= link_to trades_path, class: "block text-center text-sm text-blue-600 hover:text-blue-800 mt-4" do %>
+                  Voir toutes les opportunités
+                  <i class="fas fa-arrow-right ml-1"></i>
+                <% end %>
               </div>
             <% end %>
           </div>

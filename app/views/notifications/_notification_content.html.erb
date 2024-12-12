@@ -1,0 +1,18 @@
+<div class="flex items-start">
+  <div class="flex-1 min-w-0">
+    <p class="text-sm text-gray-900 <%= 'group-hover:text-blue-600' if notification.clickable? %>">
+      <%= notification.content %>
+    </p>
+    <p class="text-xs text-gray-500 mt-1">
+      <%= time_ago_in_words(notification.created_at) %> ago
+    </p>
+  </div>
+  <% if notification.unread? %>
+    <%= button_to mark_as_read_notification_path(notification), 
+        method: :patch,
+        class: "ml-2 text-gray-400 hover:text-gray-500",
+        data: { turbo_stream: true } do %>
+      <i class="fas fa-check text-xs"></i>
+    <% end %>
+  <% end %>
+</div>
