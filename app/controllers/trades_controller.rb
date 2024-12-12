@@ -8,7 +8,9 @@ class TradesController < ApplicationController
       .includes(:user_cards, :trade_user_cards, user_cards: { card_version: [:card, :extension] })
       .group_by(&:status)
 
-    @matches = current_user.matches
+    # Load matches in both directions - where current user has cards others want
+    # and where current user wants cards others have
+    @matches = Match.where("user_id = :user_id OR user_id_target = :user_id", user_id: current_user.id)
       .includes(
         user_card: { card_version: [:card, :extension], user: {} },
         user_wanted_card: { card_version: [:card, :extension] }

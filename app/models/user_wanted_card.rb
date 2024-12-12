@@ -57,30 +57,29 @@ class UserWantedCard < ApplicationRecord
   end
 
   def img_uri
-    # If a specific card version is selected, use its image
     return card_version.img_uri if card_version.present?
-    # Otherwise, use the image from any version of the card
     card.card_versions.first&.img_uri
+  end
+
+  # Public method to regenerate matches
+  def regenerate_matches
+    update_matches
   end
 
   private
 
   def notify_trade_partners
-    # Trouve tous les trades actifs où cette carte est potentiellement impliquée
     matching_cards = UserCard.joins(card_version: :card)
                            .where(cards: { id: card_id })
                            .where(language: language == 'any' ? UserCard.languages.keys : language)
     
     return if matching_cards.empty?
 
-    # Pour chaque carte correspondante, vérifie si elle est dans un trade actif
     matching_cards.each do |matching_card|
       matching_card.trades.active.each do |trade|
-        # Si le trade est avec l'utilisateur qui possède la carte
         next if trade.user_id == matching_card.user_id && trade.user_id_invit != user_id
         next if trade.user_id_invit == matching_card.user_id && trade.user_id != user_id
 
-        # Notifie le propriétaire de la carte que la carte n'est plus recherchée
         notification_message = I18n.t('notifications.trade.wanted_card_removed',
                                     card_name: card.name,
                                     username: user.username)
@@ -88,10 +87,7 @@ class UserWantedCard < ApplicationRecord
                              card_name: card.name,
                              username: user.username)
 
-        # Crée la notification
         Notification.create_notification(matching_card.user_id, notification_message)
-
-        # Ajoute un message dans le chat de l'échange
         Trade.save_message(user.id, matching_card.user_id, chat_message)
       end
     end
@@ -123,23 +119,11 @@ class UserWantedCard < ApplicationRecord
       .where.not(user_id: user_id)
       .where(cards: { id: card_id })
 
-    base_query = apply_language_condition(base_query)
-    apply_condition_requirement(base_query)
-  end
-
-  def apply_language_condition(query)
-    return query if language == 'any'
-    query.where(language: language)
-  end
-
-  def apply_condition_requirement(query)
-    return query if min_condition == 'unimportant'
-    
-    condition_index = CONDITION_ORDER.index(min_condition)
-    return query if condition_index.nil?
-    
-    valid_conditions = CONDITION_ORDER[condition_index..]
-    query.where(condition: valid_conditions)
+    if language == 'any'
+      base_query
+    else
+      base_query.where(language: language)
+    end
   end
 
   def build_matches(potential_matches)

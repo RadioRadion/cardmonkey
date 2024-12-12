@@ -40,26 +40,25 @@ class UserCard < ApplicationRecord
   after_update :update_matches, if: :relevant_attributes_changed?
   before_destroy :notify_trade_partners
 
+  # Public method to regenerate matches
+  def regenerate_matches
+    update_matches
+  end
+
   private
 
   def notify_trade_partners
-    # Récupère tous les trades actifs où cette carte est utilisée
     affected_trades = trades.active
 
     affected_trades.each do |trade|
-      # Notifie le partenaire de l'échange
       partner = trade.partner_for(user)
-      next unless partner # Skip si le partenaire n'existe plus
+      next unless partner
 
-      # Crée une notification pour informer de la suppression de la carte
       card_name = card_version.card.name
       notification_message = I18n.t('notifications.trade.card_removed', card_name: card_name)
       chat_message = I18n.t('notifications.trade.card_removed_chat', card_name: card_name)
       
-      # Crée la notification
       Notification.create_notification(partner.id, notification_message)
-      
-      # Ajoute un message dans le chat de l'échange
       Trade.save_message(user.id, partner.id, chat_message)
     end
   end
@@ -88,7 +87,7 @@ class UserCard < ApplicationRecord
       .joins(:card)
       .where.not(user_id: user_id)
       .where(card_id: card_version.card_id)
-      .where("user_wanted_cards.language = ? OR user_wanted_cards.language IS NULL", language)
+      .where("user_wanted_cards.language = 'any' OR user_wanted_cards.language = ?", language)
       .where("? >= COALESCE(user_wanted_cards.min_condition, 'poor')", condition)
       .select(:id, :user_id)
   end
