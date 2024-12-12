@@ -71,46 +71,4 @@ export default class extends Controller {
       // Show error notification
     }
   }
-
-  async toggleReaction(event) {
-    const emoji = event.currentTarget.dataset.emoji
-    
-    try {
-      const response = await fetch(`/messages/${this.messageId}/toggle_reaction`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content,
-        },
-        body: JSON.stringify({ emoji })
-      })
-
-      if (!response.ok) throw new Error('Failed to toggle reaction')
-      
-      // The server will broadcast the reaction update through ActionCable
-    } catch (error) {
-      console.error('Error toggling reaction:', error)
-      // Show error notification
-    }
-  }
-
-  toggleReactions() {
-    // Implementation for emoji picker
-    // You might want to use a library like emoji-mart
-    console.log('Toggle reactions picker')
-  }
-
-  reply() {
-    const messageInput = document.querySelector('#message_content')
-    if (!messageInput) return
-
-    const username = this.element.querySelector('.text-gray-500')?.textContent.trim()
-    const content = this.contentTarget.textContent.trim()
-    
-    messageInput.value = `@${username} `
-    messageInput.focus()
-
-    // Optionally scroll the message into view
-    this.element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }
 }

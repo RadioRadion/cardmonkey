@@ -1,11 +1,7 @@
 class Message < ApplicationRecord
   belongs_to :chatroom
   belongs_to :user
-  belongs_to :parent, class_name: 'Message', optional: true
-  has_many :replies, class_name: 'Message', foreign_key: 'parent_id', dependent: :nullify
-  has_many :reactions, class_name: 'MessageReaction', dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
-  
   has_many_attached :attachments
 
   validates :content, presence: true, unless: -> { has_attachments? || trade_message? }
@@ -14,7 +10,7 @@ class Message < ApplicationRecord
 
   scope :ordered, -> { order(created_at: :asc) }
   scope :recent_first, -> { order(created_at: :desc) }
-  scope :with_includes, -> { includes(:user, :reactions, attachments_attachments: :blob) }
+  scope :with_includes, -> { includes(:user, attachments_attachments: :blob) }
   scope :unread, -> { where(read_at: nil) }
   scope :unread_for, ->(user) { where(read_at: nil).where.not(user: user) }
 

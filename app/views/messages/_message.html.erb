@@ -125,20 +125,6 @@
       <!-- Message Actions -->
       <div class="absolute <%= is_own_message ? 'left-0 -translate-x-full' : 'right-0 translate-x-full' %> 
                   top-0 hidden group-hover:flex items-center space-x-2 px-2">
-        <!-- Reactions Button -->
-        <button class="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                data-action="click->message#toggleReactions"
-                title="Add reaction">
-          <i class="far fa-smile text-gray-500"></i>
-        </button>
-        
-        <!-- Reply Button -->
-        <button class="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                data-action="click->message#reply"
-                title="Reply">
-          <i class="far fa-reply text-gray-500"></i>
-        </button>
-        
         <% if is_own_message && !message.trade_message? %>
           <!-- Edit Button -->
           <button class="p-1 hover:bg-gray-100 rounded-full transition-colors"
@@ -159,19 +145,6 @@
                       form: { class: "inline-block" } do %>
             <i class="far fa-trash-alt text-gray-500"></i>
           <% end %>
-        <% end %>
-      </div>
-
-      <!-- Reactions Display -->
-      <div class="reactions mt-1 flex flex-wrap gap-1">
-        <% message.reactions.group(:emoji).count.each do |emoji, count| %>
-          <button class="inline-flex items-center space-x-1 bg-gray-100 hover:bg-gray-200 
-                         rounded-full px-2 py-0.5 text-sm transition-colors"
-                  data-action="click->message#toggleReaction"
-                  data-emoji="<%= emoji %>">
-            <span><%= emoji %></span>
-            <span class="text-gray-500"><%= count %></span>
-          </button>
         <% end %>
       </div>
     </div>
