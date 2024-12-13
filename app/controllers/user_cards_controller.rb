@@ -6,7 +6,8 @@ class UserCardsController < ApplicationController
   def index
     @user_cards = @user.user_cards
                       .includes(card_version: [:card, :extension])
-                      .order('cards.name_en')
+                      .order('card_versions.eur_price DESC NULLS LAST')
+                      .limit(15)  # 5 colonnes * 3 rangées
   end
 
   def new
