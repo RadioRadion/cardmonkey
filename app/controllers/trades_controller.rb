@@ -235,7 +235,11 @@ class TradesController < ApplicationController
   end
 
   def notify_trade_creation
-    Notification.create_notification(@trade.user_id_invit, "Nouveau trade proposé !")
+    Notification.create_notification(
+      @trade.user_id_invit,
+      "Nouveau trade #{@trade.id} proposé !",
+      'trade'
+    )
     chatroom = Trade.find_or_create_chatroom(current_user.id, @trade.user_id_invit)
     Message.create!(
       content: "#{current_user.username} a proposé un échange",
@@ -249,7 +253,7 @@ class TradesController < ApplicationController
     @trade.update!(status: :accepted)
     notify_trade_status_change(
       "Trade accepté ! Discutez-ici pour vous donner rendez-vous.",
-      "Trade accepté !"
+      "Trade #{@trade.id} accepté !"
     )
   end
 
@@ -257,7 +261,7 @@ class TradesController < ApplicationController
     @trade.update!(status: :done)
     notify_trade_status_change(
       "Trade terminé, bon jeu !",
-      "Trade réalisé !"
+      "Trade #{@trade.id} réalisé !"
     )
   end
 
@@ -268,7 +272,7 @@ class TradesController < ApplicationController
       @trade.update!(status: :modified, last_modifier_id: current_user.id)
       notify_trade_status_change(
         "Une modification a été proposée pour le trade #{@trade.id}",
-        "Modification proposée !"
+        "Modification proposée pour le trade #{@trade.id} !"
       )
     end
   end
@@ -289,7 +293,11 @@ class TradesController < ApplicationController
       chatroom_id: chatroom.id,
       metadata: { type: 'trade', trade_id: @trade.id }
     )
-    Notification.create_notification(other_user.id, "La modification du trade a été validée !")
+    Notification.create_notification(
+      other_user.id,
+      "La modification du trade #{@trade.id} a été validée !",
+      'trade'
+    )
   end
 
   def notify_trade_status_change(message, notification_text)
@@ -301,6 +309,6 @@ class TradesController < ApplicationController
       chatroom_id: chatroom.id,
       metadata: { type: 'trade', trade_id: @trade.id }
     )
-    Notification.create_notification(other_user.id, notification_text)
+    Notification.create_notification(other_user.id, notification_text, 'trade')
   end
 end

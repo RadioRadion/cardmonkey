@@ -1,7 +1,13 @@
 <div id="<%= dom_id(notification) %>" 
      class="p-4 hover:bg-gray-50 <%= notification.unread? ? 'bg-blue-50' : '' %> <%= notification.clickable? ? 'cursor-pointer group' : '' %>">
   <% if notification.clickable? %>
-    <%= link_to notification.resource_path, class: "block" do %>
+    <%= link_to notification.resource_path,
+        class: "block",
+        data: { 
+          turbo_method: :patch,
+          turbo_frame: dom_id(notification),
+          action: notification.unread? ? "click->notifications#markAsRead" : nil
+        } do %>
       <%= render "notifications/notification_content", notification: notification %>
     <% end %>
   <% else %>
