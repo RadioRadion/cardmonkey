@@ -1,11 +1,11 @@
 <div class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 flex flex-col justify-center">
   <div class="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12">
+    <div class="text-center mb-12 mt-12">
       <h2 class="text-4xl font-extrabold text-gray-900 tracking-tight">
-        Create your account
+        <%= t('devise.registrations.new.title') %>
       </h2>
       <p class="mt-3 text-lg text-gray-500">
-        Join us to start trading cards
+        <%= t('devise.registrations.new.subtitle') %>
       </p>
     </div>
 
@@ -28,7 +28,7 @@
 
             <%= f.input :password,
                         required: true,
-                        hint: ("#{@minimum_password_length} characters minimum" if @minimum_password_length),
+                        hint: t('simple_form.hints.user.password', minimum_password_length: @minimum_password_length),
                         input_html: { 
                           class: "block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm",
                           autocomplete: "new-password",
@@ -49,7 +49,7 @@
                         label_html: { class: "block text-sm font-medium text-gray-700 mb-2" } %>
 
             <div>
-              <%= f.button :submit, "Sign up", class: "w-full flex justify-center py-4 px-6 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+              <%= f.button :submit, t('devise.registrations.new.sign_up'), class: "w-full flex justify-center py-4 px-6 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
             </div>
           </div>
         <% end %>
@@ -60,12 +60,12 @@
               <div class="w-full border-t border-gray-200"></div>
             </div>
             <div class="relative flex justify-center text-sm">
-              <span class="px-4 bg-white text-gray-500">Already have an account?</span>
+              <span class="px-4 bg-white text-gray-500"><%= t('devise.registrations.new.already_have_account') %></span>
             </div>
           </div>
 
           <div class="mt-6 grid grid-cols-1 gap-4">
-            <%= link_to "Sign in", new_session_path(resource_name), 
+            <%= link_to t('devise.shared.links.sign_in'), new_session_path(resource_name), 
                 class: "w-full inline-flex justify-center py-4 px-6 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
 
             <%- if devise_mapping.omniauthable? %>
@@ -77,9 +77,9 @@
                     <svg class="w-5 h-5 mr-2 text-gray-700" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
                     </svg>
-                    <span>Sign up with Google</span>
+                    <span><%= t('devise.registrations.new.sign_up_with_google') %></span>
                   <% else %>
-                    <span>Sign up with <%= OmniAuth::Utils.camelize(provider) %></span>
+                    <span><%= t('.sign_up_with', provider: OmniAuth::Utils.camelize(provider)) %></span>
                   <% end %>
                 <% end %>
               <% end %>
