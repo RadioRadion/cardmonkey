@@ -61,7 +61,7 @@ class TradesController < ApplicationController
   end
 
   def update
-    case params[:status]
+    result = case params[:status]
     when "accepted"
       handle_trade_acceptance
     when "done"
@@ -74,9 +74,12 @@ class TradesController < ApplicationController
       handle_trade_modification
     end
 
-    respond_to do |format|
-      format.html { redirect_to trade_path(@trade) }
-      format.json { head :ok }
+    # Si la méthode a retourné false, c'est qu'elle a déjà fait un redirect
+    unless result == false
+      respond_to do |format|
+        format.html { redirect_to trade_path(@trade) }
+        format.json { head :ok }
+      end
     end
   end
 
@@ -228,17 +231,25 @@ class TradesController < ApplicationController
     offer_cards = params.dig(:trade, :offer).to_s.split(",").reject(&:blank?)
     target_cards = params.dig(:trade, :target).to_s.split(",").reject(&:blank?)
     
+    Rails.logger.info "Processing trade cards for trade ##{@trade.id}"
+    Rails.logger.info "Offer cards: #{offer_cards.inspect}"
+    Rails.logger.info "Target cards: #{target_cards.inspect}"
+    
+    @trade.trade_user_cards.destroy_all
+    
     (offer_cards + target_cards).each do |card_id|
       next if card_id.blank?
       @trade.trade_user_cards.create!(user_card_id: card_id.to_i)
     end
+
+    Rails.logger.info "After processing, trade has #{@trade.trade_user_cards.count} cards"
   end
 
   def notify_trade_creation
-    Notification.create_notification(
+    Notification.create_trade_notification(
       @trade.user_id_invit,
-      "Nouveau trade #{@trade.id} proposé !",
-      'trade'
+      @trade.id,
+      I18n.t('notifications.trade.new_trade', id: @trade.id)
     )
     chatroom = Trade.find_or_create_chatroom(current_user.id, @trade.user_id_invit)
     Message.create!(
@@ -250,38 +261,68 @@ class TradesController < ApplicationController
   end
 
   def handle_trade_acceptance
-    @trade.update!(status: :accepted)
-    notify_trade_status_change(
-      "Trade accepté ! Discutez-ici pour vous donner rendez-vous.",
-      "Trade #{@trade.id} accepté !"
-    )
+    unless @trade.can_be_accepted_by?(current_user)
+      redirect_to trade_path(@trade), alert: "Vous ne pouvez pas accepter ce trade."
+      return false
+    end
+
+    Trade.transaction do
+      @trade.update!(status: :accepted)
+      notify_trade_status_change(
+        "Trade accepté ! Discutez-ici pour vous donner rendez-vous.",
+        I18n.t('notifications.trade.trade_accepted', id: @trade.id)
+      )
+    end
+    true
   end
 
   def handle_trade_completion
+    unless @trade.accepted?
+      redirect_to trade_path(@trade), alert: "Seul un trade accepté peut être marqué comme terminé."
+      return false
+    end
+
     @trade.update!(status: :done)
     notify_trade_status_change(
       "Trade terminé, bon jeu !",
-      "Trade #{@trade.id} réalisé !"
+      I18n.t('notifications.trade.trade_completed', id: @trade.id)
     )
+    true
   end
 
   def handle_trade_modification
+    unless @trade.can_be_modified_by?(current_user)
+      redirect_to trade_path(@trade), alert: "Vous ne pouvez pas modifier ce trade."
+      return false
+    end
+
+    Rails.logger.info "Starting trade modification for trade ##{@trade.id}"
+    Rails.logger.info "Current user: #{current_user.id}"
+    Rails.logger.info "Params: #{params.inspect}"
+
     Trade.transaction do
-      @trade.trade_user_cards.destroy_all
       process_trade_cards
       @trade.update!(status: :modified, last_modifier_id: current_user.id)
       notify_trade_status_change(
         "Une modification a été proposée pour le trade #{@trade.id}",
-        "Modification proposée pour le trade #{@trade.id} !"
+        I18n.t('notifications.trade.trade_modified', id: @trade.id)
       )
     end
+
+    Rails.logger.info "Trade modification completed for trade ##{@trade.id}"
+    Rails.logger.info "New card count: #{@trade.trade_user_cards.count}"
+    true
   end
 
   def handle_trade_validation
-    if @trade.can_be_validated?(current_user)
-      @trade.update!(status: :accepted)
-      notify_trade_validation
+    unless @trade.can_be_validated?(current_user)
+      redirect_to trade_path(@trade), alert: "Vous ne pouvez pas valider ce trade."
+      return false
     end
+
+    @trade.update!(status: :accepted)
+    notify_trade_validation
+    true
   end
 
   def notify_trade_validation
@@ -293,10 +334,10 @@ class TradesController < ApplicationController
       chatroom_id: chatroom.id,
       metadata: { type: 'trade', trade_id: @trade.id }
     )
-    Notification.create_notification(
+    Notification.create_trade_notification(
       other_user.id,
-      "La modification du trade #{@trade.id} a été validée !",
-      'trade'
+      @trade.id,
+      I18n.t('notifications.trade.trade_validated', id: @trade.id)
     )
   end
 
@@ -309,6 +350,6 @@ class TradesController < ApplicationController
       chatroom_id: chatroom.id,
       metadata: { type: 'trade', trade_id: @trade.id }
     )
-    Notification.create_notification(other_user.id, notification_text, 'trade')
+    Notification.create_trade_notification(other_user.id, @trade.id, notification_text)
   end
 end

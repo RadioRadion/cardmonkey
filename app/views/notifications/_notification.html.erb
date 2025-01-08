@@ -4,9 +4,8 @@
     <%= link_to notification.resource_path,
         class: "block",
         data: { 
-          turbo_method: :patch,
-          turbo_frame: dom_id(notification),
-          action: notification.unread? ? "click->notifications#markAsRead" : nil
+          notification_id: notification.id,
+          action: notification.unread? ? "click->notifications#markAsReadAndNavigate" : nil
         } do %>
       <%= render "notifications/notification_content", notification: notification %>
     <% end %>

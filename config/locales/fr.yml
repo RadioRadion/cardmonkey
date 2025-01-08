@@ -22,6 +22,11 @@ fr:
     notification:
       mark_as_read: "Marquer comme lu"
     trade:
+      new_trade: "Nouveau trade %{id} proposé !"
+      trade_accepted: "Trade %{id} accepté !"
+      trade_completed: "Trade %{id} réalisé !"
+      trade_modified: "Modification proposée pour le trade %{id} !"
+      trade_validated: "La modification du trade %{id} a été validée !"
       card_removed: "La carte %{card_name} a été retirée d'un échange en cours"
       card_removed_chat: "La carte %{card_name} a été retirée de l'échange"
       wanted_card_removed: "La carte %{card_name} a été retirée de la liste de souhaits de %{username}"

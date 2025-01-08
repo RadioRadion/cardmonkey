@@ -107,35 +107,35 @@
 
         <%# Boutons d'action %>
         <div class="flex gap-4 items-center">
-          <% if @trade.pending? || @trade.modified? %>
-            <% if @trade.can_be_modified_by?(current_user) %>
-              <%= link_to "Modifier", 
-                        edit_trade_path(@trade),
-                        class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50",
-                        data: { turbo: false } %>
-            <% end %>
-
-            <% if @trade.can_be_validated?(current_user) %>
+          <div class="flex gap-4">
+            <% if @trade.modified? && @trade.can_be_validated?(current_user) %>
               <%= button_to "Valider la modification",
                         validate_trade_path(@trade),
                         method: :patch,
                         class: "px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg" %>
-            <% end %>
-
-            <% if @trade.can_be_accepted_by?(current_user) %>
-              <%= button_to "Accepter",
+            <% elsif @trade.accepted? %>
+              <%= button_to "Marquer comme terminé",
                         trade_path(@trade),
                         method: :patch,
-                        params: { trade: { status: "accepted" } },
-                        class: "px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg" %>
+                        params: { trade: { status: "done" } },
+                        class: "px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg" %>
+            <% else %>
+              <% if (@trade.pending? || @trade.modified?) && @trade.can_be_modified_by?(current_user) %>
+                <%= link_to "Modifier", 
+                          edit_trade_path(@trade),
+                          class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50",
+                          data: { turbo: false } %>
+              <% end %>
+
+              <% if @trade.pending? && @trade.can_be_accepted_by?(current_user) %>
+                <%= button_to "Accepter",
+                          trade_path(@trade),
+                          method: :patch,
+                          params: { trade: { status: "accepted" } },
+                          class: "px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg" %>
+              <% end %>
             <% end %>
-          <% elsif @trade.accepted? %>
-            <%= button_to "Marquer comme terminé",
-                      trade_path(@trade),
-                      method: :patch,
-                      params: { trade: { status: "done" } },
-                      class: "px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg" %>
-          <% end %>
+          </div>
           
           <%= link_to "Retour", 
                     trades_path,

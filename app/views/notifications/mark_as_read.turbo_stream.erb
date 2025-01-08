@@ -2,12 +2,14 @@
   <%= render 'notifications/notification', notification: @notification %>
 <% end %>
 
-<% if current_user.notifications.unread.empty? %>
-  <%= turbo_stream.update 'notifications_count', '' %>
-<% else %>
-  <%= turbo_stream.update 'notifications_count' do %>
+<%= turbo_stream.update 'notifications_count' do %>
+  <% if current_user.notifications.unread.any? %>
     <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
       <%= current_user.notifications.unread.count %>
     </span>
   <% end %>
+<% end %>
+
+<%= turbo_stream.update 'notifications' do %>
+  <%= render "notifications/notifications", notifications: current_user.notifications.recent %>
 <% end %>

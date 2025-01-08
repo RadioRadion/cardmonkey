@@ -25,16 +25,26 @@ class Notification < ApplicationRecord
   after_update_commit -> { broadcast_update }
 
   # Class methods
-  def self.create_notification(recipient_id, message, type = nil)
+  def self.create_notification(recipient_id, message, type = nil, resource_id = nil)
     create!(
       user_id: recipient_id,
       content: message,
       status: :unread,
-      notification_type: type
+      notification_type: type,
+      resource_id: resource_id
     )
   rescue ActiveRecord::RecordInvalid => e
     Rails.logger.error("Failed to create notification: #{e.message}")
     nil
+  end
+
+  def self.create_trade_notification(recipient_id, trade_id, message)
+    create_notification(
+      recipient_id,
+      message,
+      'trade',
+      trade_id
+    )
   end
 
   def self.mark_all_as_read(user_id)
@@ -69,47 +79,23 @@ class Notification < ApplicationRecord
   end
 
   def resource_path
-    if trade_related?
-      "/trades/#{trade_id}"
-    elsif message_related?
-      "/chatrooms/#{chatroom_id}"
-    elsif card_match_related?
-      matched_card_path
+    case notification_type
+    when 'trade'
+      "/trades/#{resource_id}"
+    when 'message'
+      "/chatrooms/#{resource_id}"
+    when 'match'
+      if content.match?(/wanted card/i)
+        "/user_wanted_cards"
+      else
+        "/user_cards"
+      end
     else
       nil
     end
   end
 
   private
-
-  def trade_related?
-    content.match?(/trade/i) && trade_id.present?
-  end
-
-  def message_related?
-    content.match?(/message/i) && chatroom_id.present?
-  end
-
-  def card_match_related?
-    content.match?(/match/i)
-  end
-
-  def trade_id
-    content.scan(/trade.*?(\d+)/i).flatten.first ||
-    content.scan(/\d+/).first
-  end
-
-  def chatroom_id
-    content.scan(/chatroom.*?(\d+)/i).flatten.first
-  end
-
-  def matched_card_path
-    if content.match?(/wanted card/i)
-      "/user_wanted_cards"
-    else
-      "/user_cards"
-    end
-  end
 
   def broadcast_notification
     broadcast_append_to(

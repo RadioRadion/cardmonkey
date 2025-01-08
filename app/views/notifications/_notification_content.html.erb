@@ -4,7 +4,7 @@
       <%= notification.content %>
     </p>
     <p class="text-xs text-gray-500 mt-1">
-      <%= time_ago_in_words(notification.created_at) %> ago
+      <%= time_ago_in_words(notification.created_at) %>
     </p>
   </div>
   <% if notification.unread? %>

@@ -31,6 +31,7 @@ class Trade < ApplicationRecord
   end
 
   def can_be_modified_by?(current_user)
+    return false if accepted? || done? || cancelled?
     return false unless pending? || modified?
     [user_id, user_id_invit].include?(current_user.id)
   end
