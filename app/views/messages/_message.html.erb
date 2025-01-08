@@ -46,7 +46,7 @@
 
     <!-- Message Content -->
     <div class="relative group">
-      <div class="<%= is_own_message ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-900' %> 
+      <div class="<%= is_own_message ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' : 'bg-gray-100 text-gray-900' %> 
                   rounded-lg px-4 py-2 break-words relative">
         
         <!-- Trade Message -->
@@ -54,7 +54,7 @@
           <div class="flex flex-col space-y-2">
             <div class="font-medium"><%= message.display_content %></div>
             <%= link_to "Voir le trade", trade_path(message.trade_id), 
-                class: "#{is_own_message ? 'bg-white text-blue-500' : 'bg-blue-500 text-white'} 
+                class: "#{is_own_message ? 'bg-white text-indigo-600' : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'} 
                        px-4 py-2 rounded-lg inline-block hover:opacity-90 transition-opacity text-center" %>
           </div>
         
@@ -72,9 +72,9 @@
                           class: "flex items-center space-x-2",
                           data: { action: "submit->message#update" }) do |f| %>
                 <%= f.text_field :content, 
-                               class: "flex-1 rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500",
+                               class: "flex-1 rounded border-gray-300 focus:border-purple-500 focus:ring-purple-500",
                                data: { message_target: "input" } %>
-                <button type="submit" class="text-sm text-blue-500 hover:text-blue-600">Save</button>
+                <button type="submit" class="text-sm text-indigo-600 hover:text-purple-600">Save</button>
                 <button type="button" 
                         class="text-sm text-gray-500 hover:text-gray-600"
                         data-action="click->message#cancelEdit">
@@ -92,7 +92,7 @@
                   <%= image_tag attachment, class: "max-w-full rounded-lg" %>
                 <% else %>
                   <%= link_to attachment.filename, rails_blob_path(attachment, disposition: "attachment"),
-                      class: "flex items-center space-x-2 text-sm #{is_own_message ? 'text-blue-100' : 'text-blue-500'} hover:underline" %>
+                      class: "flex items-center space-x-2 text-sm #{is_own_message ? 'text-indigo-100' : 'text-indigo-600'} hover:underline" %>
                 <% end %>
               <% end %>
             </div>
@@ -101,16 +101,16 @@
 
         <!-- Message Info -->
         <div class="flex items-center justify-between mt-1">
-          <div class="text-xs <%= is_own_message ? 'text-blue-100' : 'text-gray-500' %>">
+          <div class="text-xs <%= is_own_message ? 'text-indigo-100' : 'text-gray-500' %>">
             <%= message.timestamp %>
           </div>
           
           <% if is_own_message %>
             <div class="flex items-center space-x-1">
               <% if message.edited? %>
-                <span class="text-xs text-blue-100">(edited)</span>
+                <span class="text-xs text-indigo-100">(edited)</span>
               <% end %>
-              <span class="text-blue-100">
+              <span class="text-indigo-100">
                 <i class="fas fa-check<%= message.delivered? ? '-double' : '' %>" 
                    title="<%= message.delivered? ? 'Delivered' : 'Sent' %>"></i>
                 <% if message.read_at %>

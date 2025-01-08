@@ -2,21 +2,13 @@
   <div class="container mx-auto px-4 py-6">
     <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
       <div class="flex items-center space-x-2">
-        <span class="text-xl font-bold text-gray-800">Card Gather™</span>
+        <span class="text-xl font-bold text-gray-800">GODECK™</span>
         <span class="text-sm text-gray-600">© <%= Time.current.year %></span>
       </div>
       
       <nav class="flex flex-wrap justify-center gap-6">
-        <a href="#" class="text-gray-600 hover:text-gray-900 hover:scale-105 transform transition-all duration-200 text-sm font-medium">
-          <%= t('footer.about') %>
-        </a>
-        <a href="#" class="text-gray-600 hover:text-gray-900 hover:scale-105 transform transition-all duration-200 text-sm font-medium">
-          <%= t('footer.privacy_policy') %>
-        </a>
-        <a href="#" class="text-gray-600 hover:text-gray-900 hover:scale-105 transform transition-all duration-200 text-sm font-medium">
-          <%= t('footer.licensing') %>
-        </a>
-        <a href="#" class="text-gray-600 hover:text-gray-900 hover:scale-105 transform transition-all duration-200 text-sm font-medium">
+        <%= link_to t('footer.privacy_policy'), privacy_policy_path, class: "text-gray-600 hover:text-gray-900 hover:scale-105 transform transition-all duration-200 text-sm font-medium" %>
+        <a href="mailto:6098609@proton.me" class="text-gray-600 hover:text-gray-900 hover:scale-105 transform transition-all duration-200 text-sm font-medium">
           <%= t('footer.contact') %>
         </a>
       </nav>

@@ -63,6 +63,42 @@ fr:
     licensing: "Licences"
     contact: "Contact"
 
+  privacy_policy:
+    title: "Politique de Confidentialité"
+    data_collection:
+      title: "1. Collecte des Informations"
+      intro: "Nous collectons les informations suivantes lorsque vous utilisez CardMonkey :"
+      items:
+        account: "Informations de compte (email, nom d'utilisateur)"
+        location: "Informations de localisation pour faciliter les échanges locaux"
+        cards: "Données relatives à vos cartes Magic (collection et souhaits)"
+    data_usage:
+      title: "2. Utilisation des Données"
+      intro: "Vos données sont utilisées pour :"
+      items:
+        exchanges: "Faciliter les échanges entre utilisateurs"
+        experience: "Améliorer votre expérience sur la plateforme"
+        matches: "Vous informer des correspondances potentielles"
+        security: "Assurer la sécurité de votre compte"
+    data_protection:
+      title: "3. Protection des Données"
+      intro: "Nous mettons en œuvre des mesures de sécurité pour protéger vos informations personnelles :"
+      items:
+        encryption: "Chiffrement des données sensibles"
+        access: "Accès restreint aux données personnelles"
+        monitoring: "Surveillance régulière de nos systèmes"
+    user_rights:
+      title: "4. Vos Droits"
+      intro: "Vous disposez des droits suivants concernant vos données :"
+      items:
+        access: "Accès à vos données personnelles"
+        rectification: "Rectification des informations inexactes"
+        deletion: "Suppression de votre compte et des données associées"
+        opposition: "Opposition au traitement de vos données"
+    contact:
+      title: "5. Contact"
+      text: "Pour toute question concernant notre politique de confidentialité, vous pouvez nous contacter à l'adresse suivante :"
+
   wants:
     collection:
       add_card: "Ajouter une carte"

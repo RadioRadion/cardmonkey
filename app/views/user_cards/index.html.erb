@@ -4,7 +4,7 @@
     <h1 class="text-2xl font-bold text-gray-900">Ma Collection</h1>
     
     <%= link_to new_user_user_card_path(@user), 
-        class: "inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 focus:outline-none transition-colors" do %>
+        class: "inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-lg focus:ring-4 focus:ring-purple-300 focus:outline-none transition-colors" do %>
       <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
         <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/>
       </svg>
@@ -16,8 +16,8 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     <div class="bg-white rounded-lg shadow p-4 border border-gray-200 transform hover:scale-105 transition-transform animate-fade-in">
       <div class="flex items-center">
-        <div class="p-2 bg-blue-100 rounded-lg">
-          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="p-2 bg-indigo-100 rounded-lg">
+          <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
         </div>
@@ -89,18 +89,18 @@
       <div class="flex-1">
         <input type="text" 
                placeholder="Rechercher une carte..." 
-               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-300"
+               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-300 focus:border-purple-300"
                data-action="input->cards#search">
       </div>
       <div class="flex gap-2 flex-wrap">
-        <select class="px-4 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-300"
+        <select class="px-4 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-300 focus:border-purple-300"
                 data-action="change->cards#filterByLanguage">
           <option value="">Toutes les langues</option>
           <% @user_cards.pluck(:language).uniq.compact.each do |lang| %>
             <option value="<%= lang %>"><%= language_label(lang) %></option>
           <% end %>
         </select>
-        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-blue-300"
+        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-300 focus:border-purple-300"
                 data-action="change->cards#filterByCondition">
           <option value="">Tous états</option>
           <option value="mint">Mint</option>
@@ -139,7 +139,7 @@
                       class: "w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300" %>
           
           <%# Badge quantité %>
-          <div class="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded-full text-sm font-bold">
+          <div class="absolute top-2 right-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-2 py-1 rounded-full text-sm font-bold">
             <%= user_card.quantity %>×
           </div>
 
@@ -190,7 +190,7 @@
             <%# Actions %>
             <div class="flex items-center gap-2">
               <%= link_to edit_user_user_card_path(user_card.user, user_card),
-                          class: "p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full transition-colors",
+                          class: "p-2 text-indigo-600 hover:text-purple-600 hover:bg-purple-50 rounded-full transition-colors",
                           title: t('cards.table.actions.edit') do %>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />

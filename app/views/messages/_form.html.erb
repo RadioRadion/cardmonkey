@@ -8,12 +8,12 @@
               }) do |f| %>
   <%= f.text_field :content,
                   id: "message_content",
-                  class: "flex-1 rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 #{'border-red-500' if message.errors.any?}",
+                  class: "flex-1 rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 #{'border-red-500' if message.errors.any?}",
                   placeholder: "Écrivez votre message...",
                   data: { action: "keydown.enter->reset-form#submitOnEnter" },
                   autofocus: true %>
   <%= f.submit "Envoyer",
-              class: "px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" %>
+              class: "px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-500 hover:to-purple-500 transition-colors" %>
   
   <% if message.errors.any? %>
     <div class="text-red-500 text-sm mt-1">

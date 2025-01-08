@@ -65,6 +65,9 @@ Rails.application.routes.draw do
   # API endpoints for real-time features
   post 'messages/:id/mark_read', to: 'messages#mark_read'
   
+  # Static pages
+  get 'privacy-policy', to: 'pages#privacy_policy', as: :privacy_policy
+
   # Websocket mounting
   mount ActionCable.server => '/cable'
 end

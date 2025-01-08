@@ -26,7 +26,7 @@
     
     <div class="flex items-center gap-4">
       <%= link_to trade_path(trade), 
-          class: "inline-flex items-center rounded-lg text-sm font-semibold text-blue-600 hover:text-blue-800",
+          class: "inline-flex items-center rounded-lg text-sm font-semibold text-indigo-600 hover:text-indigo-800",
           data: { turbo: false } do %>
         <%= t('.view_details') %>
         <svg class="ml-2 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -42,7 +42,7 @@
       <%= form_with model: trade, method: :patch, local: true, class: "inline" do |f| %>
         <%= f.hidden_field :status, value: "accepted" %>
         <%= f.submit t('.accept_trade'),
-                  class: "rounded-md bg-blue-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 cursor-pointer" %>
+                  class: "rounded-md bg-indigo-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 cursor-pointer" %>
       <% end %>
 
       <%= form_with model: trade, method: :patch, local: true, class: "inline" do |f| %>

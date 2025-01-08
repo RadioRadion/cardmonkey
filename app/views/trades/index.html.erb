@@ -14,7 +14,7 @@
         <i class="fas fa-plus-circle mr-2"></i>
         Ajouter des cartes à échanger
       <% end %>
-      <%= link_to new_user_user_wanted_card_path(current_user), class: "flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md" do %>
+      <%= link_to new_user_user_wanted_card_path(current_user), class: "flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-md" do %>
         <i class="fas fa-search mr-2"></i>
         Ajouter des cartes recherchées
       <% end %>
@@ -41,7 +41,7 @@
               </div>
               <%= text_field_tag :user_search, nil,
                   placeholder: "Entrez un nom d'utilisateur (minimum 3 caractères)...",
-                  class: "block w-full rounded-lg border-0 py-3 pl-10 pr-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6",
+                  class: "block w-full rounded-lg border-0 py-3 pl-10 pr-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6",
                   data: {
                     action: "input->user-search#search blur->user-search#blur",
                     user_search_target: "input"
@@ -128,7 +128,7 @@
             <div class="p-4 bg-white border-b border-gray-200">
               <h2 class="flex items-center">
                 <span class="text-lg font-medium text-gray-900">Récemment terminés</span>
-                <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                <span class="ml-2 bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
                   <%= @trades['2'].size %>
                 </span>
               </h2>
@@ -171,7 +171,7 @@
               </div>
               <p class="text-sm text-gray-500 mb-4">Ajoutez des cartes à votre liste de recherche pour voir les opportunités d'échange</p>
               <%= link_to new_user_user_wanted_card_path(current_user), 
-                        class: "inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors",
+                        class: "inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors",
                         data: { turbo: false } do %>
                 <i class="fas fa-plus-circle mr-2"></i>
                 Ajouter des cartes recherchées
@@ -205,13 +205,13 @@
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-900"><%= match.user_card.card_version.card.name_fr %></p>
-                      <%= link_to user_path(match.user_card.user), class: "text-xs text-gray-500 hover:text-blue-600" do %>
+                      <%= link_to user_path(match.user_card.user), class: "text-xs text-gray-500 hover:text-indigo-600" do %>
                         Possédée par <%= match.user_card.user.username %>
                       <% end %>
                     </div>
                   </div>
                   <%= link_to new_proposition_trade_path(match.user_card.user, partner_id: match.user_card.user.id), 
-                            class: "text-sm text-blue-600 hover:text-blue-800",
+                            class: "text-sm text-indigo-600 hover:text-indigo-800",
                             data: { turbo: false } do %>
                     <i class="fas fa-exchange-alt mr-1"></i>
                     Proposer un échange

@@ -9,7 +9,7 @@
         <div class="overflow-y-auto max-h-[calc(100vh-200px)]">
           <% @chatrooms.each do |chatroom| %>
             <%= link_to user_chatroom_path(current_user, chatroom), 
-                class: "block p-4 hover:bg-gray-50 #{@chatroom == chatroom ? 'bg-blue-50' : ''}" do %>
+                class: "block p-4 hover:bg-gray-50 #{@chatroom == chatroom ? 'bg-purple-50' : ''}" do %>
               <div class="flex items-center space-x-3">
                 <% other_user = chatroom.other_user(current_user) %>
                 <div class="relative">

@@ -1,5 +1,5 @@
 <div id="<%= dom_id(notification) %>" 
-     class="p-4 hover:bg-gray-50 <%= notification.unread? ? 'bg-blue-50' : '' %> <%= notification.clickable? ? 'cursor-pointer group' : '' %>">
+     class="p-4 hover:bg-gray-50 <%= notification.unread? ? 'bg-purple-50' : '' %> <%= notification.clickable? ? 'cursor-pointer group' : '' %>">
   <% if notification.clickable? %>
     <%= link_to notification.resource_path,
         class: "block",

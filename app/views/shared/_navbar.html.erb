@@ -5,14 +5,13 @@
       <div class="flex items-center space-x-8">
         <!-- Logo -->
         <%= link_to root_path, class: "font-bold text-xl shrink-0" do %>
-          Card Gather
+          <%= image_tag "logo400.jpg", class: "h-16 w-auto" %>
         <% end %>
 
         <!-- Navigation principale avec espacement correct -->
         <div class="flex space-x-8">
-          <%= link_to t('navbar.home'), root_path, class: "text-gray-500 hover:text-gray-900 px-3" %>
-          
           <% if user_signed_in? %>
+            <%= link_to t('navbar.home'), root_path, class: "text-gray-500 hover:text-gray-900 px-3" %>
             <%= link_to t('navbar.wantlist'), user_user_wanted_cards_path(current_user), class: "text-gray-500 hover:text-gray-900 px-3" %>
             <%= link_to t('navbar.collection'), user_user_cards_path(current_user), class: "text-gray-500 hover:text-gray-900 px-3" %>
             <%= link_to t('navbar.trades'), trades_path, class: "text-gray-500 hover:text-gray-900 px-3" %>
@@ -97,9 +96,8 @@
     <!-- Menu mobile -->
     <div class="hidden md:hidden" data-mobile-menu-target="menu">
       <div class="pt-2 pb-3 space-y-1">
-        <%= link_to t('navbar.home'), root_path, class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
-        
         <% if user_signed_in? %>
+          <%= link_to t('navbar.home'), root_path, class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
           <%= link_to t('navbar.wantlist'), user_user_wanted_cards_path(current_user), class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
           <%= link_to t('navbar.collection'), user_user_cards_path(current_user), class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
           <%= link_to t('navbar.trades'), trades_path, class: "block px-3 py-2 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50" %>
