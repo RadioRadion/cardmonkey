@@ -25,8 +25,11 @@ Rails.application.configure do
   # Compress CSS using a preprocessor.
   # config.assets.css_compressor = :sass # Commented out to avoid conflicts with Tailwind
 
-  # Do not fallback to assets pipeline if a precompiled asset is missed.
-  config.assets.compile = false
+  # Enable asset compilation in production to help debug asset issues
+  config.assets.compile = true
+  
+  # Add debug logging for asset compilation
+  config.assets.debug = true
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.action_controller.asset_host = 'http://assets.example.com'
