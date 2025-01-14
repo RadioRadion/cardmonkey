@@ -2,11 +2,17 @@
 # exit on error
 set -o errexit
 
-# Install dependencies
+# Install Ruby dependencies
 bundle install
+
+# Install JavaScript dependencies
+npm install
 
 # Cleanup any assets from previous deploys
 rm -rf public/assets
+
+# Build Tailwind CSS
+bundle exec rails tailwindcss:build
 
 # Compile assets
 bundle exec rails assets:precompile
