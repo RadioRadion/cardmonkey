@@ -344,6 +344,7 @@ DEPENDENCIES
   devise
   dotenv-rails
   down
+  execjs
   factory_bot_rails
   faker
   font-awesome-sass

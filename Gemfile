@@ -34,7 +34,7 @@ gem 'geocoder'
 # testing mail in development
 gem "letter_opener", group: :development
 
-gem 'mini_racer'
+gem 'execjs'
 gem 'autoprefixer-rails'
 gem 'font-awesome-sass'
 gem 'simple_form'
