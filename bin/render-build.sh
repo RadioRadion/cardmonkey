@@ -13,6 +13,7 @@ rm -rf public/assets
 
 # Build assets
 export RAILS_ENV=production
+bundle exec rails assets:clean
 bundle exec rails tailwindcss:build
 bundle exec rails assets:precompile
 
