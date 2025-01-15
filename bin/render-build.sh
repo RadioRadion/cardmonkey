@@ -13,8 +13,14 @@ rm -rf public/assets
 
 # Build assets
 export RAILS_ENV=production
-bundle exec rails assets:clean
+export SECRET_KEY_BASE=dummy
+
+# Ensure Tailwind CSS is built first
+bundle exec rails tailwindcss:install
 bundle exec rails tailwindcss:build
+
+# Then handle other assets
+bundle exec rails assets:clean
 bundle exec rails assets:precompile
 
 # Run database migrations

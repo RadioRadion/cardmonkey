@@ -25,8 +25,9 @@ Rails.application.configure do
   # Compress CSS using a preprocessor.
   # config.assets.css_compressor = :sass # Commented out to avoid conflicts with Tailwind
 
-  # Disable runtime asset compilation in production for better performance
-  config.assets.compile = false
+  # Enable runtime asset compilation in production for Tailwind CSS
+  config.assets.compile = true
+  config.assets.css_compressor = nil
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.action_controller.asset_host = 'http://assets.example.com'
