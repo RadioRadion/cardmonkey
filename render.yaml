@@ -23,6 +23,10 @@ services:
         value: production
       - key: RAILS_SERVE_STATIC_FILES
         value: true
+      - key: NODE_ENV
+        value: production
+      - key: TAILWIND_MODE
+        value: build
       - key: SMTP_ADDRESS
         sync: false
       - key: SMTP_PORT

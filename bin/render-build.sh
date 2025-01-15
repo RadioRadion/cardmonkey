@@ -13,8 +13,8 @@ rm -rf public/assets
 
 # Build assets
 export RAILS_ENV=production
-bundle exec rails assets:precompile
 bundle exec rails tailwindcss:build
+bundle exec rails assets:precompile
 
 # Run database migrations
 bundle exec rails db:migrate
