@@ -10,7 +10,7 @@ services:
     env: ruby
     plan: starter
     buildCommand: "./bin/render-build.sh"
-    nodeVersion: 18
+    nodeVersion: 16.20.0
     startCommand: "bundle exec puma -C config/puma.rb"
     envVars:
       - key: DATABASE_URL

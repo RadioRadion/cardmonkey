@@ -34,8 +34,7 @@ gem 'geocoder'
 # testing mail in development
 gem "letter_opener", group: :development
 
-gem 'execjs'
-gem 'autoprefixer-rails'
+# Using Node.js as JavaScript runtime instead of mini_racer
 gem 'font-awesome-sass'
 gem 'simple_form'
 gem 'down'
