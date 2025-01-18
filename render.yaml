@@ -19,6 +19,12 @@ services:
         value: production
       - key: TAILWIND_MODE
         value: build
+      - key: POSTGRES_STATEMENT_TIMEOUT
+        value: "60000"
+      - key: RAILS_MAX_THREADS
+        value: "5"
+      - key: WEB_CONCURRENCY
+        value: "2"
       - key: SMTP_ADDRESS
         sync: false
       - key: SMTP_PORT
