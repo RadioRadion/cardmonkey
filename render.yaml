@@ -1,4 +1,22 @@
 services:
+  - type: cron
+    name: scryfall-sync
+    env: ruby
+    plan: starter
+    buildCommand: bundle install
+    schedule: "0 4 * * *"
+    startCommand: bundle exec rake scryfall:sync
+    envVars:
+      - key: DATABASE_URL
+        fromService:
+          type: web
+          name: cardmonkey
+          envVarKey: DATABASE_URL
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: RAILS_ENV
+        value: production
+
   - type: web
     name: cardmonkey
     env: ruby
