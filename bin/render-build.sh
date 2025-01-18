@@ -26,7 +26,7 @@ bundle exec rails assets:precompile --trace
 
 # Now handle database operations
 unset DISABLE_DATABASE_ENVIRONMENT_CHECK
-bundle exec rails db:migrate
+bundle exec rails db:create db:schema:load db:migrate
 
 # Import Scryfall data if needed (commented out by default)
 # Uncomment these lines when you want to import fresh data
