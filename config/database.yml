@@ -83,6 +83,4 @@ test:
 #
 production:
   <<: *default
-  database: cardmonkey_production
-  username: cardmonkey
-  password: <%= ENV['CARDMONKEY_DATABASE_PASSWORD'] %>
+  url: <%= ENV['DATABASE_URL'] %>
