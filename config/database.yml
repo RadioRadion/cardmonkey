@@ -83,13 +83,12 @@ test:
 #
 production:
   <<: *default
-  url: <%= ENV['DATABASE_URL'] %>
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  host: <%= ENV['DATABASE_URL'] && URI.parse(ENV['DATABASE_URL']).host %>
-  port: <%= ENV['DATABASE_URL'] && URI.parse(ENV['DATABASE_URL']).port || 5432 %>
-  database: <%= ENV['DATABASE_URL'] && URI.parse(ENV['DATABASE_URL']).path.delete_prefix('/') %>
-  username: <%= ENV['DATABASE_URL'] && URI.parse(ENV['DATABASE_URL']).user %>
-  password: <%= ENV['DATABASE_URL'] && URI.parse(ENV['DATABASE_URL']).password %>
+  database: <%= ENV['DATABASE_NAME'] %>
+  username: <%= ENV['DATABASE_USER'] %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>
+  host: <%= ENV['DATABASE_HOST'] %>
+  port: 5432
   sslmode: require

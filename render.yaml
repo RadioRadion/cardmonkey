@@ -17,6 +17,22 @@ services:
         fromDatabase:
           name: cardmonkey_postgres
           property: connectionString
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: cardmonkey_postgres
+          property: host
+      - key: DATABASE_USER
+        fromDatabase:
+          name: cardmonkey_postgres
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: cardmonkey_postgres
+          property: password
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: cardmonkey_postgres
+          property: database
       - key: RAILS_MASTER_KEY
         sync: false
       - key: RAILS_ENV
