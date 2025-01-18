@@ -84,3 +84,8 @@ test:
 production:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
+  database: <%= ENV['DATABASE_URL'] && URI.parse(ENV['DATABASE_URL']).path.delete_prefix('/') %>
+  host: <%= ENV['DATABASE_URL'] && URI.parse(ENV['DATABASE_URL']).host %>
+  port: <%= ENV['DATABASE_URL'] && URI.parse(ENV['DATABASE_URL']).port %>
+  username: <%= ENV['DATABASE_URL'] && URI.parse(ENV['DATABASE_URL']).user %>
+  password: <%= ENV['DATABASE_URL'] && URI.parse(ENV['DATABASE_URL']).password %>
