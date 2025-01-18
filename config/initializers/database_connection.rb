@@ -1,6 +1,5 @@
-# Handle connection pool for Puma workers
 if defined?(Puma)
-  Puma.cli_config.options.fetch(:max_threads, 5).times do
-    ActiveRecord::Base.connection_pool.checkout
+  ActiveSupport.on_load(:active_record) do
+    ActiveRecord::Base.establish_connection
   end
 end
