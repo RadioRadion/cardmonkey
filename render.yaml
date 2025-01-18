@@ -1,9 +1,3 @@
-databases:
-  - name: cardmonkey_postgres
-    databaseName: cardmonkey_production
-    user: cardmonkey
-    plan: starter
-
 services:
   - type: web
     name: cardmonkey
@@ -14,25 +8,7 @@ services:
     startCommand: "bundle exec puma -C config/puma.rb"
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: cardmonkey_postgres
-          property: connectionString
-      - key: DATABASE_HOST
-        fromDatabase:
-          name: cardmonkey_postgres
-          property: host
-      - key: DATABASE_USER
-        fromDatabase:
-          name: cardmonkey_postgres
-          property: user
-      - key: DATABASE_PASSWORD
-        fromDatabase:
-          name: cardmonkey_postgres
-          property: password
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: cardmonkey_postgres
-          property: database
+        value: postgresql://godeck_database_user:OtDf5gcKXVUDjkpjkstAIrgE1yQEgKif@dpg-cu5pmm0gph6c73bvnn7g-a.frankfurt-postgres.render.com/godeck_database
       - key: RAILS_MASTER_KEY
         sync: false
       - key: RAILS_ENV
