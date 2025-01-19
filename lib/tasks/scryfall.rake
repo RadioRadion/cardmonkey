@@ -127,14 +127,20 @@ namespace :scryfall do
         stats[:total_attempts] += 1
         
         begin
+          # Utiliser la première version anglaise comme référence
+          first_version = versions.first
+          
           success = false
           Card.transaction do
+            # Vérifier que l'oracle_id est présent
+            if oracle_id.blank?
+              puts "Skipping card with blank oracle_id: #{first_version['name']}"
+              next
+            end
+            
             # Trouver ou créer la carte unique
             card = Card.find_or_initialize_by(scryfall_oracle_id: oracle_id)
             is_new_card = card.new_record?
-            
-            # Utiliser la première version anglaise comme référence
-            first_version = versions.first
             
             card.assign_attributes(
               name_en: first_version['name'],
@@ -159,7 +165,7 @@ namespace :scryfall do
             end
           end
         rescue => e
-          puts "Error processing English card #{card_data['name']}: #{e.message}"
+          puts "Error processing English card #{first_version['name']}: #{e.message}"
         end
 
         if max_attempts && stats[:total_attempts] >= max_attempts
