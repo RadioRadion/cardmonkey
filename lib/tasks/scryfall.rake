@@ -33,8 +33,18 @@ namespace :scryfall do
       
       is_new_version = card_version.new_record?
 
+      # Get the image URIs from the card data
+      img_uri = version_data.dig('image_uris', 'normal')
+      icon_uri = version_data.dig('image_uris', 'small')
+
+      # For double-faced cards
+      if !img_uri && !icon_uri
+        img_uri = version_data.dig('card_faces', 0, 'image_uris', 'normal')
+        icon_uri = version_data.dig('card_faces', 0, 'image_uris', 'small')
+      end
+
       card_version.assign_attributes(
-        img_uri: version_data.dig('image_uris', 'normal'),
+        img_uri: img_uri,
         eur_price: version_data.dig('prices', 'eur'),
         eur_foil_price: version_data.dig('prices', 'eur_foil'),
         rarity: version_data['rarity'],
@@ -95,17 +105,9 @@ namespace :scryfall do
             card = Card.find_or_initialize_by(scryfall_oracle_id: card_data['oracle_id'])
             is_new_card = card.new_record?
             
-            # Get the icon_uri from the smallest available image
-            icon_uri = card_data.dig('image_uris', 'small') || 
-                      card_data.dig('image_uris', 'normal') ||
-                      card_data.dig('card_faces', 0, 'image_uris', 'small') ||
-                      card_data.dig('card_faces', 0, 'image_uris', 'normal')
-            
             card.assign_attributes(
               name_en: card_data['name'],
-              name_fr: card_data['name'], # Valeur par défaut en attendant la version FR
-              release_date: card_data['released_at'],
-              icon_uri: icon_uri
+              name_fr: card_data['name'] # Valeur par défaut en attendant la version FR
             )
             card.save!
 
@@ -174,16 +176,7 @@ namespace :scryfall do
             success = false
             if card = Card.find_by(scryfall_oracle_id: card_data['oracle_id'])
               Card.transaction do
-                # Get the icon_uri from the smallest available image for French version
-                icon_uri = card_data.dig('image_uris', 'small') || 
-                          card_data.dig('image_uris', 'normal') ||
-                          card_data.dig('card_faces', 0, 'image_uris', 'small') ||
-                          card_data.dig('card_faces', 0, 'image_uris', 'normal')
-                
-                card.update!(
-                  name_fr: card_data['printed_name'],
-                  icon_uri: icon_uri || card.icon_uri # Keep existing icon if new one not found
-                )
+                card.update!(name_fr: card_data['printed_name'])
                 
                 if process_card_version(card, card_data, stats)
                   stats[:cards_updated] += 1
