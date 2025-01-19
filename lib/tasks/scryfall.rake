@@ -20,10 +20,19 @@ namespace :scryfall do
       retry
     end
 
+    def fetch_set_data(set_code)
+      url = "https://api.scryfall.com/sets/#{set_code}"
+      fetch_json(url)
+    end
+
     def process_card_version(card, version_data, stats)
+      set_data = fetch_set_data(version_data['set'])
+      
       extension = Extension.find_or_create_by!(
         code: version_data['set'],
-        name: version_data['set_name']
+        name: version_data['set_name'],
+        release_date: set_data['released_at'],
+        icon_uri: set_data['icon_svg_uri']
       )
 
       card_version = CardVersion.find_or_initialize_by(
