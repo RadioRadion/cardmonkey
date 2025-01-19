@@ -54,10 +54,20 @@ namespace :scryfall do
         icon_uri = version_data.dig('card_faces', 0, 'image_uris', 'small')
       end
 
+      # Convertir les prix en decimal ou nil
+      eur_price = version_data.dig('prices', 'eur')
+      eur_price = eur_price.to_d if eur_price.present?
+      
+      eur_foil_price = version_data.dig('prices', 'eur_foil')
+      eur_foil_price = eur_foil_price.to_d if eur_foil_price.present?
+      
+      # Log des prix pour debug
+      puts "Prices for #{version_data['name']} (#{version_data['set']}): EUR: #{eur_price}, EUR Foil: #{eur_foil_price}"
+      
       card_version.assign_attributes(
         img_uri: img_uri,
-        eur_price: version_data.dig('prices', 'eur'),
-        eur_foil_price: version_data.dig('prices', 'eur_foil'),
+        eur_price: eur_price,
+        eur_foil_price: eur_foil_price,
         rarity: version_data['rarity'],
         frame: version_data['frame'],
         border_color: version_data['border_color'],
@@ -110,32 +120,42 @@ namespace :scryfall do
       url = "https://api.scryfall.com/cards/search?q=lang%3Aen&page=#{page}&unique=prints"
       data = fetch_json(url)
       
-      data['data'].each do |card_data|
+      # Grouper les cartes par oracle_id pour éviter les doublons
+      cards_by_oracle_id = data['data'].group_by { |card| card['oracle_id'] }
+      
+      cards_by_oracle_id.each do |oracle_id, versions|
         stats[:total_attempts] += 1
         
         begin
           success = false
           Card.transaction do
-            card = Card.find_or_initialize_by(scryfall_oracle_id: card_data['oracle_id'])
+            # Trouver ou créer la carte unique
+            card = Card.find_or_initialize_by(scryfall_oracle_id: oracle_id)
             is_new_card = card.new_record?
             
+            # Utiliser la première version anglaise comme référence
+            first_version = versions.first
+            
             card.assign_attributes(
-              name_en: card_data['name'],
-              name_fr: card_data['name'] # Valeur par défaut en attendant la version FR
+              name_en: first_version['name'],
+              name_fr: first_version['name'] # Valeur par défaut en attendant la version FR
             )
             card.save!
 
-            if process_card_version(card, card_data, stats, set_cache)
-              if is_new_card
-                stats[:cards_created] += 1
-                puts "Created new card: #{card.name_en}"
-              else
-                stats[:cards_updated] += 1
-                puts "Updated existing card: #{card.name_en}" if (stats[:cards_updated] % 100).zero?
+            # Traiter toutes les versions pour cette carte
+            versions.each do |version_data|
+              if process_card_version(card, version_data, stats, set_cache)
+                success = true
+                stats[:successful_operations] += 1
               end
-              
-              success = true
-              stats[:successful_operations] += 1
+            end
+
+            if is_new_card
+              stats[:cards_created] += 1
+              puts "Created new card: #{card.name_en}"
+            else
+              stats[:cards_updated] += 1
+              puts "Updated existing card: #{card.name_en}" if (stats[:cards_updated] % 100).zero?
             end
           end
         rescue => e
