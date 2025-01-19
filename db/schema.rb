@@ -78,6 +78,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_08_105320) do
     t.datetime "updated_at", null: false
     t.string "name_en"
     t.string "name_fr"
+    t.date "release_date"
   end
 
   create_table "chatrooms", force: :cascade do |t|
