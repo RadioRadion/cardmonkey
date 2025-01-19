@@ -20,13 +20,15 @@ namespace :scryfall do
       retry
     end
 
-    def fetch_set_data(set_code)
-      url = "https://api.scryfall.com/sets/#{set_code}"
-      fetch_json(url)
+    def fetch_set_data(set_code, set_cache)
+      set_cache[set_code] ||= begin
+        url = "https://api.scryfall.com/sets/#{set_code}"
+        fetch_json(url)
+      end
     end
 
-    def process_card_version(card, version_data, stats)
-      set_data = fetch_set_data(version_data['set'])
+    def process_card_version(card, version_data, stats, set_cache)
+      set_data = fetch_set_data(version_data['set'], set_cache)
       
       extension = Extension.find_or_create_by!(
         code: version_data['set'],
@@ -85,6 +87,9 @@ namespace :scryfall do
       successful_operations: 0
     }
     
+    set_cache = {}
+    batch_size = 20 # Traiter 20 cartes à la fois
+    
     # Traitement des cartes en anglais
     page = 1
     puts "Processing English cards..."
@@ -120,7 +125,7 @@ namespace :scryfall do
             )
             card.save!
 
-            if process_card_version(card, card_data, stats)
+            if process_card_version(card, card_data, stats, set_cache)
               if is_new_card
                 stats[:cards_created] += 1
                 puts "Created new card: #{card.name_en}"
@@ -152,8 +157,10 @@ namespace :scryfall do
                (limit && stats[:successful_operations] >= limit) ||
                (max_attempts && stats[:total_attempts] >= max_attempts)
                
+      # Pause plus longue entre les pages pour permettre au GC de faire son travail
       page += 1
-      sleep(0.1)
+      GC.start # Force garbage collection
+      sleep(1)
     end
 
     # Only process French cards if we haven't hit our limits
@@ -187,7 +194,7 @@ namespace :scryfall do
               Card.transaction do
                 card.update!(name_fr: card_data['printed_name'])
                 
-                if process_card_version(card, card_data, stats)
+                if process_card_version(card, card_data, stats, set_cache)
                   stats[:cards_updated] += 1
                   puts "Updated French version for: #{card.name_en}" if (stats[:cards_updated] % 100).zero?
                   success = true
@@ -213,8 +220,10 @@ namespace :scryfall do
         break if !data['has_more'] || 
                  (limit && stats[:successful_operations] >= limit) ||
                  (max_attempts && stats[:total_attempts] >= max_attempts)
+        # Pause plus longue entre les pages pour permettre au GC de faire son travail
         page += 1
-        sleep(0.1)
+        GC.start # Force garbage collection
+        sleep(1)
       end
     end
 
