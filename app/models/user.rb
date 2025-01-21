@@ -28,6 +28,15 @@ class User < ApplicationRecord
 
   enum preference: { value_based: 0, quantity_based: 1 }
 
+  before_validation :set_default_username, on: :create
+
+  private
+
+  def set_default_username
+    return if username.present?
+    self.username = email.split('@').first if email.present?
+  end
+
   def chatrooms
     Chatroom.where('user_id = :user_id OR user_id_invit = :user_id', user_id: id)
   end

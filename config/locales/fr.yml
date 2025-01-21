@@ -233,6 +233,7 @@ fr:
     profile:
       save_changes: "Enregistrer les modifications"
       cancel: "Annuler"
+      no_username: "Nom d'utilisateur non défini"
       trading_statistics: "Statistiques d'échange"
       total_matches: "Matchs totaux"
       trading_preferences: "Préférences d'échange"
