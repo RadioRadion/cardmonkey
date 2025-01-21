@@ -160,6 +160,16 @@ export default class extends Controller {
     
     // Mettre à jour l'input avec le nom de la carte
     this.inputTarget.value = this.selectedCard.name_fr
+
+    // Reset form fields when selecting a new card
+    if (this.hasExtensionTarget) {
+      this.extensionTarget.innerHTML = ''
+      const existingWrapper = this.extensionTarget.closest('.relative')
+      if (existingWrapper) {
+        existingWrapper.parentNode.insertBefore(this.extensionTarget, existingWrapper)
+        existingWrapper.remove()
+      }
+    }
     
     // Déterminer le type de formulaire
     const formType = this.element.dataset.autocompleteTypeValue
@@ -230,6 +240,14 @@ export default class extends Controller {
   }
 
   styleExtensionSelect(select) {
+    // Remove existing wrapper if it exists
+    const existingWrapper = select.closest('.relative')
+    if (existingWrapper) {
+      // Move the select back to its original position
+      existingWrapper.parentNode.insertBefore(select, existingWrapper)
+      existingWrapper.remove()
+    }
+
     const wrapper = document.createElement('div')
     wrapper.className = 'relative'
     select.parentNode.insertBefore(wrapper, select)
