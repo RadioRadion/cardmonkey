@@ -38,6 +38,11 @@ Rails.application.configure do
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
+  
+  # Configure Active Storage to use direct uploads and resolve redirects
+  config.active_storage.resolve_model_to_route = :rails_storage_redirect
+  config.active_storage.replace_on_assign_to_many = false
+  config.active_storage.track_variants = true
 
   # Mount Action Cable outside main process or domain.
   config.action_cable.mount_path = nil

@@ -22,14 +22,14 @@
                data-action="input->wanted-cards#search">
       </div>
       <div class="flex gap-2 flex-wrap">
-        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-300 focus:border-purple-300"
+        <select class="pl-4 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-300 focus:border-purple-300"
                 data-action="change->wanted-cards#filterByLanguage">
           <option value="">Toutes les langues</option>
           <% @user_wanted_cards.pluck(:language).uniq.compact.each do |lang| %>
             <option value="<%= lang %>"><%= language_label(lang) %></option>
           <% end %>
         </select>
-        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-300 focus:border-purple-300"
+        <select class="pl-4 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-300 focus:border-purple-300"
                 data-action="change->wanted-cards#filterByMinCondition">
           <option value="">Tous états</option>
           <option value="mint">Mint</option>
