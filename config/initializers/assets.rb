@@ -10,12 +10,4 @@ Rails.application.config.assets.paths << Rails.root.join('node_modules')
 
 # Precompile additional assets.
 Rails.application.config.assets.paths << Rails.root.join("app/assets/builds")
-Rails.application.config.assets.paths << Rails.root.join("app/javascript")
-
-# Add specific assets to precompile
-Rails.application.config.assets.precompile += %w( 
-  tailwind.css
-  favicon.png
-  controllers/**/*.js
-  channels/**/*.js
-)
+Rails.application.config.assets.precompile += %w( tailwind.css )
