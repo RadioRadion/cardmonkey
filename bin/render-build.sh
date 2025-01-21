@@ -16,13 +16,17 @@ export RAILS_ENV=production
 export SECRET_KEY_BASE=dummy
 export DISABLE_DATABASE_ENVIRONMENT_CHECK=1
 
-# Ensure Tailwind CSS is built first
-bundle exec rails tailwindcss:install
+echo "Cleaning assets..."
+bundle exec rails assets:clean
+
+echo "Building Tailwind CSS..."
 bundle exec rails tailwindcss:build
 
-# Then handle other assets
-bundle exec rails assets:clean
-bundle exec rails assets:precompile --trace
+echo "Precompiling assets..."
+bundle exec rails assets:precompile RAILS_ENV=production --trace
+
+echo "Verifying asset compilation..."
+ls -la public/assets/
 
 # Now handle database operations
 unset DISABLE_DATABASE_ENVIRONMENT_CHECK

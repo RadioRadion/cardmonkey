@@ -2,9 +2,21 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["menu"]
+  static values = {
+    hasMenu: { type: Boolean, default: false }
+  }
+
+  connect() {
+    // Add click outside listener if we have a menu
+    if (this.hasMenuValue) {
+      document.addEventListener("click", this.clickOutside.bind(this))
+    }
+  }
 
   toggle() {
-    this.menuTarget.classList.toggle("hidden")
+    if (this.hasMenuTarget) {
+      this.menuTarget.classList.toggle("hidden")
+    }
   }
 
   markAsRead(event) {
@@ -48,13 +60,10 @@ export default class extends Controller {
     }
   }
 
-  connect() {
-    // Add click outside listener
-    document.addEventListener("click", this.clickOutside.bind(this))
-  }
-
   disconnect() {
-    // Remove click outside listener
-    document.removeEventListener("click", this.clickOutside.bind(this))
+    // Remove click outside listener if we had one
+    if (this.hasMenuValue) {
+      document.removeEventListener("click", this.clickOutside.bind(this))
+    }
   }
 }
