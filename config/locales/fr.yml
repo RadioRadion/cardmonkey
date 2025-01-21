@@ -258,6 +258,12 @@ fr:
           attributes:
             card_name:
               blank: "Le nom de la carte est requis"
+        forms/user_wanted_card_form:
+          attributes:
+            quantity:
+              blank: "La quantité est requise"
+              not_a_number: "La quantité doit être un nombre"
+              greater_than: "La quantité doit être supérieure à 0"
 
   activerecord:
     models:
