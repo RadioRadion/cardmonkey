@@ -94,8 +94,7 @@ class User < ApplicationRecord
     if avatar.attached?
       avatar
     else
-      # Version plus simple avec une image statique
-      "https://via.placeholder.com/64"
+      "default_avatar.svg"
     end
   end
 end
