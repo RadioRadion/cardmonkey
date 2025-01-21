@@ -1,7 +1,7 @@
 <% if notice %>
-  <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+  <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert" data-controller="flash">
     <%= notice %>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <button type="button" class="close" data-action="flash#close">
       <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
         <svg class="fill-current h-6 w-6 text-blue-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Fermer</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697L8.303 10 5.651 7.348a1.2 1.2 0 1 1 1.697-1.697L10 8.181l2.651-3.029a1.2 1.2 0 1 1 1.697 1.697L11.697 10l2.651 3.348a1.2 1.2 0 0 1 0 1.701z"/></svg>
       </span>
@@ -9,9 +9,9 @@
   </div>
 <% end %>
 <% if alert %>
-  <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert">
+  <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" role="alert" data-controller="flash">
     <%= alert %>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <button type="button" class="close" data-action="flash#close">
       <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
         <svg class="fill-current h-6 w-6 text-yellow-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Fermer</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697L8.303 10 5.651 7.348a1.2 1.2 0 1 1 1.697-1.697L10 8.181l2.651-3.029a1.2 1.2 0 1 1 1.697 1.697L11.697 10l2.651 3.348a1.2 1.2 0 0 1 0 1.701z"/></svg>
       </span>
