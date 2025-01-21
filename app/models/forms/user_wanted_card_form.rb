@@ -10,7 +10,7 @@ module Forms
     attribute :card_id, :string
     attribute :card_version_id, :integer 
     attribute :min_condition, :string
-    attribute :language, :string
+    attribute :language, :string, default: 'any'
     attribute :quantity, :integer
     attribute :foil, :boolean
 

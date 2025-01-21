@@ -196,6 +196,7 @@ fr:
       any_extension: "N'importe quelle extension"
       any_condition: "N'importe quelle condition"
       any_language: "N'importe quelle langue"
+      language_optional: "Langue (optionnel)"
       save_changes: "Enregistrer les modifications"
       add_card: "Ajouter la carte"
     create:
