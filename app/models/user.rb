@@ -30,6 +30,10 @@ class User < ApplicationRecord
 
   before_validation :set_default_username, on: :create
 
+  def all_trades
+    Trade.where('user_id = ? OR user_id_invit = ?', id, id)
+  end
+
   private
 
   def set_default_username
@@ -78,10 +82,6 @@ class User < ApplicationRecord
         .select('cards.*, user_cards.condition, user_cards.language')
         .distinct
         .order('cards.id')
-  end
-
-  def all_trades
-    Trade.where('user_id = ? OR user_id_invit = ?', id, id)
   end
 
   def matching_stats
