@@ -39,6 +39,7 @@ gem 'font-awesome-sass'
 gem 'simple_form'
 gem 'down'
 gem 'whenever', require: false
+gem 'cloudinary'
 
 group :development, :test do  
   gem 'pry-byebug'
