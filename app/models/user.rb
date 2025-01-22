@@ -99,11 +99,4 @@ class User < ApplicationRecord
         .order('cards.id')
   end
 
-  def avatar_thumbnail
-    if avatar.attached?
-      avatar
-    else
-      "default_avatar.svg"
-    end
-  end
 end
