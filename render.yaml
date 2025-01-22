@@ -1,4 +1,9 @@
 services:
+  - type: redis
+    name: cardmonkey-redis
+    ipAllowList: [] # Only allow internal connections
+    plan: starter # Starter is the most basic plan
+    maxmemoryPolicy: noeviction
   - type: cron
     name: scryfall-sync
     env: ruby
@@ -7,6 +12,11 @@ services:
     schedule: "0 4 * * *"
     startCommand: bundle exec rake scryfall:sync
     envVars:
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: cardmonkey-redis
+          property: connectionString
       - key: DATABASE_URL
         fromService:
           type: web
@@ -25,6 +35,11 @@ services:
     nodeVersion: 16.20.0
     startCommand: "bundle exec puma -C config/puma.rb"
     envVars:
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: cardmonkey-redis
+          property: connectionString
       - key: DATABASE_URL
         value: postgresql://godeck_database_user:OtDf5gcKXVUDjkpjkstAIrgE1yQEgKif@dpg-cu5pmm0gph6c73bvnn7g-a.frankfurt-postgres.render.com/godeck_database
       - key: RAILS_MASTER_KEY
