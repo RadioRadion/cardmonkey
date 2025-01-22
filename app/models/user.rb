@@ -49,15 +49,15 @@ class User < ApplicationRecord
     }
   end
 
+  def chatrooms
+    Chatroom.where('user_id = :user_id OR user_id_invit = :user_id', user_id: id)
+  end
+
   private
 
   def set_default_username
     return if username.present?
     self.username = email.split('@').first if email.present?
-  end
-
-  def chatrooms
-    Chatroom.where('user_id = :user_id OR user_id_invit = :user_id', user_id: id)
   end
 
   def top_matching_users(limit = 10)
