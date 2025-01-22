@@ -34,6 +34,21 @@ class User < ApplicationRecord
     Trade.where('user_id = ? OR user_id_invit = ?', id, id)
   end
 
+  def matching_stats
+    {
+      total_matches: Match.where(user_id: id).or(Match.where(user_id_target: id)).count,
+      unique_matched_users: top_matching_users.size,
+      matches_by_condition: Match.joins(user_card: :card_version)
+                               .where(user_id: id)
+                               .group('user_cards.condition')
+                               .count,
+      matches_by_language: Match.joins(user_card: :card_version)
+                              .where(user_id: id)
+                              .group('user_cards.language')
+                              .count
+    }
+  end
+
   private
 
   def set_default_username
@@ -82,21 +97,6 @@ class User < ApplicationRecord
         .select('cards.*, user_cards.condition, user_cards.language')
         .distinct
         .order('cards.id')
-  end
-
-  def matching_stats
-    {
-      total_matches: Match.where(user_id: id).or(Match.where(user_id_target: id)).count,
-      unique_matched_users: top_matching_users.size,
-      matches_by_condition: Match.joins(user_card: :card_version)
-                               .where(user_id: id)
-                               .group('user_cards.condition')
-                               .count,
-      matches_by_language: Match.joins(user_card: :card_version)
-                              .where(user_id: id)
-                              .group('user_cards.language')
-                              .count
-    }
   end
 
   def avatar_thumbnail
