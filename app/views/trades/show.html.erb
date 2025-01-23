@@ -114,11 +114,18 @@
                         method: :patch,
                         class: "px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg" %>
             <% elsif @trade.accepted? %>
-              <%= button_to "Marquer comme terminé",
-                        trade_path(@trade),
-                        method: :patch,
-                        params: { trade: { status: "done" } },
-                        class: "px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg" %>
+              <div class="flex gap-4">
+                <%= link_to chatroom_path(Chatroom.between(current_user, @trade.partner_for(current_user))),
+                          class: "px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg flex items-center gap-2" do %>
+                  <i class="fas fa-comments"></i>
+                  Discuter de l'échange
+                <% end %>
+                <%= button_to "Marquer comme terminé",
+                          trade_path(@trade),
+                          method: :patch,
+                          params: { trade: { status: "done" } },
+                          class: "px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg" %>
+              </div>
             <% else %>
               <% if (@trade.pending? || @trade.modified?) && @trade.can_be_modified_by?(current_user) %>
                 <%= link_to "Modifier", 
