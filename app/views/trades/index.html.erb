@@ -206,15 +206,20 @@
                     <div>
                       <p class="text-sm font-medium text-gray-900"><%= match.user_card.card_version.card.name_fr %></p>
                       <%= link_to user_path(match.user_card.user), class: "text-xs text-gray-500 hover:text-indigo-600" do %>
-                        Possédée par <%= match.user_card.user.username %>
+                        <% if match.user_id == current_user.id %>
+                          Vous recherchez cette carte
+                        <% else %>
+                          Carte disponible dans votre collection
+                        <% end %>
                       <% end %>
                     </div>
                   </div>
-                  <%= link_to new_proposition_trade_path(match.user_card.user, partner_id: match.user_card.user.id), 
+                  <% partner = match.user_id == current_user.id ? User.find(match.user_id_target) : User.find(match.user_id) %>
+                  <%= link_to new_proposition_trade_path(partner, partner_id: partner.id), 
                             class: "text-sm text-indigo-600 hover:text-indigo-800",
                             data: { turbo: false } do %>
                     <i class="fas fa-exchange-alt mr-1"></i>
-                    Proposer un échange
+                    Échanger avec <%= partner.username %>
                   <% end %>
                 </div>
               <% end %>

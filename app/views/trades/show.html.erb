@@ -115,17 +115,38 @@
                         class: "px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg" %>
             <% elsif @trade.accepted? %>
               <div class="flex gap-4">
-                <%= link_to chatroom_path(Chatroom.between(current_user, @trade.partner_for(current_user))),
+                <%= link_to user_chatroom_path(current_user, Chatroom.between(current_user, @trade.partner_for(current_user))),
                           class: "px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg flex items-center gap-2" do %>
                   <i class="fas fa-comments"></i>
                   Discuter de l'échange
                 <% end %>
-                <%= button_to "Marquer comme terminé",
-                          trade_path(@trade),
-                          method: :patch,
-                          params: { trade: { status: "done" } },
-                          class: "px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg" %>
+
+                <% if @trade.completed_by_user_ids&.include?(current_user.id) %>
+                  <div class="px-6 py-2 bg-gray-100 text-gray-600 rounded-lg flex items-center gap-2">
+                    <i class="fas fa-check"></i>
+                    Vous avez confirmé l'échange
+                  </div>
+                <% else %>
+                  <%= button_to "Confirmer l'échange physique",
+                            trade_path(@trade),
+                            method: :patch,
+                            params: { status: "done" },
+                            class: "px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg",
+                            data: { confirm: "Confirmez-vous avoir réalisé l'échange physique avec #{@trade.partner_name_for(current_user)} ?" } %>
+                <% end %>
               </div>
+
+              <%# Statut des confirmations %>
+              <% if @trade.completed_by_user_ids.present? %>
+                <div class="mt-4 text-sm text-gray-600">
+                  <% @trade.completed_by_user_ids.each do |user_id| %>
+                    <div class="flex items-center gap-2">
+                      <i class="fas fa-check text-green-500"></i>
+                      <%= user_id == current_user.id ? "Vous avez" : "#{User.find(user_id).username} a" %> confirmé l'échange physique
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
             <% else %>
               <% if (@trade.pending? || @trade.modified?) && @trade.can_be_modified_by?(current_user) %>
                 <%= link_to "Modifier", 
@@ -138,7 +159,7 @@
                 <%= button_to "Accepter",
                           trade_path(@trade),
                           method: :patch,
-                          params: { trade: { status: "accepted" } },
+                          params: { status: "accepted" },
                           class: "px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg" %>
               <% end %>
             <% end %>

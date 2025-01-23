@@ -42,6 +42,12 @@ class Trade < ApplicationRecord
     [user_id, user_id_invit].include?(current_user.id)
   end
 
+  def can_be_completed_by?(current_user)
+    return false unless accepted?
+    return false if completed_by_user_ids.include?(current_user.id)
+    [user_id, user_id_invit].include?(current_user.id)
+  end
+
   def can_be_accepted_by?(current_user)
     pending? && current_user.id == user_id_invit
   end

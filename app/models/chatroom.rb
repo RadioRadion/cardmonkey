@@ -6,7 +6,6 @@ class Chatroom < ApplicationRecord
   has_many :notifications, dependent: :destroy
 
   validates :user_id, uniqueness: { scope: :user_id_invit }
-  validate :cannot_chat_with_self
 
   scope :for_user, ->(user) { where(user: user).or(where(user_id_invit: user)) }
   scope :ordered_by_recent_message, -> { 
@@ -90,10 +89,4 @@ class Chatroom < ApplicationRecord
   end
 
   private
-
-  def cannot_chat_with_self
-    if user_id == user_id_invit
-      errors.add(:base, "Vous ne pouvez pas discuter avec vous-même")
-    end
-  end
 end

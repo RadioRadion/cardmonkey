@@ -7,7 +7,7 @@ class HomeController < ApplicationController
         .includes(:user, :user_invit, user_cards: [:card_version])
         .order(updated_at: :desc)
         .limit(5)
-      @potential_matches = Match.where("user_id = :user_id OR user_id_target = :user_id", user_id: current_user.id)
+      @potential_matches = Match.where("(user_id = :user_id AND user_id_target != :user_id) OR (user_id_target = :user_id AND user_id != :user_id)", user_id: current_user.id)
         .includes(
           user_card: { card_version: [:card, :extension], user: {} },
           user_wanted_card: { card_version: [:card, :extension] }

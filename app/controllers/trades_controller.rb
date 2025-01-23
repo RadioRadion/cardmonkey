@@ -10,7 +10,7 @@ class TradesController < ApplicationController
 
     # Load matches in both directions - where current user has cards others want
     # and where current user wants cards others have
-    @matches = Match.where("user_id = :user_id OR user_id_target = :user_id", user_id: current_user.id)
+    @matches = Match.where("(user_id = :user_id AND user_id_target != :user_id) OR (user_id_target = :user_id AND user_id != :user_id)", user_id: current_user.id)
       .includes(
         user_card: { card_version: [:card, :extension], user: {} },
         user_wanted_card: { card_version: [:card, :extension] }
@@ -45,6 +45,11 @@ class TradesController < ApplicationController
   end
 
   def create
+    if params[:trade][:user_id_invit].to_i == current_user.id
+      redirect_back fallback_location: root_path, alert: "Vous ne pouvez pas échanger avec vous-même"
+      return
+    end
+
     @trade = Trade.new(
       user: current_user,
       user_id_invit: params[:trade][:user_id_invit],
@@ -61,7 +66,7 @@ class TradesController < ApplicationController
   end
 
   def update
-    result = case params[:status]
+    result = case params.dig(:trade, :status) || params[:status]
     when "accepted"
       handle_trade_acceptance
     when "done"
@@ -71,7 +76,12 @@ class TradesController < ApplicationController
     when "modified"
       handle_trade_modification
     else
-      handle_trade_modification
+      if params[:trade].present? && (params[:trade][:offer].present? || params[:trade][:target].present?)
+        handle_trade_modification
+      else
+        redirect_to trade_path(@trade), alert: "Action non valide."
+        return
+      end
     end
 
     # Si la méthode a retourné false, c'est qu'elle a déjà fait un redirect
@@ -167,6 +177,10 @@ class TradesController < ApplicationController
 
   def set_partner
     @partner = User.find(params[:partner_id])
+    if @partner.id == current_user.id
+      redirect_to root_path, alert: "Vous ne pouvez pas échanger avec vous-même"
+      return
+    end
   rescue ActiveRecord::RecordNotFound
     redirect_to root_path, alert: "Utilisateur non trouvé"
   end
@@ -246,18 +260,24 @@ class TradesController < ApplicationController
   end
 
   def notify_trade_creation
-    Notification.create_trade_notification(
-      @trade.user_id_invit,
-      @trade.id,
-      I18n.t('notifications.trade.new_trade', id: @trade.id)
-    )
-    chatroom = Trade.find_or_create_chatroom(current_user.id, @trade.user_id_invit)
+    begin
+      Notification.create_trade_notification(
+        @trade.user_id_invit,
+        @trade.id,
+        I18n.t('notifications.trade.new_trade', id: @trade.id)
+      )
+      chatroom = Trade.find_or_create_chatroom(current_user.id, @trade.user_id_invit)
     Message.create!(
       content: "#{current_user.username} a proposé un échange",
       user_id: current_user.id,
       chatroom_id: chatroom.id,
-      metadata: { type: 'trade', trade_id: @trade.id }
+      metadata: { 'type' => 'trade', 'trade_id' => @trade.id }
     )
+    rescue => e
+      Rails.logger.error "Error in notify_trade_creation: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      raise e
+    end
   end
 
   def handle_trade_acceptance
@@ -282,11 +302,25 @@ class TradesController < ApplicationController
       return false
     end
 
-    @trade.update!(status: :done)
-    notify_trade_status_change(
-      "Trade terminé, bon jeu !",
-      I18n.t('notifications.trade.trade_completed', id: @trade.id)
-    )
+    Trade.transaction do
+      @trade.completed_by_user_ids = (@trade.completed_by_user_ids || []) + [current_user.id]
+      
+      if @trade.completed_by_user_ids.sort == [@trade.user_id, @trade.user_id_invit].sort
+        @trade.status = :done
+        notify_trade_status_change(
+          "Les deux participants ont confirmé que l'échange physique a été réalisé. Trade terminé, bon jeu !",
+          I18n.t('notifications.trade.trade_completed', id: @trade.id)
+        )
+      else
+        other_user = @trade.other_user(current_user)
+        notify_trade_status_change(
+          "#{current_user.username} confirme avoir réalisé l'échange physiquement. En attente de la confirmation de #{other_user.username}.",
+          I18n.t('notifications.trade.trade_completion_pending', id: @trade.id, username: current_user.username)
+        )
+      end
+      
+      @trade.save!
+    end
     true
   end
 
@@ -332,7 +366,7 @@ class TradesController < ApplicationController
       content: "✅ La modification de l'échange a été validée ! Vous pouvez maintenant organiser la rencontre.",
       user_id: current_user.id,
       chatroom_id: chatroom.id,
-      metadata: { type: 'trade', trade_id: @trade.id }
+      metadata: { 'type' => 'trade', 'trade_id' => @trade.id }
     )
     Notification.create_trade_notification(
       other_user.id,
@@ -348,7 +382,7 @@ class TradesController < ApplicationController
       content: message,
       user_id: current_user.id,
       chatroom_id: chatroom.id,
-      metadata: { type: 'trade', trade_id: @trade.id }
+      metadata: { 'type' => 'trade', 'trade_id' => @trade.id }
     )
     Notification.create_trade_notification(other_user.id, @trade.id, notification_text)
   end

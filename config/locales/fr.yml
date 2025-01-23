@@ -25,6 +25,7 @@ fr:
       new_trade: "Nouveau trade %{id} proposé !"
       trade_accepted: "Trade %{id} accepté !"
       trade_completed: "Trade %{id} réalisé !"
+      trade_completion_pending: "%{username} a confirmé avoir réalisé l'échange physique pour le trade %{id}. En attente de votre confirmation."
       trade_modified: "Modification proposée pour le trade %{id} !"
       trade_validated: "La modification du trade %{id} a été validée !"
       card_removed: "La carte %{card_name} a été retirée d'un échange en cours"
@@ -267,6 +268,16 @@ fr:
               greater_than: "La quantité doit être supérieure à 0"
 
   activerecord:
+    errors:
+      messages:
+        record_invalid: "La validation a échoué : %{errors}"
+        taken: "est déjà utilisé"
+        taken_with_scope: "est déjà utilisé pour cette combinaison"
+        blank: "ne peut pas être vide"
+        not_a_number: "n'est pas un nombre"
+        greater_than: "doit être supérieur à %{count}"
+        less_than: "doit être inférieur à %{count}"
+        invalid: "n'est pas valide"
     models:
       user_card: "Carte de collection"
       user_wanted_card: "Carte recherchée"
@@ -300,6 +311,8 @@ fr:
           attributes:
             status:
               blank: "Le statut ne peut pas être vide"
+            user_id_invit:
+              invalid_trade_partner: "Vous ne pouvez pas échanger avec vous-même"
     enums:
       user_card:
         condition:
