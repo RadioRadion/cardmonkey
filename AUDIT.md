@@ -39,17 +39,35 @@
 
 ---
 
+## Section 4 : Sécurité (Vulnérabilités gems)
+
+**~30 vulnérabilités détectées** via `bundle-audit` - nécessite upgrade Rails
+
+| Gem | Version actuelle | Version requise | Criticité |
+|-----|------------------|-----------------|-----------|
+| **rails** | 7.1.3.1 | >= 7.1.5.2 | HAUTE - Multiple CVE (XSS, ReDoS, Path Traversal) |
+| **rack** | 3.1.8 | >= 3.1.21 | Moyenne - Host bypass, Content-Length |
+| **rack-session** | 2.0.0 | >= 2.1.2 | Moyenne - Session forgery |
+| **rexml** | 3.2.6 | >= 3.3.9 | HAUTE - ReDoS |
+| **uri** | 1.0.2 | >= 1.0.4 | HAUTE - Credential leakage |
+| **rails-html-sanitizer** | 1.6.0 | >= 1.6.1 | Moyenne - XSS |
+| **thor** | 1.3.2 | >= 1.4.0 | Basse - Shell injection |
+
+**Action requise** : `bundle update rails` (implique upgrade majeur vers Rails 7.1.5+)
+
+---
+
 ## Contexte git
 
 **Branche actuelle** : master
 
 **Derniers commits** :
+- `352f9ce` - update gems for security patches
+- `8225add` - update audit after cleanup
 - `ea934e8` - add stimulus controllers for filter and view toggle
 - `ff0d504` - add ratings, async matching, email notifications, pagination
-- `c74807c` - trade acceptance improved
-- `7c3ef25` - notification counter fixed
 
-**État actuel** : Working tree clean
+**État actuel** : Working tree clean (hors AUDIT.md)
 
 **Travail récent** :
 - Janvier : Intégration Scryfall API
