@@ -1,33 +1,176 @@
-<div class="row justify-content-between">
+<div class="container mx-auto px-4 py-6 pb-32">
+  <%# En-tête avec titre et statut %>
+  <div class="mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold">
+        Échange avec <%= @trade.partner_name_for(current_user) %>
+      </h1>
+      <div>
+        <%= content_tag(:span, 
+            case @trade.status
+            when "pending" then "En attente"
+            when "modified" then "Modifié"
+            when "accepted" then "Accepté"
+            when "done" then "Terminé"
+            when "cancelled" then "Annulé"
+            end,
+            class: "px-3 py-1 text-sm rounded-full #{
+              case @trade.status
+              when "pending" then "bg-yellow-100 text-yellow-800"
+              when "modified" then "bg-blue-100 text-blue-800"
+              when "accepted" then "bg-green-100 text-green-800"
+              when "done" then "bg-gray-100 text-gray-800"
+              when "cancelled" then "bg-red-100 text-red-800"
+              end
+            }"
+        ) %>
+      </div>
+    </div>
+  </div>
 
-  <%= render "shared/cards/cards_for_collection", locals: {
-    title: "Ma collection",
-    total_price: @total_price,
-    cards: @cards,
-    side: "card-offer"}  %>
+  <%# Grilles de cartes %>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <%# Vos cartes %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-semibold">Vos cartes</h2>
+      </div>
+      <div class="p-4">
+        <% if @cards_by_user[current_user.id].present? %>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <%= render partial: "trades/trade_card",
+                      collection: @cards_by_user[current_user.id][:cards],
+                      locals: { readonly: true } %>
+          </div>
+          <div class="mt-4 text-right text-gray-600">
+            Total: <%= number_to_currency(@cards_by_user[current_user.id][:total_price], unit: "€", format: "%n %u") %>
+          </div>
+        <% else %>
+          <p class="text-gray-500 text-center py-4">Aucune carte sélectionnée</p>
+        <% end %>
+      </div>
+    </div>
 
-  <%= render "shared/cards/cards_for_collection", locals: {
-    title: "Sa collection",
-    total_price: @other_total_price,
-    cards: @other_cards,
-    side: "card-target"}  %>
+    <%# Cartes du partenaire %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-semibold">Cartes de <%= @trade.partner_name_for(current_user) %></h2>
+      </div>
+      <div class="p-4">
+        <% partner_id = @trade.partner_for(current_user).id %>
+        <% if @cards_by_user[partner_id].present? %>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <%= render partial: "trades/trade_card",
+                      collection: @cards_by_user[partner_id][:cards],
+                      locals: { readonly: true } %>
+          </div>
+          <div class="mt-4 text-right text-gray-600">
+            Total: <%= number_to_currency(@cards_by_user[partner_id][:total_price], unit: "€", format: "%n %u") %>
+          </div>
+        <% else %>
+          <p class="text-gray-500 text-center py-4">Aucune carte sélectionnée</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
 
+  <%# Barre de résumé fixe %>
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex justify-between items-center">
+        <%# Côté gauche avec les totaux %>
+        <div class="flex gap-8">
+          <div>
+            <span class="text-sm text-gray-600">Vous donnez</span>
+            <div class="font-medium">
+              <%= @cards_by_user.dig(current_user.id, :cards)&.size || 0 %> cartes
+              (<%= number_to_currency(@cards_by_user.dig(current_user.id, :total_price) || 0, unit: "€", format: "%n %u") %>)
+            </div>
+          </div>
+          <div>
+            <span class="text-sm text-gray-600">Vous recevez</span>
+            <div class="font-medium">
+              <% partner_id = @trade.partner_for(current_user).id %>
+              <%= @cards_by_user.dig(partner_id, :cards)&.size || 0 %> cartes
+              (<%= number_to_currency(@cards_by_user.dig(partner_id, :total_price) || 0, unit: "€", format: "%n %u") %>)
+            </div>
+          </div>
+          <%# Balance du trade %>
+          <div class="border-l pl-8">
+            <span class="text-sm text-gray-600">Balance</span>
+            <div class="font-medium">
+              <% balance = (@cards_by_user.dig(current_user.id, :total_price) || 0) - (@cards_by_user.dig(partner_id, :total_price) || 0) %>
+              <%= number_to_currency(balance.abs, unit: "€", format: "%n %u") %>
+            </div>
+          </div>
+        </div>
+
+        <%# Boutons d'action %>
+        <div class="flex gap-4 items-center">
+          <div class="flex gap-4">
+            <% if @trade.modified? && @trade.can_be_validated?(current_user) %>
+              <%= button_to "Valider la modification",
+                        validate_trade_path(@trade),
+                        method: :patch,
+                        class: "px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg" %>
+            <% elsif @trade.accepted? %>
+              <div class="flex gap-4">
+                <%= link_to user_chatroom_path(current_user, Chatroom.between(current_user, @trade.partner_for(current_user))),
+                          class: "px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg flex items-center gap-2" do %>
+                  <i class="fas fa-comments"></i>
+                  Discuter de l'échange
+                <% end %>
+
+                <% if @trade.completed_by_user_ids&.include?(current_user.id) %>
+                  <div class="px-6 py-2 bg-gray-100 text-gray-600 rounded-lg flex items-center gap-2">
+                    <i class="fas fa-check"></i>
+                    Vous avez confirmé l'échange
+                  </div>
+                <% else %>
+                  <%= button_to "Confirmer l'échange physique",
+                            trade_path(@trade),
+                            method: :patch,
+                            params: { status: "done" },
+                            class: "px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg",
+                            data: { confirm: "Confirmez-vous avoir réalisé l'échange physique avec #{@trade.partner_name_for(current_user)} ?" } %>
+                <% end %>
+              </div>
+
+              <%# Statut des confirmations %>
+              <% if @trade.completed_by_user_ids.present? %>
+                <div class="mt-4 text-sm text-gray-600">
+                  <% @trade.completed_by_user_ids.each do |user_id| %>
+                    <div class="flex items-center gap-2">
+                      <i class="fas fa-check text-green-500"></i>
+                      <%= user_id == current_user.id ? "Vous avez" : "#{User.find(user_id).username} a" %> confirmé l'échange physique
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            <% else %>
+              <% if (@trade.pending? || @trade.modified?) && @trade.can_be_modified_by?(current_user) %>
+                <%= link_to "Modifier", 
+                          edit_trade_path(@trade),
+                          class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50",
+                          data: { turbo: false } %>
+              <% end %>
+
+              <% if @trade.pending? && @trade.can_be_accepted_by?(current_user) %>
+                <%= button_to "Accepter",
+                          trade_path(@trade),
+                          method: :patch,
+                          params: { status: "accepted" },
+                          class: "px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg" %>
+              <% end %>
+            <% end %>
+          </div>
+          
+          <%= link_to "Retour", 
+                    trades_path,
+                    class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50",
+                    data: { turbo: false } %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
-<% if @trade.status == "pending" %>
-
-  <%= link_to("Modifier Trade", edit_user_trade_path(@trade.user_id, @trade.id)) %>
-  <%= link_to("Accepter Trade", user_trade_path(@trade.user_id, @trade.id, status: "accepted"), method: 'put') %>
-
-<% elsif @trade.status == "accepted" %>
-
-  <p>TRADE ACCEPTE</p>
-  <p>Si le trade a été réalisé, merci de le valider</p>
-  <%= link_to("Trade fait", user_trade_path(@trade.user_id, @trade.id, status: "done"), method: 'put') %>
-
-<% else @trade.status == "done" %>
-
-  <p>TRADE TERMINE</p>
-
-<% end %>
-

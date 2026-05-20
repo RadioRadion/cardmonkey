@@ -1,0 +1,396 @@
+fr:
+  navbar:
+    notifications: "Notifications"
+    home: "Accueil"
+    wantlist: "Liste de souhaits"
+    collection: "Collection"
+    trades: "Échanges"
+    messages: "Messages"
+    profile:
+      my_profile: "Mon profil"
+      edit_profile: "Modifier le profil"
+      dashboard: "Tableau de bord"
+      sign_out: "Déconnexion"
+    auth:
+      sign_in: "Connexion"
+      sign_up: "Inscription"
+
+  notifications:
+    notifications:
+      no_notifications: "Aucune notification"
+      mark_all_as_read: "Tout marquer comme lu"
+    notification:
+      mark_as_read: "Marquer comme lu"
+    trade:
+      new_trade: "Nouveau trade %{id} proposé !"
+      trade_accepted: "Trade %{id} accepté !"
+      trade_completed: "Trade %{id} réalisé !"
+      trade_completion_pending: "%{username} a confirmé avoir réalisé l'échange physique pour le trade %{id}. En attente de votre confirmation."
+      trade_modified: "Modification proposée pour le trade %{id} !"
+      trade_validated: "La modification du trade %{id} a été validée !"
+      card_removed: "La carte %{card_name} a été retirée d'un échange en cours"
+      card_removed_chat: "La carte %{card_name} a été retirée de l'échange"
+      wanted_card_removed: "La carte %{card_name} a été retirée de la liste de souhaits de %{username}"
+      wanted_card_removed_chat: "La carte %{card_name} n'est plus recherchée par %{username}"
+
+  datetime:
+    distance_in_words:
+      x_seconds:
+        one: "il y a 1 seconde"
+        other: "il y a %{count} secondes"
+      x_minutes:
+        one: "il y a 1 minute"
+        other: "il y a %{count} minutes"
+      x_hours:
+        one: "il y a 1 heure"
+        other: "il y a %{count} heures"
+      x_days:
+        one: "il y a 1 jour"
+        other: "il y a %{count} jours"
+      x_months:
+        one: "il y a 1 mois"
+        other: "il y a %{count} mois"
+      x_years:
+        one: "il y a 1 an"
+        other: "il y a %{count} ans"
+      about_x_hours:
+        one: "environ 1 heure"
+        other: "environ %{count} heures"
+      about_x_months:
+        one: "environ 1 mois"
+        other: "environ %{count} mois"
+      about_x_years:
+        one: "environ 1 an"
+        other: "environ %{count} ans"
+
+  footer:
+    about: "À propos"
+    privacy_policy: "Politique de confidentialité"
+    licensing: "Licences"
+    contact: "Contact"
+
+  privacy_policy:
+    title: "Politique de Confidentialité"
+    data_collection:
+      title: "1. Collecte des Informations"
+      intro: "Nous collectons les informations suivantes lorsque vous utilisez CardMonkey :"
+      items:
+        account: "Informations de compte (email, nom d'utilisateur)"
+        location: "Informations de localisation pour faciliter les échanges locaux"
+        cards: "Données relatives à vos cartes Magic (collection et souhaits)"
+    data_usage:
+      title: "2. Utilisation des Données"
+      intro: "Vos données sont utilisées pour :"
+      items:
+        exchanges: "Faciliter les échanges entre utilisateurs"
+        experience: "Améliorer votre expérience sur la plateforme"
+        matches: "Vous informer des correspondances potentielles"
+        security: "Assurer la sécurité de votre compte"
+    data_protection:
+      title: "3. Protection des Données"
+      intro: "Nous mettons en œuvre des mesures de sécurité pour protéger vos informations personnelles :"
+      items:
+        encryption: "Chiffrement des données sensibles"
+        access: "Accès restreint aux données personnelles"
+        monitoring: "Surveillance régulière de nos systèmes"
+    user_rights:
+      title: "4. Vos Droits"
+      intro: "Vous disposez des droits suivants concernant vos données :"
+      items:
+        access: "Accès à vos données personnelles"
+        rectification: "Rectification des informations inexactes"
+        deletion: "Suppression de votre compte et des données associées"
+        opposition: "Opposition au traitement de vos données"
+    contact:
+      title: "5. Contact"
+      text: "Pour toute question concernant notre politique de confidentialité, vous pouvez nous contacter à l'adresse suivante :"
+
+  wants:
+    collection:
+      add_card: "Ajouter une carte"
+    table:
+      headers:
+        card: "Carte"
+        min_condition: "État minimum"
+        extension: "Extension"
+        language: "Langue"
+        foil: "Foil"
+        quantity: "Quantité"
+        matches: "Matches"
+        scan: "Scan"
+        actions: "Actions"
+      actions:
+        edit: "Modifier"
+        delete: "Supprimer"
+    conditions:
+      unimportant: "Sans importance"
+    languages:
+      any: "Toutes"
+    attributes:
+      foil: "Foil"
+
+  trades:
+    show:
+      title: "Échange avec %{partner}"
+      your_cards: "Vos cartes"
+      partner_cards: "Cartes de %{partner}"
+      no_cards: "Aucune carte sélectionnée"
+      you_give: "Vous donnez"
+      you_receive: "Vous recevez"
+      balance: "Balance"
+      card: "carte"
+      cards: "cartes"
+      modify: "Modifier"
+      accept: "Accepter"
+      mark_as_done: "Marquer comme terminé"
+      back: "Retour"
+    edit:
+      title: "Modifier l'échange avec %{partner}"
+      available_cards: "carte(s) disponible(s)"
+      search_your_cards: "Rechercher dans vos cartes..."
+      search_their_cards: "Rechercher dans ses cartes..."
+      your_cards: "Vos cartes"
+      partner_cards: "Cartes de %{partner}"
+      cards_they_want: "Cartes recherchées par %{partner}"
+      cards_you_want: "Cartes que vous recherchez"
+      you_give: "Vous donnez"
+      you_receive: "Vous recevez"
+      balance: "Balance"
+      cancel: "Annuler"
+      update_trade: "Mettre à jour l'échange"
+      card: "carte"
+      cards: "cartes"
+      currency: "€"
+    new_proposition:
+      title: "Proposer un échange à %{partner}"
+      wanted_cards_count: "carte recherchée||cartes recherchées"
+      search_your_cards: "Rechercher dans vos cartes..."
+      search_their_cards: "Rechercher dans ses cartes..."
+      your_cards: "Vos cartes"
+      partner_cards: "Cartes de %{partner}"
+      you_give: "Vous donnez"
+      you_receive: "Vous recevez"
+      balance: "Balance"
+      cancel: "Annuler"
+      validate_trade: "Valider l'échange"
+      card: "carte"
+      cards: "cartes"
+      currency: "€"
+    trade_row:
+      with: "avec"
+      card_offered: "carte proposée||cartes proposées"
+      card_requested: "carte demandée||cartes demandées"
+      view_details: "Voir détails"
+      accept_trade: "Accepter l'échange"
+      reject: "Refuser"
+    trade_card:
+      quantity_separator: " • "
+      condition: "État"
+      currency: "€"
+
+  user_wanted_cards:
+    form:
+      errors: "Erreurs :"
+      card_name: "Nom de la carte"
+      search_placeholder: "Rechercher une carte..."
+      extension: "Extension (optionnel)"
+      any_extension: "N'importe quelle extension"
+      any_condition: "N'importe quelle condition"
+      any_language: "N'importe quelle langue"
+      language_optional: "Langue (optionnel)"
+      save_changes: "Enregistrer les modifications"
+      add_card: "Ajouter la carte"
+    create:
+      success: "La carte a été ajoutée à votre liste de recherche"
+      error: "Une erreur est survenue lors de l'ajout de la carte"
+    update:
+      success: "La carte a été mise à jour dans votre liste de recherche"
+      error: "Une erreur est survenue lors de la mise à jour de la carte"
+    destroy:
+      success: "La carte %{name} a été retirée de votre liste de recherche"
+      error: "Une erreur est survenue lors de la suppression de la carte"
+      not_found: "La carte n'a pas été trouvée dans votre liste de recherche"
+
+  user_cards:
+    form:
+      errors: "Erreurs :"
+      card_name: "Nom de la carte"
+      search_placeholder: "Rechercher une carte..."
+      extension: "Extension"
+      save_changes: "Enregistrer les modifications"
+      add_card: "Ajouter la carte"
+    create:
+      success: "La carte a été ajoutée à votre collection"
+      error: "Une erreur est survenue lors de l'ajout de la carte"
+    update:
+      success: "La carte a été mise à jour dans votre collection"
+      error: "Une erreur est survenue lors de la mise à jour de la carte"
+    destroy:
+      success: "La carte %{name} a été retirée de votre collection"
+      error: "Une erreur est survenue lors de la suppression de la carte"
+      not_found: "La carte n'a pas été trouvée dans votre collection"
+
+  users:
+    profile:
+      save_changes: "Enregistrer les modifications"
+      cancel: "Annuler"
+      no_username: "Nom d'utilisateur non défini"
+      trading_statistics: "Statistiques d'échange"
+      total_matches: "Matchs totaux"
+      trading_preferences: "Préférences d'échange"
+      edit_profile: "Modifier le profil"
+      edit_preferences: "Modifier les préférences"
+      trading_location: "Lieu d'échange"
+      trading_area: "Zone d'échange (km)"
+      trading_preference: "Préférence d'échange"
+      value_based: "Échange basé sur la valeur"
+      quantity_based: "Échange basé sur la quantité"
+      save_preferences: "Enregistrer les préférences"
+      location: "Lieu"
+      area: "Zone"
+      preference: "Préférence"
+      not_set: "Non défini"
+      enter_location: "Entrez votre lieu d'échange"
+      enter_area: "Entrez le rayon en kilomètres"
+
+  activemodel:
+    errors:
+      models:
+        forms/user_card_form:
+          attributes:
+            card_name:
+              blank: "Le nom de la carte est requis"
+        forms/user_wanted_card_form:
+          attributes:
+            quantity:
+              blank: "La quantité est requise"
+              not_a_number: "La quantité doit être un nombre"
+              greater_than: "La quantité doit être supérieure à 0"
+
+  activerecord:
+    errors:
+      messages:
+        record_invalid: "La validation a échoué : %{errors}"
+        taken: "est déjà utilisé"
+        taken_with_scope: "est déjà utilisé pour cette combinaison"
+        blank: "ne peut pas être vide"
+        not_a_number: "n'est pas un nombre"
+        greater_than: "doit être supérieur à %{count}"
+        less_than: "doit être inférieur à %{count}"
+        invalid: "n'est pas valide"
+    models:
+      user_card: "Carte de collection"
+      user_wanted_card: "Carte recherchée"
+      trade: "Échange"
+    attributes:
+      user_card:
+        condition: "État"
+        language: "Langue"
+        quantity: "Quantité"
+        foil: "Foil"
+        card_name: "Nom de la carte"
+        extension: "Extension"
+      user_wanted_card:
+        min_condition: "État minimum"
+        language: "Langue"
+        quantity: "Quantité"
+        foil: "Foil"
+        card_name: "Nom de la carte"
+        extension: "Extension"
+      user:
+        username: "Nom d'utilisateur"
+        email: "Adresse e-mail"
+        address: "Adresse"
+        area: "Zone d'échange"
+        preference: "Préférence d'échange"
+      trade:
+        status: "Statut"
+    errors:
+      models:
+        trade:
+          attributes:
+            status:
+              blank: "Le statut ne peut pas être vide"
+            user_id_invit:
+              invalid_trade_partner: "Vous ne pouvez pas échanger avec vous-même"
+    enums:
+      user_card:
+        condition:
+          poor: "Mauvais"
+          played: "Joué"
+          light_played: "Légèrement joué"
+          good: "Bon"
+          excellent: "Excellent"
+          near_mint: "Quasi neuf"
+          mint: "Neuf"
+        language:
+          french: "Français"
+          english: "Anglais"
+          german: "Allemand"
+          italian: "Italien"
+          simplified_chinese: "Chinois simplifié"
+          traditional_chinese: "Chinois traditionnel"
+          japanese: "Japonais"
+          portuguese: "Portugais"
+          russian: "Russe"
+          korean: "Coréen"
+      user:
+        preference:
+          value_based: "Basé sur la valeur"
+          quantity_based: "Basé sur la quantité"
+      trade:
+        status:
+          pending: "En attente"
+          modified: "Modifié"
+          accepted: "Accepté"
+          done: "Terminé"
+          cancelled: "Annulé"
+
+  cards:
+    conditions:
+      poor: "Mauvais"
+      played: "Joué"
+      light_played: "Légèrement joué"
+      good: "Bon"
+      excellent: "Excellent"
+      near_mint: "Quasi neuf"
+      mint: "Neuf"
+    languages:
+      flags:
+        fr: "🇫🇷"
+        en: "🇬🇧"
+        de: "🇩🇪"
+        it: "🇮🇹"
+        zhs: "🇨🇳"
+        zht: "🇹🇼"
+        ja: "🇯🇵"
+        pt: "🇵🇹"
+        ru: "🇷🇺"
+        ko: "🇰🇷"
+    rarity:
+      common: "Commune"
+      uncommon: "Peu commune"
+      rare: "Rare"
+      mythic: "Mythique"
+    collection:
+      add_card: "Ajouter une nouvelle carte"
+      update_success: "La carte a été mise à jour dans votre collection."
+      create_success: "La carte a été ajoutée à votre collection."
+      delete_success: "La carte a été supprimée avec succès."
+      card_not_found: "La carte n'a pas été trouvée."
+    table:
+      headers:
+        card: "Carte"
+        condition: "État"
+        extension: "Extension"
+        language: "Langue"
+        foil: "Foil"
+        quantity: "Quantité"
+        price: "Prix"
+        collector_number: "N° Collection"
+        rarity: "Rareté"
+        scan: "Scan"
+        actions: "Actions"
+      actions:
+        edit: "Modifier"
+        delete: "Supprimer"

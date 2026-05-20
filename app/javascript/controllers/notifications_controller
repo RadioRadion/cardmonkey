@@ -1,0 +1,23 @@
+import { Controller } from "@hotwired/stimulus"
+
+export default class extends Controller {
+  connect() {
+    this.markAsRead()
+  }
+
+  markAsRead() {
+    // Marquer les notifications comme lues après un délai
+    setTimeout(() => {
+      const unreadNotifications = this.element.querySelectorAll('.notification-unread')
+      unreadNotifications.forEach(notification => {
+        fetch(`/notifications/${notification.dataset.id}/mark_as_read`, {
+          method: 'PATCH',
+          headers: {
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+          }
+        })
+      })
+    }, 2000)
+  }
+}

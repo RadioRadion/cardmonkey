@@ -1,0 +1,28 @@
+<h1>Nouveaux matchs trouvés ! 🎯</h1>
+
+<p>Bonjour <%= @user.username %>,</p>
+
+<p>Bonne nouvelle ! Nous avons trouvé <strong><%= @match_count %></strong> nouveau<%= 'x' if @match_count > 1 %> match<%= 's' if @match_count > 1 %> pour vos cartes.</p>
+
+<% if @matches.any? %>
+  <h2>Aperçu des matchs :</h2>
+  <ul>
+    <% @matches.limit(5).each do |match| %>
+      <li>
+        <% if match.user_card.present? %>
+          <%= match.user_card.card_version&.card&.name_fr %> -
+          disponible chez <%= match.user_card.user&.username %>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+  <% if @match_count > 5 %>
+    <p><em>Et <%= @match_count - 5 %> autres matchs...</em></p>
+  <% end %>
+<% end %>
+
+<p>
+  <%= link_to "Voir tous mes matchs", trades_url, style: "background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;" %>
+</p>
+
+<p>Bon trading !</p>

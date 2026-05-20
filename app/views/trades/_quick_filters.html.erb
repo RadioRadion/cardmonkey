@@ -1,0 +1,19 @@
+<div class="flex gap-2">
+  <%= link_to new_proposition_trades_path(partner_id: @partner.id, filter: 'in_wishlist'),
+              class: "text-sm px-3 py-1 rounded-full #{params[:filter] == 'in_wishlist' ? 'bg-blue-500 text-white' : 'bg-gray-100'}",
+              data: { turbo_frame: "trade_interface" } do %>
+    <span>Dans sa wishlist</span>
+    <% if @partner.user_wanted_cards.any? %>
+      <span class="ml-1 px-1.5 py-0.5 text-xs bg-blue-200 text-blue-800 rounded-full">
+        <%= @partner.user_wanted_cards.count %>
+      </span>
+    <% end %>
+  <% end %>
+
+  <% if @trade_history&.any? %>
+    <button class="text-sm px-3 py-1 bg-gray-100 rounded-full"
+            data-action="click->trade-selection#toggleHistory">
+      Historique des échanges
+    </button>
+  <% end %>
+</div>

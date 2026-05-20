@@ -1,17 +1,47 @@
 FactoryBot.define do
-    factory :user do
-      email { Faker::Internet.email }
-      password { 'password' }
-      password_confirmation { 'password' }
-      username { Faker::Internet.username }
-      latitude { Faker::Address.latitude }
-      longitude { Faker::Address.longitude }
-      address { Faker::Address.full_address }
-      area { 50 }  # Vous pouvez ajuster cette valeur selon vos besoins
-      preference { 'value_based' } # ou 'quantity_based', selon la préférence par défaut
-  
-      # Les attributs reset_password_token et reset_password_sent_at ne sont généralement pas nécessaires pour les tests de base.
-      # Si vous avez besoin de les définir pour certains tests, vous pouvez les surcharger dans les scénarios de test spécifiques.
+  factory :user do
+    sequence(:email) { |n| "user#{n}@example.com" }
+    sequence(:username) { |n| "user#{n}" }
+    password { "password123" }
+    address { "123 Test Street" }
+    area { "Test Area" }
+    preference { :value_based }
+
+    trait :with_avatar do
+      after(:build) do |user|
+        user.avatar.attach(
+          io: File.open(Rails.root.join('spec', 'fixtures', 'files', 'avatar.jpg')),
+          filename: 'avatar.jpg',
+          content_type: 'image/jpeg'
+        )
+      end
+    end
+
+    trait :with_cards do
+      after(:create) do |user|
+        create_list(:user_card, 3, user: user)
+      end
+    end
+
+    trait :with_wanted_cards do
+      after(:create) do |user|
+        create_list(:user_wanted_card, 3, user: user)
+      end
+    end
+
+    trait :with_trades do
+      after(:create) do |user|
+        create_list(:trade, 2, user: user)
+        create_list(:trade, 2, user_id_invit: user.id)
+      end
+    end
+
+    trait :with_matches do
+      after(:create) do |user|
+        other_user = create(:user)
+        user_card = create(:user_card, user: user)
+        create_list(:match, 3, user_id: user.id, user_id_target: other_user.id, user_card: user_card)
+      end
     end
   end
-  
+end

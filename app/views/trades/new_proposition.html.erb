@@ -1,0 +1,142 @@
+<div class="container mx-auto px-4 py-6 pb-32" 
+     data-controller="trade-selection" 
+     data-trade-selection-partner-id-value="<%= @partner.id %>">
+  <%# En-tête avec titre et recherche %>
+  <div class="mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold">
+        <%= t('.title', partner: @partner.username) %>
+      </h1>
+      <span class="text-gray-600">
+        <%= pluralize(@partner.user_wanted_cards.count, t('.wanted_cards_count')) %>
+      </span>
+    </div>
+    
+    <%# Barres de recherche %>
+    <div class="flex gap-4">
+      <div class="flex gap-4 w-full">
+        <div class="flex-1 relative">
+          <div class="relative flex items-center">
+            <div class="absolute left-3 text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input type="text" 
+                   name="user_query"
+                   placeholder="<%= t('.search_your_cards') %>" 
+                   class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   data-action="input->trade-selection#search"
+                   autocomplete="off">
+          </div>
+        </div>
+        <div class="flex-1 relative">
+          <div class="relative flex items-center">
+            <div class="absolute left-3 text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input type="text" 
+                   name="partner_query"
+                   placeholder="<%= t('.search_their_cards') %>" 
+                   class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   data-action="input->trade-selection#search"
+                   autocomplete="off">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Grilles de cartes %>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <%# Vos cartes %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-semibold"><%= t('.your_cards') %></h2>
+      </div>
+      <div class="p-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4" 
+             data-trade-selection-target="userCardsGrid">
+          <%= render partial: "trades/card",
+                    collection: @user_cards,
+                    locals: { side: 'user' } %>
+        </div>
+      </div>
+    </div>
+
+    <%# Cartes du partenaire %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-semibold"><%= t('.partner_cards', partner: @partner.username) %></h2>
+      </div>
+      <div class="p-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4" 
+             data-trade-selection-target="partnerCardsGrid">
+          <%= render partial: "trades/card",
+                    collection: @partner_cards,
+                    locals: { side: 'partner' } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Barre de résumé fixe %>
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <%= form_with model: @trade, 
+                    local: true, 
+                    class: "w-full", 
+                    data: { 
+                      turbo: false,
+                      action: "submit->trade-selection#submitTrade" 
+                    } do |f| %>
+        <%= f.hidden_field :user_id, value: current_user.id %>
+        <%= f.hidden_field :user_id_invit, value: @partner.id %>
+        <%= f.hidden_field :offer %>
+        <%= f.hidden_field :target %>
+        
+        <div class="flex justify-between items-center">
+          <%# Côté gauche avec les totaux %>
+          <div class="flex gap-8">
+            <div>
+              <span class="text-sm text-gray-600"><%= t('.you_give') %></span>
+              <div class="font-medium">
+                <span data-trade-selection-target="userCardCount">0</span> cartes
+                (<span data-trade-selection-target="userValue">0,00 €</span>)
+              </div>
+            </div>
+            <div>
+              <span class="text-sm text-gray-600"><%= t('.you_receive') %></span>
+              <div class="font-medium">
+                <span data-trade-selection-target="partnerCardCount">0</span> cartes
+                (<span data-trade-selection-target="partnerValue">0,00 €</span>)
+              </div>
+            </div>
+            <%# Balance du trade %>
+            <div class="border-l pl-8">
+              <span class="text-sm text-gray-600"><%= t('.balance') %></span>
+              <div class="font-medium" data-trade-selection-target="balance">0,00 €</div>
+            </div>
+          </div>
+
+          <%# Boutons d'action %>
+          <div class="flex gap-4 items-center">
+            <%= link_to t('.cancel'), 
+                      user_path(@partner), 
+                      class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50",
+                      data: { turbo: false } %>
+            
+            <%= f.submit t('.validate_trade'), 
+                      class: "text-white bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+                      data: { 
+                        trade_selection_target: "submitButton",
+                        disable_with: t('.validating')
+                      } %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,41 +1,36 @@
-<div class="container">
+<%# app/views/users/show.html.erb %>
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-3xl mx-auto">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+      <!-- Profile Header avec Photo -->
+      <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-8">
+        <div class="flex items-center space-x-4">
+          <%= turbo_frame_tag "profile_avatar" do %>
+            <%= render "users/avatar", user: @user %>
+          <% end %>
+          
+          <!-- Username et Email éditable -->
+          <%= turbo_frame_tag "profile_info" do %>
+            <%= render "users/profile_info", user: @user, editing: @editing %>
+          <% end %>
+        </div>
+      </div>
 
-<% if current_user == @user %>
-  <span>Total collection : <%= @cards.length %></span><br>
-  <span>Total WantList : <%= @wants.length %></span><br>
-  <span>Nombre de trades en cours</span><br>
-  <span>Nombre de trades réalisés en cours</span><br>
-  <span>Votre périmètres de recherche: <%= @user.area %> km</span><br>
-  <%= link_to "Changer mes paramètres", edit_user_path(@user) %>
+      <!-- Trading Preferences -->
+      <%= turbo_frame_tag "trading_preferences" do %>
+        <%= render "users/trading_preferences", user: @user, editing_preferences: @editing_preferences %>
+      <% end %>
 
-<% else %>
-  <div class="row justify-content-between text-center">
-    <div class="col-6"><p>Mon total: <span id="monTotal">0</span></p></div>
-    <div class="col-6"><p>Son total: <span id="sonTotal">0</span></p></div>
+      <!-- Statistiques -->
+      <div class="p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4"><%= t('users.profile.trading_statistics') %></h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-gray-50 p-4 rounded-lg text-center transition-all duration-200 hover:shadow-md">
+            <div class="text-2xl font-bold text-blue-600"><%= @stats[:total_matches] %></div>
+            <div class="text-sm text-gray-500"><%= t('users.profile.total_matches') %></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div class="row justify-content-between">
-    <%= render "shared/cards/cards_for_trade", locals: {title: "Cartes qu'il recherche",
-      cards: @cards_other_wants,
-      side: "card-offer"}  %>
-    <%= render "shared/cards/cards_for_trade", locals: {title: "Cartes que je recherche",
-      cards: @cards_i_wants,
-      side: "card-target"}  %>
-  </div>
-
-
-  <div class="row justify-content-between">
-    <%= render "shared/cards/cards_for_trade", locals: {title: "Ma collection",
-      cards: @my_cards,
-      side: "card-offer"}  %>
-    <%= render "shared/cards/cards_for_trade", locals: {title: "Sa collection",
-      cards: @other_cards,
-      side: "card-target"}  %>
-  </div>
-  <%= render "shared/trades/form_new" %>
-
-  <% end %>
-
 </div>
-
-

@@ -1,23 +1,31 @@
 module ConditionHelper
-    def condition(condition)
-      case condition
-      when "poor"
-        content_tag(:span, "P", class: "px-2 py-1 text-white bg-red-600 rounded")
-      when "played"
-        content_tag(:span, "PL", class: "px-2 py-1 text-white bg-red-400 rounded")
-      when "light_played"
-        content_tag(:span, "LP", class: "px-2 py-1 text-white bg-orange-400 rounded")
-      when "good"
-        content_tag(:span, "G", class: "px-2 py-1 text-white bg-yellow-400 rounded")
-      when "excellent"
-        content_tag(:span, "E", class: "px-2 py-1 text-white bg-green-300 rounded")
-      when "near_mint"
-        content_tag(:span, "NM", class: "px-2 py-1 text-white bg-green-500 rounded")
-      when "mint"
-        content_tag(:span, "M", class: "px-2 py-1 text-white bg-green-700 rounded")
-      else
-        condition
+  def condition_label(condition)
+    return "" if condition.blank?
+    return t("wants.conditions.unimportant") if condition == "unimportant"
+    
+    # For user_wanted_cards, keep using translations
+    return t("activerecord.enums.user_card.condition.#{condition}") if @form_type == :user_wanted_card
+    
+    # For user_cards, use direct values
+    condition.humanize
+  end
+
+  def condition_options_for_select(form_type = :user_card)
+    @form_type = form_type
+    
+    if form_type == :user_wanted_card
+      # Keep translations for user_wanted_cards
+      conditions = UserCard.conditions.keys.map do |condition|
+        [t("activerecord.enums.user_card.condition.#{condition}"), condition]
+      end
+      conditions.unshift([t("user_wanted_cards.form.any_condition"), "unimportant"])
+    else
+      # Direct values for user_cards
+      conditions = UserCard.conditions.keys.map do |condition|
+        [condition.humanize, condition]
       end
     end
+
+    conditions
   end
-  
+end

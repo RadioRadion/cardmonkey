@@ -1,18 +1,27 @@
-// app/javascript/application.js
-import { Application } from "@hotwired/stimulus"
-import 'flowbite';
+// Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
+import "@hotwired/turbo-rails"
+import "@hotwired/stimulus"
+import "@rails/actioncable"
+import "@rails/activestorage"
 
-// Importez chaque contrôleur spécifiquement
-import HelloController from "./controllers/hello_controller"
-import AutoCompleteController from "./controllers/autocomplete_controller"
-import UserCardController from "./controllers/user_card_controller"
-import UserWantedCardController from "./controllers/user_wanted_card_controller"
+// Import controllers
+import "controllers"
 
-// Démarrage de l'application Stimulus
-window.Stimulus = Application.start()
+// Import channels
+import "channels"
 
-// Enregistrement des contrôleurs
-Stimulus.register("hello", HelloController)
-Stimulus.register("autocomplete", AutoCompleteController)
-Stimulus.register("user-card", UserCardController) 
-Stimulus.register("user-wanted-card", UserWantedCardController) 
+// Initialize ActiveStorage
+import { DirectUpload } from "@rails/activestorage"
+window.DirectUpload = DirectUpload
+
+// Ensure Turbo is properly configured
+import { Turbo } from "@hotwired/turbo-rails"
+Turbo.session.drive = true
+
+// Configure Turbo Stream actions
+document.addEventListener("turbo:load", () => {
+  // Ensure forms don't trigger full page loads
+  document.querySelectorAll("form[data-remote='true']").forEach(form => {
+    form.setAttribute("data-turbo", "true")
+  })
+})

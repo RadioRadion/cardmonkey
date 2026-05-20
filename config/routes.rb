@@ -1,21 +1,74 @@
 Rails.application.routes.draw do
   devise_for :users
-  root to: 'user_cards#index'
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  
+  root 'home#index'
 
-  resources :users, only: [:show, :edit, :update] do
-    resources :user_cards, only: [:index, :destroy, :new, :edit, :create, :update]
-    resources :user_wanted_cards, only: [:index, :destroy, :new, :edit, :create, :update]
-    resources :trades, only: [:index, :create, :show, :edit, :update]
-    resources :chatrooms, only: [:index, :show, :new, :create, :update, :destroy] do
-      resources :messages, only: [:create]
+  # Direct messaging route
+  get 'messages', to: redirect { |p, req| "/users/#{req.env['warden'].user.id}/chatrooms" }, as: :messages
+  
+  resources :users do
+    collection do
+      get :search
+    end
+    member do
+      get :profile
+      get :dashboard
+    end
+    resources :chatrooms do
+      resources :messages do
+        member do
+          post :toggle_reaction
+          post :mark_delivered
+        end
+      end
+    end
+    resources :user_cards
+    resources :user_wanted_cards
+  end
+
+  resources :trades do
+    collection do
+      get :search_cards
+    end
+    member do
+      get :new_proposition
+      post :accept
+      post :decline
+      post :cancel
+      patch :validate
+    end
+    resources :ratings, only: [:new, :create]
+  end
+
+  resources :matches do
+    collection do
+      get :dashboard
     end
   end
 
-  get 'cards/search', to: 'cards#search', defaults: { format: 'json' }
-  get 'cards/versions', to: 'cards#versions', defaults: { format: 'json' }
+  resources :cards, only: [:index, :show] do
+    collection do
+      get :search
+      get :autocomplete
+      get :versions
+    end
+  end
 
+  resources :notifications, only: [:index] do
+    collection do
+      post :mark_all_as_read
+    end
+    member do
+      post :mark_as_read
+    end
+  end
 
+  # API endpoints for real-time features
+  post 'messages/:id/mark_read', to: 'messages#mark_read'
+  
+  # Static pages
+  get 'privacy-policy', to: 'pages#privacy_policy', as: :privacy_policy
+
+  # Websocket mounting
+  mount ActionCable.server => '/cable'
 end
-
-

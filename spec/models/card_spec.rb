@@ -1,25 +1,42 @@
-# spec/models/card_spec.rb
-
 require 'rails_helper'
 
 RSpec.describe Card, type: :model do
-  context 'validations' do
-    it 'is valid with valid attributes' do
-      card = Card.new(name_en: 'Black Lotus', name_fr: 'Lotus Noir', extension: 'Alpha')
-      expect(card).to be_valid
-    end
-
-    it 'is not valid without an extension' do
-      card = Card.new(name_en: 'Black Lotus', name_fr: 'Lotus Noir')
-      expect(card).not_to be_valid
-    end
+  describe 'validations' do
+    it { should validate_presence_of(:scryfall_oracle_id) }
+    it { should validate_presence_of(:name_fr) }
+    it { should validate_presence_of(:name_en) }
   end
 
-  context 'associations' do
-    it { should have_many(:user_cards) }
+  describe 'associations' do
     it { should have_many(:user_wanted_cards) }
+    it { should have_many(:card_versions) }
   end
 
-  # Autres tests, y compris pour la méthode de classe fetch_cards
-  # ...
+  describe '#name' do
+    let(:card) { build_stubbed(:card, name_fr: 'Lotus Noir', name_en: 'Black Lotus') }
+
+    context 'when preferred language is English' do
+      it 'returns the English name' do
+        expect(card.name(:en)).to eq('Black Lotus')
+      end
+    end
+
+    context 'when preferred language is French' do
+      it 'returns the French name' do
+        expect(card.name(:fr)).to eq('Lotus Noir')
+      end
+    end
+
+    context 'when preferred language is not supported' do
+      it 'returns the English name as default' do
+        expect(card.name(:es)).to eq('Black Lotus')
+      end
+    end
+
+    context 'when no language is specified' do
+      it 'returns the English name as default' do
+        expect(card.name).to eq('Black Lotus')
+      end
+    end
+  end
 end

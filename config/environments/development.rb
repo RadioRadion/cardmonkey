@@ -51,17 +51,40 @@ Rails.application.configure do
   config.active_record.verbose_query_logs = true
 
   # Debug mode disables concatenation and preprocessing of assets.
-  # This option may cause significant delays in view rendering with a large
-  # number of complex assets.
-  config.assets.debug = false
+  config.assets.debug = true
+
+  # Enable asset digests
+  config.assets.digest = true
 
   # Suppress logger output for asset requests.
   config.assets.quiet = true
 
+  # Serve assets with proper MIME types
+  config.public_file_server.enabled = true
+  config.public_file_server.headers = {
+    'Cache-Control' => 'public, max-age=31536000',
+    'Access-Control-Allow-Origin' => '*'
+  }
+
+  # ActionCable configuration
+  config.action_cable.url = "ws://localhost:3000/cable"
+  config.action_cable.allowed_request_origins = [/http:\/\/*/, /https:\/\/*/]
+  config.action_cable.disable_request_forgery_protection = true
+
+  # Use Sidekiq for Active Job (run `bundle exec sidekiq` to process jobs)
+  config.active_job.queue_adapter = :sidekiq
+
   # Raises error for missing translations.
-  # config.action_view.raise_on_missing_translations = true
+  # config.i18n.raise_on_missing_translations = true
+
+  # Annotate rendered view with file names.
+  # config.action_view.annotate_rendered_view_with_filenames = true
 
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  # Configure importmap to serve JavaScript modules with proper MIME types
+  config.importmap.cache_sweepers << Rails.root.join("app/javascript")
+  config.importmap.javascript_compiler = :esbuild
 end

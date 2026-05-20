@@ -1,0 +1,70 @@
+<div class="bg-white rounded-lg shadow p-4 mb-6" data-controller="filters">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="font-medium">Filtres avancés</h3>
+    <button data-action="filters#toggle" class="text-sm text-blue-600 hover:text-blue-800">
+      <span data-filters-target="toggleText">Afficher</span>
+      <svg data-filters-target="toggleIcon" class="w-4 h-4 inline-block ml-1"></svg>
+    </button>
+  </div>
+
+  <div data-filters-target="content" class="hidden space-y-4">
+    <%# Ligne 1 : Rareté et Prix %>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="text-sm text-gray-600 block mb-1">Rareté</label>
+        <div class="flex flex-wrap gap-2">
+          <% %w[common uncommon rare mythic].each do |rarity| %>
+            <%= link_to rarity.titleize,
+                      new_proposition_trades_path(filter: { rarity: rarity }),
+                      class: "text-sm px-2 py-1 rounded-full #{params.dig(:filter, :rarity) == rarity ? 'bg-blue-500 text-white' : 'bg-gray-100'}",
+                      data: { turbo_frame: "trade_interface" } %>
+          <% end %>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-600 block mb-1">Prix</label>
+        <div class="grid grid-cols-2 gap-2">
+          <%= number_field_tag 'filter[price_min]',
+                             params.dig(:filter, :price_min),
+                             placeholder: 'Min €',
+                             class: 'rounded border-gray-300 text-sm',
+                             data: { action: 'input->filters#applyFilter' } %>
+          
+          <%= number_field_tag 'filter[price_max]',
+                             params.dig(:filter, :price_max),
+                             placeholder: 'Max €',
+                             class: 'rounded border-gray-300 text-sm',
+                             data: { action: 'input->filters#applyFilter' } %>
+        </div>
+      </div>
+    </div>
+
+    <%# Ligne 2 : Langue et État %>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="text-sm text-gray-600 block mb-1">Langue</label>
+        <div class="flex flex-wrap gap-2">
+          <% UserCard.languages.keys.each do |language| %>
+            <%= link_to t("languages.#{language}"),
+                      new_proposition_trades_path(filter: { language: language }),
+                      class: "text-sm px-2 py-1 rounded-full #{params.dig(:filter, :language) == language ? 'bg-blue-500 text-white' : 'bg-gray-100'}",
+                      data: { turbo_frame: "trade_interface" } %>
+          <% end %>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-600 block mb-1">État minimum</label>
+        <div class="flex flex-wrap gap-2">
+          <% UserCard.conditions.keys.each do |condition| %>
+            <%= link_to t("conditions.#{condition}"),
+                      new_proposition_trades_path(filter: { condition: condition }),
+                      class: "text-sm px-2 py-1 rounded-full #{params.dig(:filter, :condition) == condition ? 'bg-blue-500 text-white' : 'bg-gray-100'}",
+                      data: { turbo_frame: "trade_interface" } %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

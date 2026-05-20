@@ -1,39 +1,201 @@
-<div class="container">
-
-  <div class="row justify-content-between text-center">
-    <div class="col-6"><p>Mon total: <span id="monTotal">0</span></p></div>
-    <div class="col-6"><p>Son total: <span id="sonTotal">0</span></p></div>
+<div class="container mx-auto px-4 py-6 pb-32" data-controller="trade-selection" data-trade-selection-partner-id-value="<%= @trade.partner_for(current_user).id %>">
+  <%# En-tête avec titre %>
+  <div class="mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold">
+        <%= t('.title', partner: @trade.partner_name_for(current_user)) %>
+      </h1>
+      <span class="text-gray-600">
+        <%= @trade_data[:collection_cards][:theirs].count %> cartes disponibles
+      </span>
+    </div>
+    
+    <%# Barres de recherche %>
+    <div class="flex gap-4">
+      <div class="flex gap-4 w-full">
+        <div class="flex-1">
+          <input type="text" 
+                 name="user_query"
+                 placeholder="Rechercher dans vos cartes..." 
+                 class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                 data-action="input->trade-selection#search">
+        </div>
+        <div class="flex-1">
+          <input type="text" 
+                 name="partner_query"
+                 placeholder="Rechercher dans ses cartes..." 
+                 class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                 data-action="input->trade-selection#search">
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="row justify-content-between">
-    <%= render "shared/card", locals: {title: "Mes cartes trade",
-      cards: @trade_user_cards,
-      side: "card-offer"}  %>
-    <%= render "shared/card", locals: {title: "Ses cartes trade",
-      cards: @trade_user_wanted_cards,
-      side: "card-target"}  %>
+  <%# Grilles de cartes %>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <%# Vos cartes %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-semibold">Vos cartes</h2>
+        <div class="mt-2 text-sm text-gray-600">
+          <% if @trade_data[:wanted_cards][:they_want].any? %>
+            <div class="mb-2">
+              <span class="font-medium text-blue-600">Cartes recherchées par <%= @trade.partner_name_for(current_user) %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4" data-trade-selection-target="userCardsGrid">
+          <%# Afficher d'abord les cartes déjà dans le trade %>
+          <%= render partial: "trades/card",
+                    collection: @trade_data[:trade_cards][:mine],
+                    locals: { side: 'user', selected: true } %>
+          
+          <%# Puis les cartes que le partenaire recherche %>
+          <%= render partial: "trades/card",
+                    collection: @trade_data[:wanted_cards][:they_want],
+                    locals: { side: 'user', suggested: true } %>
+          
+          <%# Enfin le reste de la collection %>
+          <%= render partial: "trades/card",
+                    collection: @trade_data[:collection_cards][:mine],
+                    locals: { side: 'user' } %>
+        </div>
+      </div>
+    </div>
+
+    <%# Cartes du partenaire %>
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-semibold">Cartes de <%= @trade.partner_name_for(current_user) %></h2>
+        <div class="mt-2 text-sm text-gray-600">
+          <% if @trade_data[:wanted_cards][:i_want].any? %>
+            <div class="mb-2">
+              <span class="font-medium text-blue-600">Cartes que vous recherchez</span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4" data-trade-selection-target="partnerCardsGrid">
+          <%# Afficher d'abord les cartes déjà dans le trade %>
+          <%= render partial: "trades/card",
+                    collection: @trade_data[:trade_cards][:theirs],
+                    locals: { side: 'partner', selected: true } %>
+          
+          <%# Puis les cartes que vous recherchez %>
+          <%= render partial: "trades/card",
+                    collection: @trade_data[:wanted_cards][:i_want],
+                    locals: { side: 'partner', suggested: true } %>
+          
+          <%# Enfin le reste de leur collection %>
+          <%= render partial: "trades/card",
+                    collection: @trade_data[:collection_cards][:theirs],
+                    locals: { side: 'partner' } %>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="row justify-content-between">
-    <%= render "shared/card", locals: {title: "Cartes qu'il recherche",
-      cards: @cards_other_wants,
-      side: "card-offer"}  %>
-    <%= render "shared/card", locals: {title: "Cartes que je recherche",
-      cards: @cards_i_wants,
-      side: "card-target"}  %>
+  <%# Barre de résumé fixe %>
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <%= form_with model: @trade, 
+                    url: trade_path(@trade), 
+                    method: :patch, 
+                    local: true,
+                    class: "w-full", 
+                    data: { 
+                      action: "submit->trade-selection#submitTrade" 
+                    } do |f| %>
+        <%= f.hidden_field :offer %>
+        <%= f.hidden_field :target %>
+        <%= hidden_field_tag :status, "modified" %>
+        
+        <div class="flex justify-between items-center">
+          <%# Côté gauche avec les totaux %>
+          <div class="flex gap-8">
+            <div>
+              <span class="text-sm text-gray-600">Vous donnez</span>
+              <div class="font-medium">
+                <span data-trade-selection-target="userCardCount">0</span> cartes
+                (<span data-trade-selection-target="userValue">0,00</span> €)
+              </div>
+            </div>
+            <div>
+              <span class="text-sm text-gray-600">Vous recevez</span>
+              <div class="font-medium">
+                <span data-trade-selection-target="partnerCardCount">0</span> cartes
+                (<span data-trade-selection-target="partnerValue">0,00</span> €)
+              </div>
+            </div>
+            <%# Balance du trade %>
+            <div class="border-l pl-8">
+              <span class="text-sm text-gray-600">Balance</span>
+              <div class="font-medium" data-trade-selection-target="balance">0,00 €</div>
+            </div>
+          </div>
+
+          <%# Boutons d'action %>
+          <div class="flex gap-4 items-center">
+            <%= link_to "Annuler", 
+                      trade_path(@trade), 
+                      class: "px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50" %>
+            
+            <% if @trade.can_be_accepted_by?(current_user) %>
+              <%= form_with url: trade_path(@trade), method: :patch, local: true do |f| %>
+                <%= hidden_field_tag :status, "accepted" %>
+                <%= f.submit "Accepter l'échange",
+                          class: "text-white bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700" %>
+              <% end %>
+            <% end %>
+
+            <% if @trade.can_be_validated?(current_user) %>
+              <%= form_with url: validate_trade_path(@trade), method: :patch, local: true do |f| %>
+                <%= f.submit "Valider la modification",
+                          class: "text-white bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700" %>
+              <% end %>
+            <% elsif @trade.can_be_modified_by?(current_user) %>
+              <%= f.submit "Mettre à jour l'échange", 
+                        class: "text-white bg-blue-600 px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+                        data: { 
+                          trade_selection_target: "submitButton"
+                        } %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
   </div>
-
-
-  <div class="row justify-content-between">
-    <%= render "shared/card", locals: {title: "Ma collection",
-      cards: @my_cards,
-      side: "card-offer"}  %>
-    <%= render "shared/card", locals: {title: "Sa collection",
-      cards: @other_cards,
-      side: "card-target"}  %>
-  </div>
-  <%= render "shared/trades/form_edit" %>
-
 </div>
 
+<%# Script pour pré-sélectionner les cartes %>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const controller = document.querySelector('[data-controller="trade-selection"]')?._stimulus
+  if (controller) {
+    // Fonction pour créer et dispatcher un événement de carte
+    function dispatchCardEvent(cardId, side, price) {
+      const event = new CustomEvent('cardQuantityChanged', {
+        detail: {
+          cardId: cardId,
+          side: side,
+          quantity: 1,
+          price: price || 0
+        }
+      })
+      controller.element.dispatchEvent(event)
+    }
 
+    // Pré-sélectionner les cartes du trade actuel
+    <% @trade_data[:trade_cards][:mine].each do |card| %>
+      dispatchCardEvent(<%= card.id %>, 'user', <%= card.card_version.eur_price || 0 %>)
+    <% end %>
+
+    <% @trade_data[:trade_cards][:theirs].each do |card| %>
+      dispatchCardEvent(<%= card.id %>, 'partner', <%= card.card_version.eur_price || 0 %>)
+    <% end %>
+  }
+})
+</script>

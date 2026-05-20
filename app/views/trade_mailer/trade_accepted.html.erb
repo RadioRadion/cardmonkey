@@ -1,0 +1,13 @@
+<h1>Échange accepté ! 🎉</h1>
+
+<p>Bonjour <%= @recipient.username %>,</p>
+
+<p><strong><%= @accepter.username %></strong> a accepté votre proposition d'échange !</p>
+
+<p>Vous pouvez maintenant discuter pour organiser la rencontre et finaliser l'échange.</p>
+
+<p>
+  <%= link_to "Ouvrir le chat", trade_url(@trade), style: "background-color: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;" %>
+</p>
+
+<p>Bon échange !</p>

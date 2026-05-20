@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond circulaire avec dégradé -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a5568;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2d3748;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Cercle de fond -->
+  <circle cx="256" cy="256" r="256" fill="url(#bgGradient)"/>
+  
+  <!-- Symbole de mana incolore stylisé -->
+  <path d="M256 96
+           L358 156
+           L358 356
+           L256 416
+           L154 356
+           L154 156
+           Z" 
+        fill="none" 
+        stroke="#e2e8f0" 
+        stroke-width="24"
+        stroke-linejoin="round"/>
+  
+  <!-- Détails intérieurs -->
+  <path d="M256 176
+           L307 208
+           L307 304
+           L256 336
+           L205 304
+           L205 208
+           Z" 
+        fill="#e2e8f0"
+        stroke="#e2e8f0" 
+        stroke-width="4"/>
+</svg>

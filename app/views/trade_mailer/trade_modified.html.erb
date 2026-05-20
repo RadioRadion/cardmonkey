@@ -1,0 +1,25 @@
+<h1>Modification de l'échange</h1>
+
+<p>Bonjour <%= @recipient.username %>,</p>
+
+<p><strong><%= @modifier.username %></strong> a modifié la proposition d'échange.</p>
+
+<% if @trade_cards.any? %>
+  <h2>Nouvelle composition de l'échange :</h2>
+  <ul>
+    <% @trade_cards.each do |user_card| %>
+      <li>
+        <%= user_card.card_version.card.name_fr %>
+        (<%= user_card.card_version.extension&.name %>) -
+        <%= user_card.condition %>, <%= user_card.language %>
+        <% if user_card.foil %><strong>Foil</strong><% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<p>
+  <%= link_to "Voir et valider", trade_url(@trade), style: "background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;" %>
+</p>
+
+<p>À bientôt sur Godeck !</p>

@@ -1,0 +1,16 @@
+Nouvelle proposition d'échange !
+
+Bonjour <%= @recipient.username %>,
+
+<%= @sender.username %> vous propose un échange de cartes.
+
+<% if @trade_cards.any? %>
+Cartes dans cet échange :
+<% @trade_cards.each do |user_card| %>
+- <%= user_card.card_version.card.name_fr %> (<%= user_card.card_version.extension&.name %>) - <%= user_card.condition %>, <%= user_card.language %><%= user_card.foil ? ' (Foil)' : '' %>
+<% end %>
+<% end %>
+
+Voir la proposition : <%= trade_url(@trade) %>
+
+À bientôt sur Godeck !

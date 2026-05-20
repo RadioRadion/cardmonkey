@@ -1,0 +1,47 @@
+<% if users.any? %>
+  <div class="divide-y divide-gray-200 border border-gray-200 rounded-lg bg-white shadow-lg">
+    <% users.each do |user| %>
+      <div class="p-4 hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <%= render "users/avatar", user: user %>
+            <div>
+              <%= link_to user.username, user_path(user), class: "text-lg font-medium text-gray-900 hover:text-blue-600 transition-colors duration-200" %>
+              <div class="mt-1 text-sm text-gray-500">
+                <%= pluralize(user.user_cards.count, 'carte') %> disponible<%= user.user_cards.count > 1 ? 's' : '' %> •
+                <%= pluralize(user.user_wanted_cards.count, 'carte') %> recherchée<%= user.user_wanted_cards.count > 1 ? 's' : '' %>
+              </div>
+              <div class="mt-1 text-sm text-gray-500">
+                <% if user.address.present? %>
+                  <span class="inline-flex items-center">
+                    <i class="fas fa-map-marker-alt text-gray-400 mr-1"></i>
+                    <%= user.address %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3">
+            <%= link_to user_path(user), 
+                class: "inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:text-gray-700 transition-colors duration-200" do %>
+              <i class="fas fa-user mr-2"></i>
+              Profil
+            <% end %>
+            <%= link_to new_proposition_trade_path(user, partner_id: user.id),
+                class: "inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors duration-200" do %>
+              <i class="fas fa-exchange-alt mr-2"></i>
+              Proposer un échange
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="text-center py-6 bg-white border border-gray-200 rounded-lg shadow-lg">
+    <div class="text-gray-500">
+      <i class="fas fa-search text-gray-400 text-xl mb-2"></i>
+      <p>Aucun utilisateur trouvé</p>
+    </div>
+  </div>
+<% end %>

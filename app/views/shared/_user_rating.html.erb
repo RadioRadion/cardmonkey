@@ -1,0 +1,60 @@
+<%# Display user rating summary %>
+<%# Usage: render 'shared/user_rating', user: @user %>
+<div class="flex items-center space-x-2">
+  <% if user.rating_count > 0 %>
+    <div class="flex items-center">
+      <% filled_stars = user.average_rating.floor %>
+      <% half_star = (user.average_rating - filled_stars) >= 0.5 %>
+
+      <% filled_stars.times do %>
+        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+        </svg>
+      <% end %>
+
+      <% if half_star %>
+        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+          <defs>
+            <linearGradient id="half">
+              <stop offset="50%" stop-color="currentColor"/>
+              <stop offset="50%" stop-color="#D1D5DB"/>
+            </linearGradient>
+          </defs>
+          <path fill="url(#half)" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+        </svg>
+      <% end %>
+
+      <% (5 - filled_stars - (half_star ? 1 : 0)).times do %>
+        <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+        </svg>
+      <% end %>
+    </div>
+
+    <span class="text-sm font-medium text-gray-700">
+      <%= user.average_rating %>/5
+    </span>
+    <span class="text-sm text-gray-500">
+      (<%= user.rating_count %> avis)
+    </span>
+  <% else %>
+    <span class="text-sm text-gray-500 italic">Aucune évaluation</span>
+  <% end %>
+</div>
+
+<% if local_assigns[:show_breakdown] && user.rating_count > 0 %>
+  <div class="mt-2 flex items-center space-x-4 text-xs">
+    <span class="text-green-600">
+      <svg class="w-4 h-4 inline" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+      </svg>
+      <%= user.rating_breakdown[:positive] %> positifs
+    </span>
+    <span class="text-gray-500">
+      <%= user.rating_breakdown[:neutral] %> neutres
+    </span>
+    <span class="text-red-500">
+      <%= user.rating_breakdown[:negative] %> négatifs
+    </span>
+  </div>
+<% end %>

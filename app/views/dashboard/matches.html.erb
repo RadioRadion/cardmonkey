@@ -1,0 +1,93 @@
+<%# app/views/dashboard/matches.html.erb %>
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold mb-8">Tableau de bord des échanges</h1>
+
+  <%# Statistiques générales %>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-lg font-semibold mb-2">Total des matches</h3>
+      <p class="text-3xl font-bold text-indigo-600"><%= @stats[:total_matches] %></p>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-lg font-semibold mb-2">Échanges en attente</h3>
+      <p class="text-3xl font-bold text-yellow-600"><%= @stats[:pending_trades] %></p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-lg font-semibold mb-2">Échanges complétés</h3>
+      <p class="text-3xl font-bold text-green-600"><%= @stats[:completed_trades] %></p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <%# Top utilisateurs matchés %>
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-lg font-semibold mb-4">Top 5 des utilisateurs</h3>
+      <div class="space-y-4">
+        <% @stats[:top_matched_users].each do |user, match_count| %>
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="font-medium"><%= user.username %></p>
+              <p class="text-sm text-gray-500"><%= match_count %> matches</p>
+            </div>
+            <%= link_to "Voir les matches", by_user_matches_path(user_id: user.id), 
+                        class: "text-indigo-600 hover:text-indigo-900" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Distribution par état %>
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-lg font-semibold mb-4">Distribution par état</h3>
+      <div class="space-y-2">
+        <% @stats[:matches_by_condition].each do |condition, count| %>
+          <div class="flex items-center">
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
+              <div class="bg-indigo-600 h-2.5 rounded-full" 
+                   style="width: <%= (count.to_f / @stats[:total_matches] * 100).round %>%">
+              </div>
+            </div>
+            <span class="text-sm whitespace-nowrap">
+              <%= condition_label(condition) %> (<%= count %>)
+            </span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# Matches récents %>
+  <div class="mt-8 bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold">Matches récents</h3>
+    </div>
+    <div class="divide-y divide-gray-200">
+      <% @stats[:recent_matches].each do |match| %>
+        <div class="p-6 flex justify-between items-center">
+          <div class="flex items-center space-x-4">
+            <div class="flex-shrink-0">
+              <%= image_tag match.user_card.card_version.img_uri, 
+                          class: "h-12 w-12 rounded",
+                          alt: match.user_card.card_version.card.name_en %>
+            </div>
+            <div>
+              <p class="font-medium">
+                <%= match.user_card.card_version.card.name_en %>
+                <span class="text-gray-500">↔</span>
+                <%= match.user_wanted_card.card.name_en %>
+              </p>
+              <p class="text-sm text-gray-500">
+                avec <%= match.user_id == current_user.id ? User.find(match.user_id_target).username : User.find(match.user_id).username %>
+              </p>
+            </div>
+          </div>
+          <div class="text-sm text-gray-500">
+            <%= time_ago_in_words(match.created_at) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

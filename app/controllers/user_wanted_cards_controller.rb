@@ -1,74 +1,125 @@
 class UserWantedCardsController < ApplicationController
-  before_action :set_user, only: [:new, :index, :create]
+  before_action :set_user
+  before_action :set_user_wanted_card, only: [:edit, :update, :destroy]
+  before_action :set_versions, only: [:edit, :update]
 
   def index
-    # Assurez-vous que @user est l'utilisateur actuellement connecté ou un utilisateur dont vous avez le droit de voir les cartes recherchées
-    @user_wanted_cards = @user.user_wanted_cards.includes(:card)
+    @pagy, @user_wanted_cards = pagy(
+      @user.user_wanted_cards
+           .includes(:card, card_version: :extension)
+           .order('card_versions.eur_price DESC NULLS LAST'),
+      items: 15
+    )
   end
 
   def new
-    @user_wanted_card = @user.user_wanted_cards.build
+    @form = Forms::UserWantedCardForm.new(user_id: @user.id)
   end
 
   def create
-    @user = User.find(params[:user_id])
-    
-    # Trouver la version de la carte basée sur l'identifiant Scryfall reçu
-    card_version = CardVersion.find_by(scryfall_id: params[:user_wanted_card][:scryfall_id])
-  
-    if card_version
-      # Préparer les paramètres en incluant card_version_id
-      wanted_card_params = user_wanted_card_params.except(:scryfall_id).merge(card_version_id: card_version.id, card_id: card_version.card.id)
-      @user_wanted_card = @user.user_wanted_cards.new(wanted_card_params)
-    
-      if @user_wanted_card.save!
-        redirect_to user_user_wanted_cards_path(@user), notice: 'Wanted card was successfully created.'
-      else
-        render :new, status: :unprocessable_entity
-      end
+    @form = Forms::UserWantedCardForm.new(user_wanted_card_form_params)
+
+    if @form.save
+      redirect_to user_user_wanted_cards_path(@user), notice: t('user_wanted_cards.create.success')
     else
-      flash.now[:alert] = 'Card version not found.'
       render :new, status: :unprocessable_entity
     end
   end
-  
+
   def edit
-    @user_wanted_card = UserWantedCard.find(params[:id])
+    @form = Forms::UserWantedCardForm.from_model(@user_wanted_card)
   end
 
   def update
-    @user_wanted_card = UserWantedCard.find(params[:id])
-    if @user_wanted_card.update(user_wanted_card_params)
-      redirect_to user_user_wanted_cards_path
+    @form = Forms::UserWantedCardForm.new(
+      user_wanted_card_form_params.merge(
+        id: @user_wanted_card.id,
+        card_id: @user_wanted_card.card_id
+      )
+    )
+
+    if @form.save
+      respond_to do |format|
+        format.html { 
+          redirect_to user_user_wanted_cards_path(@user), 
+          notice: t('user_wanted_cards.update.success')
+        }
+        format.json { render json: success_json_response }
+      end
     else
-      render :new
+      respond_to do |format|
+        format.html { 
+          render :edit, 
+          status: :unprocessable_entity 
+        }
+        format.json { 
+          render json: error_json_response, 
+          status: :unprocessable_entity 
+        }
+      end
     end
   end
 
   def destroy
-    @user_wanted_card = current_user.user_wanted_cards.find(params[:id])
+    name = @user_wanted_card.card.name_en
     if @user_wanted_card.destroy
       respond_to do |format|
-        format.html { redirect_to user_user_wanted_cards_path(current_user), notice: 'La carte recherchée a été supprimée avec succès.' }
-        format.json { head :no_content } # Pour AJAX, renvoie un statut 204 sans contenu.
+        format.html {
+          redirect_to user_user_wanted_cards_path(@user),
+          notice: t('user_wanted_cards.destroy.success', name: name)
+        }
+        format.json { head :no_content }
       end
-    else
-      # Gérer le cas où la suppression échoue, par exemple, en renvoyant un statut d'erreur.
     end
   rescue ActiveRecord::RecordNotFound => e
-    respond_to do |format|
-      format.html { redirect_to user_user_wanted_cards_path(current_user), alert: 'La carte n\'a pas été trouvée.' }
-      format.json { render json: { error: e.message }, status: :not_found }
-    end
+    handle_destroy_error(e)
   end
 
   private
 
-  def user_wanted_card_params
-    params.require(:user_wanted_card).permit(:min_condition, :foil, :language, :quantity, :card_id, :scryfall_id)
-  end
-
   def set_user
     @user = current_user
+  end
+
+  def set_user_wanted_card
+    @user_wanted_card = @user.user_wanted_cards.find(params[:id])
+  end
+
+  def set_versions
+    @versions = @user_wanted_card.card.card_versions.includes(:extension).order('extensions.name ASC')
+  end
+
+  def user_wanted_card_form_params
+    params.require(:user_wanted_card)
+          .permit(:min_condition, :foil, :language, :quantity, 
+                  :scryfall_id, :card_id, :card_version_id)  # Ajout de card_version_id
+          .merge(user_id: @user.id)
+  end
+
+  def success_json_response
+    {
+      message: t('user_wanted_cards.update.success'),
+      quantity: @user_wanted_card.quantity
+    }
+  end
+
+  def error_json_response
+    {
+      message: t('user_wanted_cards.update.error'),
+      errors: @form.errors.full_messages
+    }
+  end
+
+  def handle_destroy_error(error)
+    respond_to do |format|
+      format.html do
+        redirect_to user_user_wanted_cards_path(@user),
+        alert: t('user_wanted_cards.destroy.not_found')
+      end
+      format.json { 
+        render json: { error: error.message }, 
+        status: :not_found 
+      }
+    end
   end
 end

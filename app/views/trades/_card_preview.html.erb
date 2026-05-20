@@ -1,0 +1,19 @@
+<div id="card-preview" 
+     class="fixed hidden pointer-events-none z-50 bg-white rounded-lg shadow-xl p-2"
+     data-controller="card-preview">
+  <div class="relative">
+    <img data-card-preview-target="image" 
+         src="" 
+         alt="Card preview"
+         class="w-64 rounded-lg" />
+    
+    <div data-card-preview-target="info" 
+         class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white p-2 rounded-b-lg">
+      <h3 data-card-preview-target="name" class="font-medium text-sm"></h3>
+      <div class="flex justify-between text-xs mt-1">
+        <span data-card-preview-target="set"></span>
+        <span data-card-preview-target="price"></span>
+      </div>
+    </div>
+  </div>
+</div>

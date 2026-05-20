@@ -1,27 +1,92 @@
 class Trade < ApplicationRecord
   belongs_to :user
+  belongs_to :user_invit, class_name: 'User', foreign_key: 'user_id_invit'
+  belongs_to :last_modifier, class_name: 'User', optional: true
   has_many :trade_user_cards, dependent: :destroy
   has_many :user_cards, through: :trade_user_cards
+  has_many :ratings, dependent: :destroy
 
-  scope :pending, -> { where(status: "pending") }
-  scope :accepted, -> { where(status: "accepted") }
-  scope :done, -> { where(status: "done") }
+  validates :user_id_invit, presence: true
+  validates :status, presence: true, inclusion: { in: %w[pending modified accepted done cancelled] }
 
-  validates :status, presence: true
+  before_validation :set_default_status, on: :create
 
-  enum status: { pending: "0", accepted: "1", done: "2" }
+  enum status: {
+    pending: 0,
+    modified: 1,
+    accepted: 2,
+    done: 3,
+    cancelled: 4
+  }
 
-  def self.save_message(current_user_id, other_user_id, content)
-    first_chat = Chatroom.where(user_id: current_user_id, user_id_invit: other_user_id).first
-    second_chat = Chatroom.where(user_id: other_user_id, user_id_invit: current_user_id).first
+  # Scopes pour filtrer les trades par état
+  scope :active, -> { where(status: [:pending, :modified, :accepted]) }
+  scope :completed, -> { where(status: :done) }
+  scope :in_progress, -> { where(status: [:pending, :modified]) }
 
-    if !first_chat.nil?
-      Message.new(content: content, user_id: current_user_id, chatroom_id: first_chat.id).save!
-    elsif !second_chat.nil?
-      Message.new(content: content, user_id: current_user_id, chatroom_id: second_chat.id).save!
-    else
-      chatroom = Chatroom.create!(user_id: current_user_id, user_id_invit: other_user_id)
-      Message.create!(content: content, user_id: current_user_id, chatroom_id: @chatroom.id)
-    end
+  def partner_for(current_user)
+    current_user.id == user_id ? user_invit : user
+  end
+
+  def partner_name_for(current_user)
+    partner_for(current_user).username
+  end
+
+  def other_user(current_user)
+    current_user.id == user_id ? user_invit : user
+  end
+
+  def can_be_modified_by?(current_user)
+    return false if accepted? || done? || cancelled?
+    return false unless pending? || modified?
+    [user_id, user_id_invit].include?(current_user.id)
+  end
+
+  def can_be_validated?(current_user)
+    return false unless modified?
+    return false if last_modifier_id == current_user.id
+    [user_id, user_id_invit].include?(current_user.id)
+  end
+
+  def can_be_completed_by?(current_user)
+    return false unless accepted?
+    return false if completed_by_user_ids.include?(current_user.id)
+    [user_id, user_id_invit].include?(current_user.id)
+  end
+
+  def can_be_accepted_by?(current_user)
+    pending? && current_user.id == user_id_invit
+  end
+
+  def can_be_rated_by?(current_user)
+    return false unless done?
+    return false unless [user_id, user_id_invit].include?(current_user.id)
+    !ratings.exists?(rater_id: current_user.id)
+  end
+
+  def rating_by(current_user)
+    ratings.find_by(rater_id: current_user.id)
+  end
+
+  def self.save_message(from_user_id, to_user_id, content)
+    chatroom = find_or_create_chatroom(from_user_id, to_user_id)
+    Message.create!(
+      content: content,
+      user_id: from_user_id,
+      chatroom_id: chatroom.id
+    )
+  end
+
+  def self.find_or_create_chatroom(user1_id, user2_id)
+    Chatroom.find_or_create_by!(
+      user_id: [user1_id, user2_id].min,
+      user_id_invit: [user1_id, user2_id].max
+    )
+  end
+
+  private
+
+  def set_default_status
+    self.status ||= :pending
   end
 end

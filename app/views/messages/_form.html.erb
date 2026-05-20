@@ -1,0 +1,23 @@
+<%= form_with(model: [chatroom, message],
+              url: user_chatroom_messages_path(current_user, chatroom),
+              class: "flex items-center space-x-2",
+              data: { 
+                chat_target: "form",
+                controller: "reset-form",
+                action: "turbo:submit-end->reset-form#reset turbo:submit-end->chat#scrollToBottom"
+              }) do |f| %>
+  <%= f.text_field :content,
+                  id: "message_content",
+                  class: "flex-1 rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500 #{'border-red-500' if message.errors.any?}",
+                  placeholder: "Écrivez votre message...",
+                  data: { action: "keydown.enter->reset-form#submitOnEnter" },
+                  autofocus: true %>
+  <%= f.submit "Envoyer",
+              class: "px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-500 hover:to-purple-500 transition-colors" %>
+  
+  <% if message.errors.any? %>
+    <div class="text-red-500 text-sm mt-1">
+      <%= message.errors.full_messages.join(", ") %>
+    </div>
+  <% end %>
+<% end %>

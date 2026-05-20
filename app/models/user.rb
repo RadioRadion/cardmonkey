@@ -3,69 +3,134 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   geocoded_by :address
   after_validation :geocode, if: :will_save_change_to_address?
+  has_one_attached :avatar
+
+  scope :within_distance, ->(origin, radius_km) {
+    return all unless origin.is_a?(Array) && origin[0].present? && origin[1].present?
+    near(origin, radius_km, units: :km)
+  }
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
-  has_many :trades
+  
+  # Chatroom associations
+  has_many :sent_chatrooms, class_name: 'Chatroom', foreign_key: 'user_id'
+  has_many :received_chatrooms, class_name: 'Chatroom', foreign_key: 'user_id_invit'
   has_many :messages
-  has_many :chatrooms, through: :messages
+  
+  # Trade associations
+  has_many :trades
+  has_many :received_trades, class_name: 'Trade', foreign_key: 'user_id_invit'
+  has_many :modified_trades, class_name: 'Trade', foreign_key: 'last_modifier_id'
+  
+  # Other associations
   has_many :user_cards
-  has_many :cards, through: :user_cards
+  has_many :card_versions, through: :user_cards
+  has_many :cards, through: :card_versions
   has_many :user_wanted_cards
   has_many :matches
   has_many :notifications
 
+  # Rating associations
+  has_many :ratings_received, class_name: 'Rating', foreign_key: 'rated_id', dependent: :destroy
+  has_many :ratings_given, class_name: 'Rating', foreign_key: 'rater_id', dependent: :destroy
+
   enum preference: { value_based: 0, quantity_based: 1 }
+  enum email_digest: { instant: 'instant', daily: 'daily', weekly: 'weekly', never: 'never' }, _prefix: true
 
-  # Trouver des correspondances pour les cartes souhaitées
-  def find_card_matches
-    # Récupérer la liste de souhaits de l'utilisateur
-    wanted_card_ids = user_wanted_cards.pluck(:card_id)
+  before_validation :set_default_username, on: :create
 
-    # Trouver les correspondances dans les collections d'autres utilisateurs
-    matches = UserCard.where(card_id: wanted_card_ids)
-                      .where.not(user_id: id)
-                      .includes(:user, :card)
+  def email_notifications?
+    email_notifications && !email_digest_never?
+  end
 
-    # Filtrer les correspondances basées sur la préférence de l'utilisateur (nombre de cartes ou valeur totale)
-    matches = sort_matches(matches)
+  def average_rating
+    ratings_received.average(:score)&.round(1) || 0
+  end
 
-    # Optionnel : Filtrer les correspondances basées sur la géolocalisation
-    # matches = filter_by_location(matches)
+  def rating_count
+    ratings_received.count
+  end
 
-    matches
+  def completed_trades_count
+    all_trades.done.count
+  end
+
+  def rating_breakdown
+    {
+      positive: ratings_received.positive.count,
+      neutral: ratings_received.neutral.count,
+      negative: ratings_received.negative.count
+    }
+  end
+
+  def all_trades
+    Trade.where('user_id = ? OR user_id_invit = ?', id, id)
+  end
+
+  def matching_stats
+    {
+      total_matches: Match.where(user_id: id).or(Match.where(user_id_target: id)).count,
+      unique_matched_users: top_matching_users.size,
+      matches_by_condition: Match.joins(user_card: :card_version)
+                               .where(user_id: id)
+                               .group('user_cards.condition')
+                               .count,
+      matches_by_language: Match.joins(user_card: :card_version)
+                              .where(user_id: id)
+                              .group('user_cards.language')
+                              .count
+    }
+  end
+
+  def chatrooms
+    Chatroom.where('user_id = :user_id OR user_id_invit = :user_id', user_id: id)
   end
 
   private
 
-  # Trier les correspondances en fonction de la préférence de l'utilisateur
-  def sort_matches(matches)
-    case preference
-    when 'value'
-      matches.sort_by { |match| -match.card.price }
-    when 'quantity'
-      matches.group_by(&:user_id).sort_by { |_, user_matches| -user_matches.count }
-    else
-      matches
-    end
+  def set_default_username
+    return if username.present?
+    self.username = email.split('@').first if email.present?
   end
 
-  # Filtrer les correspondances en fonction de la géolocalisation (si nécessaire)
-  def filter_by_location(matches)
-    # Implémentation dépend de la façon dont la localisation est gérée dans l'application
+  def top_matching_users(limit = 10)
+    User.find_by_sql([<<-SQL, { user_id: id, limit: limit }])
+      WITH match_counts AS (
+        SELECT 
+          CASE 
+            WHEN matches.user_id = :user_id THEN matches.user_id_target
+            WHEN matches.user_id_target = :user_id THEN matches.user_id
+          END AS matched_user_id,
+          COUNT(*) as match_count
+        FROM matches
+        WHERE (matches.user_id = :user_id OR matches.user_id_target = :user_id)
+          AND (matches.user_id IS NOT NULL AND matches.user_id_target IS NOT NULL)
+        GROUP BY 
+          CASE 
+            WHEN matches.user_id = :user_id THEN matches.user_id_target
+            WHEN matches.user_id_target = :user_id THEN matches.user_id
+          END
+      )
+      SELECT 
+        users.*,
+        match_counts.match_count
+      FROM users
+      INNER JOIN match_counts ON users.id = match_counts.matched_user_id
+      ORDER BY match_counts.match_count DESC, users.username
+      LIMIT :limit
+    SQL
   end
 
-  def group_matches
-    users = User.near(address, area)
-      results = []
-      users.each do |user|
-        matches = Match
-                    .where(user_id: id, user_id_target: user.id)
-                    .or(Match.where(user_id: user.id, user_id_target: id))
-        total = matches.count
-        results << {total: total, matches: matches, user: user} if user.id != id
-      end
-      results.sort_by { |i| i[:total] }.reverse
+  def matching_cards_with_user(other_user_id)
+    Card.joins(card_versions: { user_cards: :matches })
+        .where(
+          '(matches.user_id = :user_id AND matches.user_id_target = :other_user_id) OR (matches.user_id = :other_user_id AND matches.user_id_target = :user_id)',
+          user_id: id, other_user_id: other_user_id
+        )
+        .select('cards.*, user_cards.condition, user_cards.language')
+        .distinct
+        .order('cards.id')
   end
 
 end

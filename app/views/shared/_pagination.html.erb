@@ -1,0 +1,40 @@
+<% pagy_var = defined?(pagy) ? pagy : @pagy %>
+<% if pagy_var && pagy_var.pages > 1 %>
+  <nav class="flex items-center justify-between bg-cm-surface border border-cm-border rounded-lg p-3 mt-6" aria-label="Pagination">
+    <div class="flex-1 flex justify-start">
+      <% if pagy_var.prev %>
+        <%= link_to pagy_url_for(pagy_var, pagy_var.prev), class: "inline-flex items-center px-3 py-1.5 text-sm text-cm-text-muted hover:text-cm-text hover:bg-cm-surface-2 rounded transition-colors" do %>
+          <i class="fas fa-chevron-left mr-1.5 text-xs"></i>
+          Précédent
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="hidden md:flex items-center space-x-1">
+      <% pagy_var.series.each do |item| %>
+        <% case item %>
+        <% when Integer %>
+          <%= link_to item, pagy_url_for(pagy_var, item),
+              class: "inline-flex items-center justify-center w-8 h-8 rounded text-sm transition-colors #{item == pagy_var.page ? 'bg-cm-accent text-cm-bg font-medium' : 'text-cm-text-muted hover:text-cm-text hover:bg-cm-surface-2'}" %>
+        <% when String %>
+          <span class="inline-flex items-center justify-center w-8 h-8 text-sm text-cm-text-subtle"><%= item %></span>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="md:hidden flex justify-center">
+      <span class="inline-flex items-center px-3 py-1.5 text-sm text-cm-text">
+        Page <%= pagy_var.page %> sur <%= pagy_var.pages %>
+      </span>
+    </div>
+
+    <div class="flex-1 flex justify-end">
+      <% if pagy_var.next %>
+        <%= link_to pagy_url_for(pagy_var, pagy_var.next), class: "inline-flex items-center px-3 py-1.5 text-sm text-cm-text-muted hover:text-cm-text hover:bg-cm-surface-2 rounded transition-colors" do %>
+          Suivant
+          <i class="fas fa-chevron-right ml-1.5 text-xs"></i>
+        <% end %>
+      <% end %>
+    </div>
+  </nav>
+<% end %>
