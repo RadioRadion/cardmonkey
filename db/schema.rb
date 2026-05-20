@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_23_101915) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_01_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -106,6 +106,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_23_101915) do
     t.bigint "user_wanted_card_id"
     t.bigint "user_id"
     t.integer "user_id_target", null: false
+    t.index ["user_card_id", "user_wanted_card_id"], name: "index_matches_on_user_card_and_wanted_card_unique", unique: true
     t.index ["user_card_id"], name: "index_matches_on_user_card_id"
     t.index ["user_id", "user_id_target"], name: "index_matches_on_user_and_target"
     t.index ["user_id"], name: "index_matches_on_user_id"
@@ -159,6 +160,20 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_23_101915) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
+  create_table "ratings", force: :cascade do |t|
+    t.bigint "trade_id", null: false
+    t.bigint "rater_id", null: false
+    t.bigint "rated_id", null: false
+    t.integer "score", null: false
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["rated_id"], name: "index_ratings_on_rated_id"
+    t.index ["rater_id"], name: "index_ratings_on_rater_id"
+    t.index ["trade_id", "rater_id"], name: "index_ratings_on_trade_and_rater", unique: true
+    t.index ["trade_id"], name: "index_ratings_on_trade_id"
+  end
+
   create_table "supported_languages", force: :cascade do |t|
     t.string "code", null: false
     t.string "name", null: false
@@ -188,6 +203,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_23_101915) do
     t.integer "last_modifier_id"
     t.integer "completed_by_user_ids", default: [], array: true
     t.index ["last_modifier_id"], name: "index_trades_on_last_modifier_id"
+    t.index ["status"], name: "index_trades_on_status"
     t.index ["user_id", "user_id_invit"], name: "index_trades_on_user_and_invit"
     t.index ["user_id"], name: "index_trades_on_user_id"
   end
@@ -202,6 +218,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_23_101915) do
     t.integer "quantity"
     t.bigint "card_version_id", null: false
     t.index ["card_version_id"], name: "index_user_cards_on_card_version_id"
+    t.index ["condition"], name: "index_user_cards_on_condition"
+    t.index ["language"], name: "index_user_cards_on_language"
     t.index ["user_id", "card_version_id"], name: "index_user_cards_on_user_and_card_version"
     t.index ["user_id"], name: "index_user_cards_on_user_id"
   end
@@ -218,6 +236,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_23_101915) do
     t.bigint "card_version_id"
     t.index ["card_id"], name: "index_user_wanted_cards_on_card_id"
     t.index ["card_version_id"], name: "index_user_wanted_cards_on_card_version_id"
+    t.index ["language", "min_condition"], name: "index_user_wanted_cards_on_language_and_condition"
     t.index ["user_id", "card_id", "card_version_id"], name: "index_user_wanted_cards_on_user_card_and_version"
     t.index ["user_id"], name: "index_user_wanted_cards_on_user_id"
   end
@@ -236,6 +255,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_23_101915) do
     t.string "address"
     t.integer "area"
     t.integer "preference", default: 0
+    t.boolean "email_notifications", default: true, null: false
+    t.string "email_digest", default: "instant", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["latitude", "longitude"], name: "index_users_on_coordinates"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -252,6 +273,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_23_101915) do
   add_foreign_key "messages", "chatrooms"
   add_foreign_key "messages", "users"
   add_foreign_key "notifications", "users"
+  add_foreign_key "ratings", "trades"
+  add_foreign_key "ratings", "users", column: "rated_id"
+  add_foreign_key "ratings", "users", column: "rater_id"
   add_foreign_key "trade_user_cards", "trades"
   add_foreign_key "trade_user_cards", "user_cards"
   add_foreign_key "trades", "users"

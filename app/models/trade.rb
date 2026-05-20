@@ -4,6 +4,7 @@ class Trade < ApplicationRecord
   belongs_to :last_modifier, class_name: 'User', optional: true
   has_many :trade_user_cards, dependent: :destroy
   has_many :user_cards, through: :trade_user_cards
+  has_many :ratings, dependent: :destroy
 
   validates :user_id_invit, presence: true
   validates :status, presence: true, inclusion: { in: %w[pending modified accepted done cancelled] }
@@ -17,6 +18,11 @@ class Trade < ApplicationRecord
     done: 3,
     cancelled: 4
   }
+
+  # Scopes pour filtrer les trades par état
+  scope :active, -> { where(status: [:pending, :modified, :accepted]) }
+  scope :completed, -> { where(status: :done) }
+  scope :in_progress, -> { where(status: [:pending, :modified]) }
 
   def partner_for(current_user)
     current_user.id == user_id ? user_invit : user
@@ -50,6 +56,16 @@ class Trade < ApplicationRecord
 
   def can_be_accepted_by?(current_user)
     pending? && current_user.id == user_id_invit
+  end
+
+  def can_be_rated_by?(current_user)
+    return false unless done?
+    return false unless [user_id, user_id_invit].include?(current_user.id)
+    !ratings.exists?(rater_id: current_user.id)
+  end
+
+  def rating_by(current_user)
+    ratings.find_by(rater_id: current_user.id)
   end
 
   def self.save_message(from_user_id, to_user_id, content)

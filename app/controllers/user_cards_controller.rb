@@ -4,30 +4,28 @@ class UserCardsController < ApplicationController
   before_action :set_user_card, only: [:edit, :update, :destroy]
 
   def index
-    @user_cards = @user.user_cards
-                      .includes(card_version: [:card, :extension])
-                      .order('card_versions.eur_price DESC NULLS LAST')
-                      .limit(15)  # 5 colonnes * 3 rangées
+    @pagy, @user_cards = pagy(
+      filtered_user_cards,
+      items: 15
+    )
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream { render turbo_stream: turbo_stream.replace("cards_list", partial: "user_cards/cards_list", locals: { user_cards: @user_cards, pagy: @pagy }) }
+    end
   end
 
   def new
     @form = Forms::UserCardForm.new(user_id: @user.id)
-    # Pour le debug
-    Rails.logger.debug "Form initialized with user_id: #{@user.id}"
-    Rails.logger.debug "Form object: #{@form.inspect}"
   end
+
   def create
-    Rails.logger.debug "=== Create Action ==="
-    Rails.logger.debug "Params: #{params.inspect}"
-    
     @form = Forms::UserCardForm.new(user_card_form_params)
-    Rails.logger.debug "Form created with: #{user_card_form_params.inspect}"
-  
+
     if @form.save
-      redirect_to user_user_cards_path(@user), 
+      redirect_to user_user_cards_path(@user),
                   notice: t('.success', name: @form.card_name)
     else
-      Rails.logger.debug "Form errors: #{@form.errors.full_messages}"
       render :new, status: :unprocessable_entity
     end
   end
@@ -118,10 +116,39 @@ class UserCardsController < ApplicationController
   def handle_destroy_error(error)
     respond_to do |format|
       format.html do
-        redirect_to user_user_cards_path(@user), 
+        redirect_to user_user_cards_path(@user),
                     alert: t('.not_found')
       end
       format.json { render json: { error: error.message }, status: :not_found }
     end
+  end
+
+  def filtered_user_cards
+    cards = @user.user_cards
+                 .includes(card_version: [:card, :extension])
+
+    # Apply search filter
+    if params[:search].present?
+      search_term = "%#{params[:search]}%"
+      cards = cards.joins(card_version: :card)
+                   .where("cards.name_fr ILIKE :q OR cards.name_en ILIKE :q", q: search_term)
+    end
+
+    # Apply language filter
+    if params[:language].present?
+      cards = cards.where(language: params[:language])
+    end
+
+    # Apply condition filter
+    if params[:condition].present?
+      cards = cards.where(condition: params[:condition])
+    end
+
+    # Apply foil filter
+    if params[:foil].present?
+      cards = cards.where(foil: params[:foil] == 'true')
+    end
+
+    cards.order('card_versions.eur_price DESC NULLS LAST')
   end
 end

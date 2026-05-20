@@ -50,21 +50,12 @@ module Forms
     end
 
     def save
-      Rails.logger.debug "=== Saving Form ==="
-      Rails.logger.debug "Attributes: #{attributes.inspect}"
-      Rails.logger.debug "Valid? #{valid?}"
-      Rails.logger.debug "Errors: #{errors.full_messages}" if errors.any?
-
       return false unless valid?
 
       ActiveRecord::Base.transaction do
-        create_or_update_user_card.tap do |user_card|
-          Rails.logger.debug "Created/Updated UserCard: #{user_card.inspect}"
-          Rails.logger.debug "UserCard errors: #{user_card.errors.full_messages}" if user_card.errors.any?
-        end
+        create_or_update_user_card
       end
     rescue => e
-      Rails.logger.debug "Error saving: #{e.message}"
       errors.add(:base, e.message)
       false
     end

@@ -1,11 +1,22 @@
 class UserCard < ApplicationRecord
   include CardConditionManagement
-  
+
   belongs_to :user
   belongs_to :card_version
   has_many :matches, dependent: :destroy
   has_many :trade_user_cards, dependent: :delete_all
   has_many :trades, through: :trade_user_cards
+
+  # Condition quality ordering (worst to best)
+  CONDITION_ORDER = {
+    'poor' => 0,
+    'played' => 1,
+    'light_played' => 2,
+    'good' => 3,
+    'excellent' => 4,
+    'near_mint' => 5,
+    'mint' => 6
+  }.freeze
 
   # Validations
   validates :quantity, :condition, :language, presence: true
@@ -35,17 +46,30 @@ class UserCard < ApplicationRecord
     korean: 'ko'
   }, _default: 'en'
 
-  # Callbacks
-  after_create :create_matches
-  after_update :update_matches, if: :relevant_attributes_changed?
+  # Callbacks - use async jobs for matching to avoid blocking requests
+  after_commit :schedule_create_matches, on: :create
+  after_commit :schedule_update_matches, on: :update, if: :relevant_attributes_changed?
   before_destroy :notify_trade_partners
 
-  # Public method to regenerate matches
+  # Public method to regenerate matches (sync)
   def regenerate_matches
     update_matches
   end
 
+  # Public method to regenerate matches (async)
+  def regenerate_matches_async
+    MatchingJob.perform_later(id, :update)
+  end
+
   private
+
+  def schedule_create_matches
+    MatchingJob.perform_later(id, :create)
+  end
+
+  def schedule_update_matches
+    MatchingJob.perform_later(id, :update)
+  end
 
   def notify_trade_partners
     affected_trades = trades.active
@@ -83,12 +107,29 @@ class UserCard < ApplicationRecord
   end
 
   def find_potential_matches
+    # Get ordinal value for this card's condition
+    card_condition_value = CONDITION_ORDER[condition] || 0
+
+    # SQL CASE for converting condition strings to ordinal values
+    condition_case_sql = <<-SQL
+      CASE COALESCE(user_wanted_cards.min_condition, 'poor')
+        WHEN 'poor' THEN 0
+        WHEN 'played' THEN 1
+        WHEN 'light_played' THEN 2
+        WHEN 'good' THEN 3
+        WHEN 'excellent' THEN 4
+        WHEN 'near_mint' THEN 5
+        WHEN 'mint' THEN 6
+        ELSE 0
+      END
+    SQL
+
     UserWantedCard
       .joins(:card)
       .where.not(user_id: user_id)
       .where(card_id: card_version.card_id)
       .where("user_wanted_cards.language = 'any' OR user_wanted_cards.language = ?", language)
-      .where("? >= COALESCE(user_wanted_cards.min_condition, 'poor')", condition)
+      .where("? >= (#{condition_case_sql})", card_condition_value)
       .select(:id, :user_id)
   end
 

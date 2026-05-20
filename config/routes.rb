@@ -37,6 +37,7 @@ Rails.application.routes.draw do
       post :cancel
       patch :validate
     end
+    resources :ratings, only: [:new, :create]
   end
 
   resources :matches do

@@ -13,6 +13,8 @@ gem 'puma', '6.4.2'
 gem 'jbuilder', '~> 2.7'
 # Use Redis adapter to run Action Cable in production
 gem 'redis', '~> 4.0'
+# Background job processing
+gem 'sidekiq', '~> 7.0'
 
 gem "turbo-rails", "~> 1.5.0"
 gem "stimulus-rails", "~> 1.3.0"
@@ -34,9 +36,9 @@ gem 'geocoder'
 # testing mail in development
 gem "letter_opener", group: :development
 
-# Using Node.js as JavaScript runtime instead of mini_racer
-gem 'font-awesome-sass'
+# Font Awesome loaded via CDN in application layout (no sassc dependency)
 gem 'simple_form'
+gem 'pagy', '~> 6.0'
 gem 'down'
 gem 'whenever', require: false
 gem 'cloudinary'

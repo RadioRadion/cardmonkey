@@ -144,8 +144,6 @@ GEM
     faraday-net_http (3.4.0)
       net-http (>= 0.5.0)
     ffi (1.16.3)
-    font-awesome-sass (6.5.2)
-      sassc (~> 2.0)
     geocoder (1.8.3)
       base64 (>= 0.1.0)
       csv (>= 3.0.0)
@@ -208,6 +206,7 @@ GEM
       racc (~> 1.4)
     orm_adapter (0.5.0)
     ostruct (0.6.1)
+    pagy (6.5.0)
     pg (1.5.6)
     pry (0.14.2)
       coderay (~> 1.1)
@@ -268,6 +267,8 @@ GEM
       ffi (~> 1.0)
     rdoc (6.3.4.1)
     redis (4.8.1)
+    redis-client (0.28.0)
+      connection_pool
     regexp_parser (2.9.1)
     reline (0.5.11)
       io-console (~> 0.5)
@@ -293,14 +294,18 @@ GEM
       rspec-support (~> 3.13)
     rspec-support (3.13.1)
     rubyzip (2.3.2)
-    sassc (2.4.0)
-      ffi (~> 1.9)
     selenium-webdriver (4.10.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
     shoulda-matchers (4.5.1)
       activesupport (>= 4.2.0)
+    sidekiq (7.3.10)
+      base64
+      connection_pool (>= 2.3.0, < 3)
+      logger
+      rack (>= 2.2.4, < 3.3)
+      redis-client (>= 0.23.0, < 1)
     simple_form (5.3.0)
       actionpack (>= 5.2)
       activemodel (>= 5.2)
@@ -352,6 +357,7 @@ PLATFORMS
   x86_64-darwin-19
   x86_64-darwin-20
   x86_64-darwin-21
+  x86_64-darwin-24
   x86_64-linux
 
 DEPENDENCIES
@@ -365,12 +371,12 @@ DEPENDENCIES
   down
   factory_bot_rails
   faker
-  font-awesome-sass
   geocoder
   importmap-rails
   jbuilder (~> 2.7)
   letter_opener
   listen (~> 3.2)
+  pagy (~> 6.0)
   pg (>= 0.18, < 2.0)
   pry-byebug
   pry-rails
@@ -382,6 +388,7 @@ DEPENDENCIES
   rspec-rails
   selenium-webdriver
   shoulda-matchers (~> 4.0)
+  sidekiq (~> 7.0)
   simple_form
   spring
   sprockets-rails

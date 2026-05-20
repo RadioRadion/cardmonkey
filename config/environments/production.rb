@@ -61,8 +61,8 @@ Rails.application.configure do
   # Use memory store for caching in production
   config.cache_store = :memory_store, { size: 64.megabytes }
 
-  # Use async adapter for Active Job
-  config.active_job.queue_adapter = :async
+  # Use Sidekiq for Active Job (async background processing)
+  config.active_job.queue_adapter = :sidekiq
   config.active_job.queue_name_prefix = "cardmonkey_production"
 
   config.action_mailer.perform_caching = false

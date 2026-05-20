@@ -1,6 +1,7 @@
 class Message < ApplicationRecord
   belongs_to :chatroom
   belongs_to :user
+  has_many :reactions, class_name: 'MessageReaction', dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_many_attached :attachments
 

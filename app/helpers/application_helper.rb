@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include Pagy::Frontend
+
   def card_image_tag(card_version, options = {})
     if card_version&.img_uri.present?
       image_tag(card_version.img_uri, options)

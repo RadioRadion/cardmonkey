@@ -42,21 +42,12 @@ module Forms
     end
 
     def save
-      Rails.logger.debug "=== Saving Form ==="
-      Rails.logger.debug "Attributes: #{attributes.inspect}"
-      Rails.logger.debug "Valid? #{valid?}"
-      Rails.logger.debug "Errors: #{errors.full_messages}" if errors.any?
-
       return false unless valid?
 
       ActiveRecord::Base.transaction do
-        create_or_update_user_wanted_card.tap do |user_wanted_card|
-          Rails.logger.debug "Created/Updated UserWantedCard: #{user_wanted_card.inspect}"
-          Rails.logger.debug "UserWantedCard errors: #{user_wanted_card.errors.full_messages}" if user_wanted_card.errors.any?
-        end
+        create_or_update_user_wanted_card
       end
     rescue => e
-      Rails.logger.debug "Error saving: #{e.message}"
       errors.add(:base, e.message)
       false
     end
@@ -72,12 +63,9 @@ module Forms
     end
 
     def create_new_card
-      card = find_card
-      Rails.logger.debug "Found card: #{card.inspect}"
-      
       user.user_wanted_cards.create!(
         card: find_card,
-        card_version_id: card_version_id, 
+        card_version_id: card_version_id,
         min_condition: min_condition,
         language: language,
         quantity: quantity.to_i,
@@ -99,13 +87,9 @@ module Forms
     end
 
     def find_card
-      Rails.logger.debug "Finding card with scryfall_id: #{scryfall_id.inspect} or card_id: #{card_id.inspect}"
-      
       @card ||= if scryfall_id.present?
-        Rails.logger.debug "Searching by oracle_id"
         Card.find_by!(scryfall_oracle_id: scryfall_id)
       elsif card_id.present?
-        Rails.logger.debug "Searching by card_id"
         Card.find(card_id)
       else
         raise ActiveRecord::RecordNotFound, "Une carte doit être sélectionnée"

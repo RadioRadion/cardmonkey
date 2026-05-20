@@ -4,28 +4,24 @@ class UserWantedCardsController < ApplicationController
   before_action :set_versions, only: [:edit, :update]
 
   def index
-    @user_wanted_cards = @user.user_wanted_cards
-      .includes(:card, card_version: :extension)
-      .order('card_versions.eur_price DESC NULLS LAST')
-      .limit(15)  # 5 colonnes * 3 rangées
+    @pagy, @user_wanted_cards = pagy(
+      @user.user_wanted_cards
+           .includes(:card, card_version: :extension)
+           .order('card_versions.eur_price DESC NULLS LAST'),
+      items: 15
+    )
   end
 
   def new
     @form = Forms::UserWantedCardForm.new(user_id: @user.id)
-    Rails.logger.debug "Form initialized with user_id: #{@user.id}"
-    Rails.logger.debug "Form object: #{@form.inspect}"
   end
 
   def create
-    Rails.logger.debug "Create params: #{params.inspect}"
-    Rails.logger.debug "Permitted params: #{user_wanted_card_form_params.inspect}"
-    
     @form = Forms::UserWantedCardForm.new(user_wanted_card_form_params)
-    
+
     if @form.save
       redirect_to user_user_wanted_cards_path(@user), notice: t('user_wanted_cards.create.success')
     else
-      Rails.logger.debug "Form errors: #{@form.errors.full_messages}"
       render :new, status: :unprocessable_entity
     end
   end

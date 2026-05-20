@@ -4,26 +4,75 @@ class TradesController < ApplicationController
   before_action :set_partner, only: [:new_proposition, :update_trade_value, :search_cards]
 
   def index
-    @trades = current_user.all_trades
-      .includes(:user_cards, :trade_user_cards, user_cards: { card_version: [:card, :extension] })
-      .group_by(&:status)
+    # Load trades by status with limits (avoid loading all trades into memory)
+    base_includes = [:user_cards, :trade_user_cards, user_cards: { card_version: [:card, :extension] }]
 
-    # Load matches in both directions - where current user has cards others want
-    # and where current user wants cards others have
-    @matches = Match.where("(user_id = :user_id AND user_id_target != :user_id) OR (user_id_target = :user_id AND user_id != :user_id)", user_id: current_user.id)
+    @pending_trades = current_user.all_trades.pending
+      .includes(*base_includes)
+      .order(created_at: :desc)
+      .limit(20)
+
+    @modified_trades = current_user.all_trades.modified
+      .includes(*base_includes)
+      .order(updated_at: :desc)
+      .limit(20)
+
+    @accepted_trades = current_user.all_trades.accepted
+      .includes(*base_includes)
+      .order(updated_at: :desc)
+      .limit(10)
+
+    @completed_trades = current_user.all_trades.done
+      .includes(*base_includes)
+      .order(updated_at: :desc)
+      .limit(5)
+
+    # Legacy format for view compatibility (will refactor view later)
+    @trades = {
+      'pending' => @pending_trades.to_a,
+      'modified' => @modified_trades.to_a,
+      'accepted' => @accepted_trades.to_a,
+      'done' => @completed_trades.to_a
+    }
+
+    @distance_filter = params[:distance].present? ? params[:distance].to_i : nil
+    @current_user_coords = [current_user.latitude, current_user.longitude] if current_user.latitude.present?
+
+    # Load matches in both directions with optional distance filtering
+    matches_query = Match.where("(user_id = :user_id AND user_id_target != :user_id) OR (user_id_target = :user_id AND user_id != :user_id)", user_id: current_user.id)
       .includes(
         user_card: { card_version: [:card, :extension], user: {} },
         user_wanted_card: { card_version: [:card, :extension] }
       )
-      .limit(5)
 
-    # Get users with most matches
-    @top_matching_users = Match.where(user: current_user)
+    # Apply distance filter if set and user has location
+    if @distance_filter.present? && @current_user_coords&.first.present?
+      nearby_user_ids = User.within_distance(@current_user_coords, @distance_filter).pluck(:id)
+      matches_query = matches_query.joins("INNER JOIN user_cards ON user_cards.id = matches.user_card_id")
+                                   .where(user_cards: { user_id: nearby_user_ids })
+    end
+
+    @matches = matches_query.limit(10)
+
+    # Preload users for matches to avoid N+1 in view
+    match_user_ids = @matches.flat_map { |m| [m.user_id, m.user_id_target] }.uniq - [current_user.id]
+    @match_users_by_id = User.where(id: match_user_ids).index_by(&:id)
+
+    # Get users with most matches (with distance info)
+    top_users_query = Match.where(user: current_user)
       .group(:user_id_target)
       .select('user_id_target, COUNT(*) as match_count')
       .order('match_count DESC')
-      .limit(4)
-      .map { |m| [User.find(m.user_id_target), m.match_count] }
+
+    if @distance_filter.present? && @current_user_coords&.first.present?
+      nearby_user_ids = User.within_distance(@current_user_coords, @distance_filter).pluck(:id)
+      top_users_query = top_users_query.where(user_id_target: nearby_user_ids)
+    end
+
+    # Batch load users to avoid N+1
+    top_user_ids = top_users_query.limit(4).map(&:user_id_target)
+    top_users_hash = User.where(id: top_user_ids).index_by(&:id)
+    @top_matching_users = top_users_query.limit(4).map { |m| [top_users_hash[m.user_id_target], m.match_count] }.reject { |u, _| u.nil? }
 
     @stats = {
       trades_completed: current_user.trades.done.count,
@@ -244,40 +293,31 @@ class TradesController < ApplicationController
   def process_trade_cards
     offer_cards = params.dig(:trade, :offer).to_s.split(",").reject(&:blank?)
     target_cards = params.dig(:trade, :target).to_s.split(",").reject(&:blank?)
-    
-    Rails.logger.info "Processing trade cards for trade ##{@trade.id}"
-    Rails.logger.info "Offer cards: #{offer_cards.inspect}"
-    Rails.logger.info "Target cards: #{target_cards.inspect}"
-    
+
     @trade.trade_user_cards.destroy_all
-    
+
     (offer_cards + target_cards).each do |card_id|
       next if card_id.blank?
       @trade.trade_user_cards.create!(user_card_id: card_id.to_i)
     end
-
-    Rails.logger.info "After processing, trade has #{@trade.trade_user_cards.count} cards"
   end
 
   def notify_trade_creation
-    begin
-      Notification.create_trade_notification(
-        @trade.user_id_invit,
-        @trade.id,
-        I18n.t('notifications.trade.new_trade', id: @trade.id)
-      )
-      chatroom = Trade.find_or_create_chatroom(current_user.id, @trade.user_id_invit)
+    Notification.create_trade_notification(
+      @trade.user_id_invit,
+      @trade.id,
+      I18n.t('notifications.trade.new_trade', id: @trade.id)
+    )
+
+    chatroom = Trade.find_or_create_chatroom(current_user.id, @trade.user_id_invit)
     Message.create!(
       content: "#{current_user.username} a proposé un échange",
       user_id: current_user.id,
       chatroom_id: chatroom.id,
       metadata: { 'type' => 'trade', 'trade_id' => @trade.id }
     )
-    rescue => e
-      Rails.logger.error "Error in notify_trade_creation: #{e.message}"
-      Rails.logger.error e.backtrace.join("\n")
-      raise e
-    end
+
+    TradeMailer.new_trade(@trade).deliver_later
   end
 
   def handle_trade_acceptance
@@ -292,6 +332,7 @@ class TradesController < ApplicationController
         "Trade accepté ! Discutez-ici pour vous donner rendez-vous.",
         I18n.t('notifications.trade.trade_accepted', id: @trade.id)
       )
+      TradeMailer.trade_accepted(@trade, current_user).deliver_later
     end
     true
   end
@@ -304,13 +345,14 @@ class TradesController < ApplicationController
 
     Trade.transaction do
       @trade.completed_by_user_ids = (@trade.completed_by_user_ids || []) + [current_user.id]
-      
+
       if @trade.completed_by_user_ids.sort == [@trade.user_id, @trade.user_id_invit].sort
         @trade.status = :done
         notify_trade_status_change(
           "Les deux participants ont confirmé que l'échange physique a été réalisé. Trade terminé, bon jeu !",
           I18n.t('notifications.trade.trade_completed', id: @trade.id)
         )
+        TradeMailer.trade_completed(@trade).deliver_later
       else
         other_user = @trade.other_user(current_user)
         notify_trade_status_change(
@@ -318,7 +360,7 @@ class TradesController < ApplicationController
           I18n.t('notifications.trade.trade_completion_pending', id: @trade.id, username: current_user.username)
         )
       end
-      
+
       @trade.save!
     end
     true
@@ -330,10 +372,6 @@ class TradesController < ApplicationController
       return false
     end
 
-    Rails.logger.info "Starting trade modification for trade ##{@trade.id}"
-    Rails.logger.info "Current user: #{current_user.id}"
-    Rails.logger.info "Params: #{params.inspect}"
-
     Trade.transaction do
       process_trade_cards
       @trade.update!(status: :modified, last_modifier_id: current_user.id)
@@ -341,10 +379,8 @@ class TradesController < ApplicationController
         "Une modification a été proposée pour le trade #{@trade.id}",
         I18n.t('notifications.trade.trade_modified', id: @trade.id)
       )
+      TradeMailer.trade_modified(@trade, current_user).deliver_later
     end
-
-    Rails.logger.info "Trade modification completed for trade ##{@trade.id}"
-    Rails.logger.info "New card count: #{@trade.trade_user_cards.count}"
     true
   end
 

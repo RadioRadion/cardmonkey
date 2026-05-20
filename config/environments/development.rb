@@ -71,6 +71,9 @@ Rails.application.configure do
   config.action_cable.allowed_request_origins = [/http:\/\/*/, /https:\/\/*/]
   config.action_cable.disable_request_forgery_protection = true
 
+  # Use Sidekiq for Active Job (run `bundle exec sidekiq` to process jobs)
+  config.active_job.queue_adapter = :sidekiq
+
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 

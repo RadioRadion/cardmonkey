@@ -1,31 +1,42 @@
 # app/controllers/matches_controller.rb
 class MatchesController < ApplicationController
+  include Pagy::Backend
+
   def index
-    # Récupérer tous les matches de l'utilisateur actuel
-    all_matches = current_user.matches
-                            .includes(user_card: { card_version: :card }, 
-                                    user_wanted_card: :card)
+    # Get paginated list of users with match counts (efficient query)
+    matched_users_data = Match.where(user_id: current_user.id)
+      .group(:user_id_target)
+      .select('user_id_target, COUNT(*) as match_count')
+      .order('match_count DESC')
 
-    # Créer un Hash des matches groupés par utilisateur
-    @matches_by_user = all_matches.each_with_object({}) do |match, hash|
-      # Déterminer l'autre utilisateur dans le match
-      other_user = if match.user_id == current_user.id
-                    User.find(match.user_id_target)
-                  else
-                    User.find(match.user_id)
-                  end
+    # Paginate the matched users (10 per page)
+    @pagy, @matched_users_page = pagy_array(
+      matched_users_data.to_a,
+      items: 10,
+      page: params[:page] || 1
+    )
 
-      # Initialiser ou ajouter au tableau de matches pour cet utilisateur
-      hash[other_user] ||= []
-      hash[other_user] << match
+    # Batch load users for this page
+    user_ids_on_page = @matched_users_page.map(&:user_id_target)
+    users_by_id = User.where(id: user_ids_on_page).index_by(&:id)
+
+    # Load matches only for users on this page
+    matches_for_page = current_user.matches
+      .where(user_id_target: user_ids_on_page)
+      .includes(user_card: { card_version: :card }, user_wanted_card: :card)
+
+    # Group matches by user (already limited to this page's users)
+    @matches_by_user = {}
+    @matched_users_page.each do |data|
+      user = users_by_id[data.user_id_target]
+      next unless user
+      user_matches = matches_for_page.select { |m| m.user_id_target == user.id }
+      @matches_by_user[user] = user_matches.take(20) # Limit matches per user displayed
     end
 
-    # Trier le hash par nombre de matches (du plus grand au plus petit)
-    @matches_by_user = @matches_by_user.sort_by { |_, matches| -matches.size }.to_h
-
-    # Statistiques
-    @matches_count = all_matches.count
-    @matched_users_count = @matches_by_user.keys.count
+    # Statistiques (count queries, not full loads)
+    @matches_count = current_user.matches.count
+    @matched_users_count = matched_users_data.length
     @active_trades_count = current_user.trades.active.count rescue 0
   end
 

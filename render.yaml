@@ -41,7 +41,7 @@ services:
           name: cardmonkey-redis
           property: connectionString
       - key: DATABASE_URL
-        value: postgresql://godeck_database_user:OtDf5gcKXVUDjkpjkstAIrgE1yQEgKif@dpg-cu5pmm0gph6c73bvnn7g-a.frankfurt-postgres.render.com/godeck_database
+        sync: false
       - key: RAILS_MASTER_KEY
         sync: false
       - key: RAILS_ENV

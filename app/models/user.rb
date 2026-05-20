@@ -5,6 +5,11 @@ class User < ApplicationRecord
   after_validation :geocode, if: :will_save_change_to_address?
   has_one_attached :avatar
 
+  scope :within_distance, ->(origin, radius_km) {
+    return all unless origin.is_a?(Array) && origin[0].present? && origin[1].present?
+    near(origin, radius_km, units: :km)
+  }
+
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
   
@@ -26,9 +31,38 @@ class User < ApplicationRecord
   has_many :matches
   has_many :notifications
 
+  # Rating associations
+  has_many :ratings_received, class_name: 'Rating', foreign_key: 'rated_id', dependent: :destroy
+  has_many :ratings_given, class_name: 'Rating', foreign_key: 'rater_id', dependent: :destroy
+
   enum preference: { value_based: 0, quantity_based: 1 }
+  enum email_digest: { instant: 'instant', daily: 'daily', weekly: 'weekly', never: 'never' }, _prefix: true
 
   before_validation :set_default_username, on: :create
+
+  def email_notifications?
+    email_notifications && !email_digest_never?
+  end
+
+  def average_rating
+    ratings_received.average(:score)&.round(1) || 0
+  end
+
+  def rating_count
+    ratings_received.count
+  end
+
+  def completed_trades_count
+    all_trades.done.count
+  end
+
+  def rating_breakdown
+    {
+      positive: ratings_received.positive.count,
+      neutral: ratings_received.neutral.count,
+      negative: ratings_received.negative.count
+    }
+  end
 
   def all_trades
     Trade.where('user_id = ? OR user_id_invit = ?', id, id)
