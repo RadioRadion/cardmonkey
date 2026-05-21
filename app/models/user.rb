@@ -35,8 +35,8 @@ class User < ApplicationRecord
   has_many :ratings_received, class_name: 'Rating', foreign_key: 'rated_id', dependent: :destroy
   has_many :ratings_given, class_name: 'Rating', foreign_key: 'rater_id', dependent: :destroy
 
-  enum preference: { value_based: 0, quantity_based: 1 }
-  enum email_digest: { instant: 'instant', daily: 'daily', weekly: 'weekly', never: 'never' }, _prefix: true
+  enum :preference, { value_based: 0, quantity_based: 1 }
+  enum :email_digest, { instant: 'instant', daily: 'daily', weekly: 'weekly', never: 'never' }, prefix: true
 
   before_validation :set_default_username, on: :create
 

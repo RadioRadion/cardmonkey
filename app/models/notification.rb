@@ -7,10 +7,10 @@ class Notification < ApplicationRecord
   validates :status, presence: true
 
   # Enums
-  enum status: {
+  enum :status, {
     unread: 'unread',
     read: 'read'
-  }, _default: :unread
+  }, default: :unread
 
   # Scopes
   scope :unread, -> { where(status: :unread) }

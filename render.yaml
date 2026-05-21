@@ -32,7 +32,7 @@ services:
     env: ruby
     plan: starter
     buildCommand: "./bin/render-build.sh"
-    nodeVersion: 16.20.0
+    nodeVersion: 20
     startCommand: "bundle exec puma -C config/puma.rb"
     envVars:
       - key: REDIS_URL

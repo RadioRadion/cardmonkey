@@ -86,5 +86,4 @@ Rails.application.configure do
 
   # Configure importmap to serve JavaScript modules with proper MIME types
   config.importmap.cache_sweepers << Rails.root.join("app/javascript")
-  config.importmap.javascript_compiler = :esbuild
 end

@@ -23,7 +23,7 @@ class UserCard < ApplicationRecord
   validates :foil, inclusion: { in: [true, false], message: "can't be blank" }
 
   # Énumérations
-  enum condition: {
+  enum :condition, {
     poor: 'poor',
     played: 'played',
     light_played: 'light_played',
@@ -31,9 +31,9 @@ class UserCard < ApplicationRecord
     excellent: 'excellent',
     near_mint: 'near_mint',
     mint: 'mint'
-  }, _default: 'good'
+  }, default: 'good'
 
-  enum language: {
+  enum :language, {
     french: 'fr',
     english: 'en',
     german: 'de',
@@ -44,7 +44,7 @@ class UserCard < ApplicationRecord
     portuguese: 'pt',
     russian: 'ru',
     korean: 'ko'
-  }, _default: 'en'
+  }, default: 'en'
 
   # Callbacks - use async jobs for matching to avoid blocking requests
   after_commit :schedule_create_matches, on: :create

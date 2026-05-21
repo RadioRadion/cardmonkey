@@ -11,7 +11,7 @@ class Trade < ApplicationRecord
 
   before_validation :set_default_status, on: :create
 
-  enum status: {
+  enum :status, {
     pending: 0,
     modified: 1,
     accepted: 2,

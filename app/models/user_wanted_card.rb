@@ -12,7 +12,7 @@ class UserWantedCard < ApplicationRecord
   validates :foil, inclusion: { in: [true, false], message: "can't be blank" }
 
   # Énumérations
-  enum min_condition: {
+  enum :min_condition, {
     poor: 'poor',
     played: 'played',
     light_played: 'light_played',
@@ -21,9 +21,9 @@ class UserWantedCard < ApplicationRecord
     near_mint: 'near_mint',
     mint: 'mint',
     unimportant: 'unimportant'
-  }, _default: 'good'
+  }, default: 'good'
 
-  enum language: {
+  enum :language, {
     french: 'fr',
     english: 'en',
     german: 'de',
@@ -35,7 +35,7 @@ class UserWantedCard < ApplicationRecord
     russian: 'ru',
     korean: 'ko',
     any: 'any'
-  }, _default: 'en'
+  }, default: 'en'
 
   # Callbacks
   after_create :create_matches
