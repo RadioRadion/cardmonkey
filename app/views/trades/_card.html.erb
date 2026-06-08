@@ -15,7 +15,7 @@
      aria-label="<%= card.card_version.card.name_fr %> - <%= card.card_version.extension.name %> - <%= number_to_currency(card.card_version.eur_price) %>">
   
   <%= image_tag card.card_version.img_uri,
-                class: "w-[120px] h-[167px] object-contain rounded-lg transition-all hover:ring-2 hover:ring-blue-500 hover:shadow-lg cursor-pointer",
+                class: "w-full aspect-[63/88] object-cover border-2 border-cm-ink transition-all hover:ring-2 hover:ring-cm-accent cursor-pointer",
                 loading: "lazy",
                 alt: card.card_version.card.name_fr %>
 
