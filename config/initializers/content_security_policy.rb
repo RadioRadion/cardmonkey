@@ -1,30 +1,23 @@
 # Be sure to restart your server when you modify this file.
+#
+# Content Security Policy. Enabled in REPORT-ONLY mode first: the browser reports
+# violations without blocking, so the policy can be validated against real
+# traffic before enforcing. Flip `content_security_policy_report_only` to false
+# once reports are clean.
 
-# Define an application-wide content security policy
-# For further information see the following documentation
-# https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
+Rails.application.configure do
+  config.content_security_policy do |policy|
+    policy.default_src :self, :https
+    policy.font_src    :self, :https, :data
+    # Card art (Scryfall CDN), set icons, user avatars (Cloudinary), data URIs.
+    policy.img_src     :self, :https, :data, "https://cards.scryfall.io",
+                       "https://svgs.scryfall.io", "https://res.cloudinary.com"
+    policy.object_src  :none
+    # Hotwire/Stimulus + importmap shims rely on inline; tighten with nonces later.
+    policy.script_src  :self, :https, :unsafe_inline
+    policy.style_src   :self, :https, :unsafe_inline
+    policy.connect_src :self, :https, :wss
+  end
 
-# Rails.application.config.content_security_policy do |policy|
-#   policy.default_src :self, :https
-#   policy.font_src    :self, :https, :data
-#   policy.img_src     :self, :https, :data
-#   policy.object_src  :none
-#   policy.script_src  :self, :https
-#   policy.style_src   :self, :https
-#   # If you are using webpack-dev-server then specify webpack-dev-server host
-#   policy.connect_src :self, :https, "http://localhost:3035", "ws://localhost:3035" if Rails.env.development?
-
-#   # Specify URI for violation reports
-#   # policy.report_uri "/csp-violation-report-endpoint"
-# end
-
-# If you are using UJS then enable automatic nonce generation
-# Rails.application.config.content_security_policy_nonce_generator = -> request { SecureRandom.base64(16) }
-
-# Set the nonce only to specific directives
-# Rails.application.config.content_security_policy_nonce_directives = %w(script-src)
-
-# Report CSP violations to a specified URI
-# For further information see the following documentation:
-# https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only
-# Rails.application.config.content_security_policy_report_only = true
+  config.content_security_policy_report_only = true
+end

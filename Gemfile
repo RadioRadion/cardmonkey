@@ -12,9 +12,16 @@ gem 'puma', '~> 6.5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.7'
 # Use Redis adapter to run Action Cable in production
-gem 'redis', '~> 4.0'
+gem 'redis', '~> 5.0'
 # Background job processing
 gem 'sidekiq', '~> 7.0'
+
+# Fast, streaming JSON parser for the (multi-GB) Scryfall bulk import
+gem 'oj', '~> 3.16'
+
+# Error monitoring
+gem 'sentry-ruby'
+gem 'sentry-rails'
 
 gem "turbo-rails", "~> 1.5.0"
 gem "stimulus-rails", "~> 1.3.0"
@@ -42,28 +49,33 @@ gem 'down'
 gem 'whenever', require: false
 gem 'cloudinary'
 
-group :development, :test do  
+group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rails'
   gem 'dotenv-rails'
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'factory_bot_rails'
   gem 'faker'
+  gem 'rubocop', require: false
 end
 
 group :development do
   gem 'web-console', '>= 3.3.0'
   gem 'listen', '~> 3.2'
   gem 'spring'
+  gem 'brakeman', require: false
+  gem 'bundler-audit', require: false
 end
 
 group :test do
   gem 'capybara', '>= 2.15'
+  # selenium-webdriver 4.11+ manages drivers itself (Selenium Manager),
+  # so the abandoned `webdrivers` gem is no longer needed.
   gem 'selenium-webdriver'
-  gem 'webdrivers', '= 5.3.0'
   gem 'database_cleaner-active_record'
-  gem 'shoulda-matchers', '~> 4.0'
+  gem 'shoulda-matchers', '~> 6.0'
   gem 'rails-controller-testing'
+  gem 'simplecov', require: false
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

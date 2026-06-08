@@ -25,8 +25,9 @@ Rails.application.configure do
   # Compress CSS using a preprocessor.
   # config.assets.css_compressor = :sass # Commented out to avoid conflicts with Tailwind
 
-  # Enable runtime asset compilation in production for Tailwind CSS
-  config.assets.compile = true
+  # Assets are precompiled at build time (bin/render-build.sh runs
+  # tailwindcss:build + assets:precompile), so no slow runtime compilation.
+  config.assets.compile = false
   config.assets.css_compressor = nil
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
@@ -58,8 +59,15 @@ Rails.application.configure do
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
 
-  # Use memory store for caching in production
-  config.cache_store = :memory_store, { size: 64.megabytes }
+  # Shared Redis cache so all Puma workers see the same cache (memory_store is
+  # per-process and gets inconsistent across workers).
+  config.cache_store = :redis_cache_store, {
+    url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0"),
+    namespace: "cardmonkey_cache",
+    error_handler: ->(method:, returning:, exception:) {
+      Sentry.capture_exception(exception) if defined?(Sentry)
+    }
+  }
 
   # Use Sidekiq for Active Job (async background processing)
   config.active_job.queue_adapter = :sidekiq

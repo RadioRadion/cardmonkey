@@ -27,6 +27,11 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+# Never commit credentials backups
+/config/credentials.yml.enc.backup
+
+# Test coverage output
+/coverage
 
 /public/packs
 /public/packs-test
