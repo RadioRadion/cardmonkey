@@ -1,6 +1,7 @@
 require 'json'
 require 'set'
 require 'logger'
+require_relative 'scryfall_client'
 
 module UpdatePricesTask
   class Updater
@@ -31,27 +32,30 @@ module UpdatePricesTask
 
     def process_price_updates
       json_file_path = Rails.root.join('tmp', 'scryfall', 'all-cards.json')
-      
+
       unless File.exist?(json_file_path)
         @logger.error("Price data file not found: #{json_file_path}")
         raise "Price data file not found"
       end
 
-      cards_data = JSON.parse(File.read(json_file_path))
-      process_in_batches(cards_data)
-    end
-
-    def process_in_batches(cards_data)
-      cards_data.each_slice(BATCH_SIZE) do |batch|
-        ActiveRecord::Base.transaction do
-          begin
-            update_batch(batch)
-          rescue => e
-            @logger.error("Error processing batch: #{e.message}")
-            raise
-          end
+      buffer = []
+      ScryfallClient.each_object(json_file_path) do |card_data|
+        buffer << card_data
+        if buffer.size >= BATCH_SIZE
+          flush(buffer)
+          buffer = []
         end
       end
+      flush(buffer) unless buffer.empty?
+    end
+
+    def flush(batch)
+      ActiveRecord::Base.transaction do
+        update_batch(batch)
+      end
+    rescue => e
+      @logger.error("Error processing batch: #{e.message}")
+      raise
     end
 
     def update_batch(batch)
