@@ -8,10 +8,10 @@ class ChatroomsController < ApplicationController
     @chatrooms = load_chatrooms
 
     # Redirect to the most recent chatroom if one exists
-    if @chatrooms.any? && !request.xhr?
-      redirect_to user_chatroom_path(current_user, @chatrooms.first)
-      return
-    end
+    return unless @chatrooms.any? && !request.xhr?
+
+    redirect_to user_chatroom_path(current_user, @chatrooms.first)
+    return
   end
 
   def show
@@ -25,11 +25,17 @@ class ChatroomsController < ApplicationController
       return
     end
 
+    # Most recent active trade with this partner, to link the conversation to it.
+    @active_trade = current_user.all_trades.active
+                                .where("user_id = :o OR user_id_invit = :o", o: @other_user.id)
+                                .order(updated_at: :desc)
+                                .first
+
     # Mark unread messages as read
     unread_messages = @chatroom.messages.unread_for(current_user)
-    if unread_messages.any?
-      unread_messages.update_all(read_at: Time.current)
-    end
+    return unless unread_messages.any?
+
+    unread_messages.update_all(read_at: Time.current)
   end
 
   def create
@@ -47,13 +53,13 @@ class ChatroomsController < ApplicationController
 
   def load_chatrooms
     chatrooms = Chatroom
-      .includes(:user, :user_invit)
-      .where("chatrooms.user_id = :user_id OR chatrooms.user_id_invit = :user_id", user_id: @user.id)
-      .left_joins(:messages)
-      .select("chatrooms.*, MAX(messages.created_at) as last_message_at")
-      .group("chatrooms.id, chatrooms.user_id, chatrooms.user_id_invit, chatrooms.created_at, chatrooms.updated_at")
-      .order(Arel.sql("MAX(messages.created_at) DESC NULLS LAST"))
-      .to_a
+                .includes(:user, :user_invit)
+                .where("chatrooms.user_id = :user_id OR chatrooms.user_id_invit = :user_id", user_id: @user.id)
+                .left_joins(:messages)
+                .select("chatrooms.*, MAX(messages.created_at) as last_message_at")
+                .group("chatrooms.id, chatrooms.user_id, chatrooms.user_id_invit, chatrooms.created_at, chatrooms.updated_at")
+                .order(Arel.sql("MAX(messages.created_at) DESC NULLS LAST"))
+                .to_a
 
     preload_message_summaries(chatrooms)
     chatrooms
@@ -78,9 +84,10 @@ class ChatroomsController < ApplicationController
 
   def set_user
     @user = User.find(params[:user_id])
-    unless @user == current_user
-      redirect_to user_chatrooms_path(current_user), alert: "Vous ne pouvez pas accéder aux messages d'autres utilisateurs."
-    end
+    return if @user == current_user
+
+    redirect_to user_chatrooms_path(current_user),
+                alert: "Vous ne pouvez pas accéder aux messages d'autres utilisateurs."
   end
 
   def set_chatroom
@@ -88,9 +95,9 @@ class ChatroomsController < ApplicationController
   end
 
   def authorize_chatroom_access
-    unless chatroom_member?
-      redirect_to user_chatrooms_path(current_user), alert: "Vous n'avez pas accès à cette conversation."
-    end
+    return if chatroom_member?
+
+    redirect_to user_chatrooms_path(current_user), alert: "Vous n'avez pas accès à cette conversation."
   end
 
   def chatroom_member?

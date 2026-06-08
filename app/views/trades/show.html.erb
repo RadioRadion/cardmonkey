@@ -28,6 +28,15 @@
     </div>
   </div>
 
+  <%# Prochaine action : indique clairement quoi faire maintenant %>
+  <% next_action = trade_next_action(@trade) %>
+  <% if next_action %>
+    <div class="mb-6 rounded-xl px-5 py-4 border flex items-center gap-3 <%= next_action[:actionable] ? 'bg-indigo-50 border-indigo-200 text-indigo-900' : 'bg-gray-50 border-gray-200 text-gray-600' %>">
+      <span class="text-lg"><%= next_action[:actionable] ? '👉' : '⏳' %></span>
+      <p class="text-sm font-medium"><%= next_action[:text] %></p>
+    </div>
+  <% end %>
+
   <%# Grilles de cartes %>
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <%# Vos cartes %>
@@ -161,6 +170,11 @@
                           method: :patch,
                           params: { status: "accepted" },
                           class: "px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg" %>
+                <%= button_to "Refuser",
+                          decline_trade_path(@trade),
+                          method: :post,
+                          class: "px-6 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50",
+                          data: { confirm: "Refuser cette proposition d'échange ?" } %>
               <% end %>
             <% end %>
           </div>

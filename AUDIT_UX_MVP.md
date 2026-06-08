@@ -13,10 +13,12 @@
 | # | Friction | Sévérité | Statut |
 |---|----------|----------|--------|
 | 1 | Aucun import en masse (200 cartes une par une) | 🔴 | ✅ Phase 1 |
-| 2 | Géoloc absente à l'inscription → matching inopérant | 🔴 | ⏳ Phase 2 |
-| 3 | Onboarding inexistant (pas d'étapes guidées, pas d'aide) | 🟠 | ⏳ Phase 2 |
-| 4 | Écran matches ambigu (qui a / qui veut ?) + bruit technique | 🟠 | ⏳ Phase 3 |
-| 5 | Cycle de vie des trades : « ma prochaine action ? » floue | 🟠 | ⏳ Phase 4 |
+| 2 | Géoloc absente à l'inscription → matching inopérant | 🔴 | ✅ Phase 2 |
+| 3 | Onboarding inexistant (pas d'étapes guidées, pas d'aide) | 🟠 | ✅ Phase 2 |
+| 4 | Écran matches ambigu (qui a / qui veut ?) + bruit technique | 🟠 | ✅ Phase 3 |
+| 5 | Cycle de vie des trades : « ma prochaine action ? » floue | 🟠 | ✅ Phase 4 |
+
+> **Phases 3 & 4 implémentées.** Matches reformulés « vous donnez / vous recevez » + distance + réputation. Trades : bannière « prochaine action » sur la fiche et indice sur les lignes, bouton Refuser pour l'invité, lien chat ↔ échange. Restent (confort, non bloquant) : notifications visuellement « action requise vs info », récap avant envoi d'une proposition, garde anti-oscillation modifier↔valider.
 
 ---
 

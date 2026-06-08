@@ -8,6 +8,11 @@
           <%= t('.with') %> <%= trade.partner_name_for(current_user) %>
         </p>
       </div>
+
+      <% next_action = trade_next_action(trade) %>
+      <% if next_action && next_action[:actionable] %>
+        <p class="mt-1 text-xs font-medium text-indigo-600">👉 <%= next_action[:text] %></p>
+      <% end %>
       
       <%# Infos sur les cartes %>
       <div class="mt-1 flex items-center gap-4 text-sm text-gray-500">
