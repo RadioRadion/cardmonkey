@@ -2,16 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ───────────────────────── CardMonkey design system ─────────────────────────
+   "Editorial / bold" — cream paper + ink + one pop color, heavy display type,
+   hard borders & offset shadows (print/sticker feel), broken grid.
+   Scoped via the `.cm-theme` wrapper so it rolls out page by page.
+   ------------------------------------------------------------------------- */
 @layer components {
-  .btn-primary {
-    @apply py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75;
+  .cm-theme {
+    @apply bg-cm-bg text-cm-ink font-sans;
   }
 
-  .card {
-    @apply bg-white rounded-lg shadow-md p-4;
+  /* Display headline */
+  .cm-display {
+    @apply font-display uppercase leading-[0.9] tracking-tight;
   }
 
-  .form-input {
-    @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50;
+  /* Eyebrow / kicker label */
+  .cm-kicker {
+    @apply inline-block text-xs font-bold uppercase tracking-[0.2em];
+  }
+
+  /* Surfaces — bold ink border + hard offset shadow */
+  .cm-card {
+    @apply bg-cm-surface border-2 border-cm-ink rounded-none shadow-cm-hard;
+  }
+  .cm-card-flat {
+    @apply bg-cm-surface border-2 border-cm-ink rounded-none;
+  }
+
+  /* Buttons */
+  .cm-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-none border-2 border-cm-ink px-5 py-3 text-sm font-bold uppercase tracking-wide transition-transform;
+  }
+  .cm-btn-primary {
+    @apply cm-btn bg-cm-accent text-white shadow-cm-hard-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none;
+  }
+  .cm-btn-ink {
+    @apply cm-btn bg-cm-ink text-cm-bg shadow-cm-hard-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none;
+  }
+  .cm-btn-ghost {
+    @apply cm-btn bg-transparent text-cm-ink hover:bg-cm-ink hover:text-cm-bg;
+  }
+
+  /* Tag / chip */
+  .cm-tag {
+    @apply inline-flex items-center gap-1 bg-cm-ink text-cm-bg px-2 py-0.5 text-xs font-bold uppercase tracking-wider;
+  }
+  .cm-tag-pop {
+    @apply inline-flex items-center gap-1 bg-cm-accent text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wider;
+  }
+
+  /* Text helpers */
+  .cm-muted { @apply text-cm-text-muted; }
+  .cm-subtle { @apply text-cm-text-subtle; }
+
+  /* Inputs */
+  .cm-input {
+    @apply block w-full rounded-none bg-white border-2 border-cm-ink text-cm-ink placeholder-cm-text-subtle focus:ring-0 focus:border-cm-accent;
   }
 }
