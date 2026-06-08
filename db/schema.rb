@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_01_150000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_07_172946) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -55,29 +56,33 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_01_150000) do
 
   create_table "card_versions", force: :cascade do |t|
     t.bigint "card_id", null: false
-    t.string "scryfall_id"
+    t.string "scryfall_id", null: false
     t.string "img_uri"
     t.decimal "eur_price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "extension_id"
-    t.string "border_color"
-    t.string "frame"
+    t.bigint "extension_id", null: false
+    t.string "border_color", null: false
+    t.string "frame", null: false
     t.string "collector_number"
-    t.string "rarity"
+    t.string "rarity", null: false
     t.decimal "eur_foil_price", precision: 10, scale: 2
     t.index ["card_id", "extension_id"], name: "index_card_versions_on_card_and_extension"
     t.index ["card_id"], name: "index_card_versions_on_card_id"
+    t.index ["eur_price"], name: "index_card_versions_on_eur_price"
     t.index ["extension_id"], name: "index_card_versions_on_extension_id"
-    t.index ["scryfall_id"], name: "index_card_versions_on_scryfall_id"
+    t.index ["scryfall_id"], name: "index_card_versions_on_scryfall_id", unique: true
   end
 
   create_table "cards", force: :cascade do |t|
     t.string "scryfall_oracle_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "name_en"
-    t.string "name_fr"
+    t.string "name_en", null: false
+    t.string "name_fr", null: false
+    t.index ["name_en"], name: "index_cards_on_name_en_trgm", opclass: :gin_trgm_ops, using: :gin
+    t.index ["name_fr"], name: "index_cards_on_name_fr_trgm", opclass: :gin_trgm_ops, using: :gin
+    t.index ["scryfall_oracle_id"], name: "index_cards_on_scryfall_oracle_id", unique: true
   end
 
   create_table "chatrooms", force: :cascade do |t|
@@ -86,7 +91,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_01_150000) do
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.integer "user_id_invit"
+    t.index ["user_id", "user_id_invit"], name: "index_chatrooms_on_user_and_invit_unique", unique: true
     t.index ["user_id"], name: "index_chatrooms_on_user_id"
+    t.index ["user_id_invit"], name: "index_chatrooms_on_user_id_invit"
   end
 
   create_table "extensions", force: :cascade do |t|
@@ -102,9 +109,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_01_150000) do
   create_table "matches", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_card_id"
-    t.bigint "user_wanted_card_id"
-    t.bigint "user_id"
+    t.bigint "user_card_id", null: false
+    t.bigint "user_wanted_card_id", null: false
+    t.bigint "user_id", null: false
     t.integer "user_id_target", null: false
     t.index ["user_card_id", "user_wanted_card_id"], name: "index_matches_on_user_card_and_wanted_card_unique", unique: true
     t.index ["user_card_id"], name: "index_matches_on_user_card_id"
@@ -112,6 +119,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_01_150000) do
     t.index ["user_id"], name: "index_matches_on_user_id"
     t.index ["user_id_target", "user_id"], name: "index_matches_on_target_and_user"
     t.index ["user_wanted_card_id"], name: "index_matches_on_user_wanted_card_id"
+    t.check_constraint "user_id <> user_id_target", name: "matches_no_self_match"
   end
 
   create_table "message_reactions", force: :cascade do |t|
@@ -206,16 +214,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_01_150000) do
     t.index ["status"], name: "index_trades_on_status"
     t.index ["user_id", "user_id_invit"], name: "index_trades_on_user_and_invit"
     t.index ["user_id"], name: "index_trades_on_user_id"
+    t.index ["user_id_invit"], name: "index_trades_on_user_id_invit"
   end
 
   create_table "user_cards", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "condition"
-    t.boolean "foil"
-    t.string "language"
-    t.integer "quantity"
+    t.string "condition", null: false
+    t.boolean "foil", null: false
+    t.string "language", null: false
+    t.integer "quantity", null: false
     t.bigint "card_version_id", null: false
     t.index ["card_version_id"], name: "index_user_cards_on_card_version_id"
     t.index ["condition"], name: "index_user_cards_on_condition"
@@ -229,11 +238,12 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_01_150000) do
     t.bigint "card_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "min_condition"
-    t.boolean "foil"
-    t.string "language"
-    t.integer "quantity"
+    t.string "min_condition", null: false
+    t.boolean "foil", null: false
+    t.string "language", null: false
+    t.integer "quantity", null: false
     t.bigint "card_version_id"
+    t.index ["card_id", "language"], name: "index_user_wanted_cards_on_card_id_and_language"
     t.index ["card_id"], name: "index_user_wanted_cards_on_card_id"
     t.index ["card_version_id"], name: "index_user_wanted_cards_on_card_version_id"
     t.index ["language", "min_condition"], name: "index_user_wanted_cards_on_language_and_condition"
@@ -260,6 +270,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_01_150000) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["latitude", "longitude"], name: "index_users_on_coordinates"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["username"], name: "index_users_on_username"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -268,6 +279,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_01_150000) do
   add_foreign_key "card_versions", "cards"
   add_foreign_key "card_versions", "extensions"
   add_foreign_key "chatrooms", "users"
+  add_foreign_key "chatrooms", "users", column: "user_id_invit"
+  add_foreign_key "matches", "user_cards"
+  add_foreign_key "matches", "user_wanted_cards"
+  add_foreign_key "matches", "users"
+  add_foreign_key "matches", "users", column: "user_id_target"
   add_foreign_key "message_reactions", "messages"
   add_foreign_key "message_reactions", "users"
   add_foreign_key "messages", "chatrooms"
@@ -279,6 +295,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_01_150000) do
   add_foreign_key "trade_user_cards", "trades"
   add_foreign_key "trade_user_cards", "user_cards"
   add_foreign_key "trades", "users"
+  add_foreign_key "trades", "users", column: "last_modifier_id"
+  add_foreign_key "trades", "users", column: "user_id_invit"
   add_foreign_key "user_cards", "card_versions"
   add_foreign_key "user_cards", "users"
   add_foreign_key "user_wanted_cards", "card_versions"
