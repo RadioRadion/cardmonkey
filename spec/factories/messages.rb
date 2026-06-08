@@ -13,7 +13,8 @@ FactoryBot.define do
     end
 
     trait :trade_message do
-      sequence(:content) { |n| "trade_id:#{n}" }
+      content { "Proposition d'échange" }
+      metadata { { 'type' => 'trade', 'trade_id' => '123' } }
     end
   end
 end

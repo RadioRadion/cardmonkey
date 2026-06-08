@@ -35,6 +35,9 @@ RSpec.configure do |config|
   # Disable ActiveRecord logging during tests
   ActiveRecord::Base.logger.level = Logger::INFO
 
+  # ActiveJob test helpers (perform_enqueued_jobs, assert_enqueued_with, ...)
+  config.include ActiveJob::TestHelper
+
   # RSpec Rails configurations
   config.fixture_paths = [Rails.root.join('spec/fixtures')]
   config.use_transactional_fixtures = true

@@ -43,8 +43,8 @@ RSpec.describe UserCard, type: :model do
     describe 'after_create' do
       let(:user_card) { build(:user_card) }
 
-      it 'creates matches after creation' do
-        expect(user_card).to receive(:create_matches)
+      it 'schedules match creation asynchronously after creation' do
+        expect(user_card).to receive(:schedule_create_matches)
         user_card.save
       end
     end
@@ -57,8 +57,8 @@ RSpec.describe UserCard, type: :model do
           allow(user_card).to receive(:relevant_attributes_changed?).and_return(true)
         end
 
-        it 'updates matches' do
-          expect(user_card).to receive(:update_matches)
+        it 'schedules a match update' do
+          expect(user_card).to receive(:schedule_update_matches)
           user_card.save
         end
       end
@@ -68,8 +68,8 @@ RSpec.describe UserCard, type: :model do
           allow(user_card).to receive(:relevant_attributes_changed?).and_return(false)
         end
 
-        it 'does not update matches' do
-          expect(user_card).not_to receive(:update_matches)
+        it 'does not schedule a match update' do
+          expect(user_card).not_to receive(:schedule_update_matches)
           user_card.save
         end
       end

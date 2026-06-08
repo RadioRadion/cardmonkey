@@ -2,22 +2,26 @@ FactoryBot.define do
   factory :trade do
     association :user
     association :user_invit, factory: :user
-    status { "0" }  # pending
+    status { :pending }
 
     trait :pending do
-      status { "0" }
+      status { :pending }
       accepted_at { nil }
       completed_at { nil }
     end
 
+    trait :modified do
+      status { :modified }
+    end
+
     trait :accepted do
-      status { "1" }
+      status { :accepted }
       accepted_at { Time.current }
       completed_at { nil }
     end
 
     trait :done do
-      status { "2" }
+      status { :done }
       accepted_at { 1.day.ago }
       completed_at { Time.current }
     end

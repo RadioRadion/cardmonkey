@@ -124,37 +124,37 @@ RSpec.describe UserWantedCard, type: :model do
 
   describe 'callbacks' do
     describe 'after_create' do
-      it 'creates matches' do
+      it 'creates matches (via the async matching job)' do
         other_user = create(:user)
         card = create(:card)
         card_version = create(:card_version, card: card)
-        matching_card = create(:user_card, 
+        create(:user_card,
           user: other_user,
           card_version: card_version,
           language: 'fr',
           condition: 'good'
         )
-        
+
         user_wanted_card = build(:user_wanted_card,
           card: card,
           language: 'fr',
           min_condition: 'good'
         )
-        
-        expect { user_wanted_card.save }.to change(Match, :count).by(1)
+
+        expect { perform_enqueued_jobs { user_wanted_card.save } }.to change(Match, :count).by(1)
       end
     end
 
     describe 'after_update' do
       let!(:user_wanted_card) { create(:user_wanted_card) }
 
-      it 'updates matches when relevant attributes change' do
-        expect(user_wanted_card).to receive(:update_matches)
+      it 'schedules a match update when relevant attributes change' do
+        expect(user_wanted_card).to receive(:schedule_update_matches)
         user_wanted_card.update(min_condition: 'mint')
       end
 
-      it 'does not update matches when irrelevant attributes change' do
-        expect(user_wanted_card).not_to receive(:update_matches)
+      it 'does not schedule a match update when irrelevant attributes change' do
+        expect(user_wanted_card).not_to receive(:schedule_update_matches)
         user_wanted_card.update(quantity: 2)
       end
     end
