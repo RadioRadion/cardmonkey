@@ -9,6 +9,8 @@
         <% if @chatrooms.any? %>
           <% @chatrooms.each do |chatroom| %>
             <% other_user = chatroom.other_user(current_user) %>
+            <% last_message = @last_messages[chatroom.id] %>
+            <% unread_count = @unread_counts[chatroom.id] %>
             <%= link_to user_chatroom_path(current_user, chatroom), 
                 class: "block hover:bg-gray-50 transition-colors" do %>
               <div class="p-4 flex items-center space-x-4">
@@ -25,22 +27,21 @@
                     <h3 class="text-lg font-medium text-gray-900">
                       <%= other_user&.username || "Utilisateur inconnu" %>
                     </h3>
-                    <% if chatroom.messages.any? %>
+                    <% if last_message %>
                       <span class="text-sm text-gray-500">
-                        <%= t('datetime.distance_in_words.ago', count: time_ago_in_words(chatroom.messages.last.created_at)) %>
+                        <%= t('datetime.distance_in_words.ago', count: time_ago_in_words(last_message.created_at)) %>
                       </span>
                     <% end %>
                   </div>
 
-                  <% if chatroom.messages.any? %>
+                  <% if last_message %>
                     <p class="text-sm text-gray-500 truncate">
-                      <%= chatroom.messages.last.display_content %>
+                      <%= last_message.display_content %>
                     </p>
                   <% else %>
                     <p class="text-sm text-gray-500">Démarrer une conversation</p>
                   <% end %>
 
-                  <% unread_count = chatroom.unread_count_for(current_user) %>
                   <% if unread_count > 0 %>
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       <%= unread_count %> nouveau<%= 's' if unread_count > 1 %>

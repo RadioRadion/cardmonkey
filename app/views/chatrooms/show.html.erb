@@ -21,9 +21,10 @@
                 </div>
                 <div class="flex-1">
                   <h3 class="font-medium"><%= other_user&.username || 'Utilisateur inconnu' %></h3>
-                  <% if chatroom.messages.any? %>
+                  <% last_message = @last_messages[chatroom.id] %>
+                  <% if last_message %>
                     <p class="text-sm text-gray-500 truncate">
-                      <%= chatroom.messages.last.display_content %>
+                      <%= last_message.display_content %>
                     </p>
                   <% end %>
                 </div>

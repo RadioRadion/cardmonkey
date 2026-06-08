@@ -88,7 +88,7 @@
                         <% end %>
                       </div>
                     </div>
-                    <% partner = match.user_id == current_user.id ? User.find(match.user_id_target) : User.find(match.user_id) %>
+                    <% partner = @match_users_by_id[match.user_id == current_user.id ? match.user_id_target : match.user_id] %>
                     <%= link_to new_proposition_trade_path(partner, partner_id: partner.id), 
                               class: "text-sm text-indigo-600 hover:text-indigo-800",
                               data: { turbo: false } do %>

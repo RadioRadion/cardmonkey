@@ -19,6 +19,12 @@ module Cardmonkey
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
+    # i18n — MVP is French-only (en.yml is not translated yet). Locale is
+    # centralized here instead of hard-coded in ApplicationController, so adding
+    # more locales later is a config change, not a controller change.
+    config.i18n.default_locale = :fr
+    config.i18n.available_locales = [:fr]
+
     # Register proper MIME types for JavaScript modules
     config.before_configuration do
       Mime::Type.register "text/javascript", :js

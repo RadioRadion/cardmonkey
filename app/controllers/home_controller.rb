@@ -13,6 +13,9 @@ class HomeController < ApplicationController
           user_wanted_card: { card_version: [:card, :extension] }
         )
         .limit(10)
+      # Preload partner users to avoid N+1 in the dashboard match list
+      partner_ids = @potential_matches.flat_map { |m| [m.user_id, m.user_id_target] }.uniq - [current_user.id]
+      @match_users_by_id = User.where(id: partner_ids).index_by(&:id)
       @notifications = current_user.notifications.unread.limit(5)
       @user_cards = current_user.user_cards
         .includes(card_version: :card)

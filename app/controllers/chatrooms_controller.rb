@@ -46,13 +46,34 @@ class ChatroomsController < ApplicationController
   private
 
   def load_chatrooms
-    Chatroom
-      .includes(:messages, :user, :user_invit)
+    chatrooms = Chatroom
+      .includes(:user, :user_invit)
       .where("chatrooms.user_id = :user_id OR chatrooms.user_id_invit = :user_id", user_id: @user.id)
       .left_joins(:messages)
       .select("chatrooms.*, MAX(messages.created_at) as last_message_at")
       .group("chatrooms.id, chatrooms.user_id, chatrooms.user_id_invit, chatrooms.created_at, chatrooms.updated_at")
       .order(Arel.sql("MAX(messages.created_at) DESC NULLS LAST"))
+      .to_a
+
+    preload_message_summaries(chatrooms)
+    chatrooms
+  end
+
+  # Batch-load the last message + unread count per chatroom (avoids N queries
+  # in the list view and loading every message into memory).
+  def preload_message_summaries(chatrooms)
+    ids = chatrooms.map(&:id)
+    @last_messages = {}
+    @unread_counts = Hash.new(0)
+    return if ids.empty?
+
+    last_ids = Message.where(chatroom_id: ids).group(:chatroom_id).maximum(:id)
+    @last_messages = Message.where(id: last_ids.values).includes(:user).index_by(&:chatroom_id)
+    @unread_counts = Message.where(chatroom_id: ids, read_at: nil)
+                            .where.not(user_id: current_user.id)
+                            .group(:chatroom_id)
+                            .count
+    @unread_counts.default = 0
   end
 
   def set_user

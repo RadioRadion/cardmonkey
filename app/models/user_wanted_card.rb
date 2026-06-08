@@ -37,10 +37,12 @@ class UserWantedCard < ApplicationRecord
     any: 'any'
   }, default: 'en'
 
-  # Callbacks
-  after_create :create_matches
-  after_update :update_matches, if: :relevant_attributes_changed?
-  before_destroy :notify_trade_partners
+  # Callbacks - matching runs async (Sidekiq) to avoid blocking the request,
+  # mirroring UserCard. Removal notifications are also deferred to a job.
+  after_commit :schedule_create_matches, on: :create
+  after_commit :schedule_update_matches, on: :update, if: :relevant_attributes_changed?
+  before_destroy :snapshot_for_notifications
+  after_commit :notify_trade_partners_async, on: :destroy
 
   # Scopes
   scope :by_min_condition, ->(condition) { where(min_condition: condition) }
@@ -53,7 +55,7 @@ class UserWantedCard < ApplicationRecord
   end
 
   def potential_matches_count
-    find_potential_matches.count
+    MatchFinder.rows_for_user_wanted_card(self).size
   end
 
   def img_uri
@@ -61,49 +63,19 @@ class UserWantedCard < ApplicationRecord
     card.card_versions.first&.img_uri
   end
 
-  # Public method to regenerate matches
-  def regenerate_matches
-    update_matches
+  # Public method to regenerate matches (async, via Sidekiq)
+  def regenerate_matches_async
+    UserWantedCardMatchingJob.perform_later(id, :update)
   end
 
   private
 
-  def notify_trade_partners
-    matching_cards = UserCard.joins(card_version: :card)
-                           .where(cards: { id: card_id })
-                           .where(language: language == 'any' ? UserCard.languages.keys : language)
-    
-    return if matching_cards.empty?
-
-    matching_cards.each do |matching_card|
-      matching_card.trades.active.each do |trade|
-        next if trade.user_id == matching_card.user_id && trade.user_id_invit != user_id
-        next if trade.user_id_invit == matching_card.user_id && trade.user_id != user_id
-
-        notification_message = I18n.t('notifications.trade.wanted_card_removed',
-                                    card_name: card.name,
-                                    username: user.username)
-        chat_message = I18n.t('notifications.trade.wanted_card_removed_chat',
-                             card_name: card.name,
-                             username: user.username)
-
-        Notification.create_notification(matching_card.user_id, notification_message)
-        Trade.save_message(user.id, matching_card.user_id, chat_message)
-      end
-    end
+  def schedule_create_matches
+    UserWantedCardMatchingJob.perform_later(id, :create)
   end
 
-  def create_matches
-    potential_matches = find_potential_matches
-    return if potential_matches.empty?
-
-    matches_to_create = build_matches(potential_matches)
-    Match.insert_all(matches_to_create) if matches_to_create.any?
-  end
-
-  def update_matches
-    matches.destroy_all
-    create_matches
+  def schedule_update_matches
+    UserWantedCardMatchingJob.perform_later(id, :update)
   end
 
   def relevant_attributes_changed?
@@ -113,31 +85,20 @@ class UserWantedCard < ApplicationRecord
     saved_change_to_card_version_id?
   end
 
-  def find_potential_matches
-    base_query = UserCard
-      .joins(card_version: :card)
-      .where.not(user_id: user_id)
-      .where(cards: { id: card_id })
-
-    if language == 'any'
-      base_query
-    else
-      base_query.where(language: language)
-    end
+  # Capture the scalars the notification needs before the record disappears.
+  def snapshot_for_notifications
+    @removal_payload = {
+      card_id: card_id,
+      language: language,
+      user_id: user_id,
+      card_name: card&.name,
+      username: user&.username
+    }
   end
 
-  def build_matches(potential_matches)
-    current_time = Time.current
+  def notify_trade_partners_async
+    return unless @removal_payload
 
-    potential_matches.map do |user_card|
-      {
-        user_card_id: user_card.id,
-        user_wanted_card_id: id,
-        user_id: user_card.user_id,
-        user_id_target: user_id,
-        created_at: current_time,
-        updated_at: current_time
-      }
-    end
+    WantedCardRemovedNotificationJob.perform_later(**@removal_payload)
   end
 end

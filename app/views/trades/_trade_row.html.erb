@@ -11,12 +11,12 @@
       
       <%# Infos sur les cartes %>
       <div class="mt-1 flex items-center gap-4 text-sm text-gray-500">
-        <% user_cards = trade.trade_user_cards.joins(:user_card).where(user_cards: { user_id: current_user.id }) %>
-        <% partner_cards = trade.trade_user_cards.joins(:user_card).where.not(user_cards: { user_id: current_user.id }) %>
-        
-        <span><%= pluralize(user_cards.count, t('.card_offered')) %></span>
+        <%# Partition the preloaded user_cards in memory (no per-row COUNT queries) %>
+        <% mine, theirs = trade.user_cards.partition { |uc| uc.user_id == current_user.id } %>
+
+        <span><%= pluralize(mine.size, t('.card_offered')) %></span>
         <span>•</span>
-        <span><%= pluralize(partner_cards.count, t('.card_requested')) %></span>
+        <span><%= pluralize(theirs.size, t('.card_requested')) %></span>
       </div>
 
       <p class="mt-1 text-sm text-gray-500">
