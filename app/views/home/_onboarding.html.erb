@@ -13,15 +13,14 @@
 <% done_count = steps.count { |s| s[:done] } %>
 
 <% unless done_count == steps.size %>
-  <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 p-6 mb-8">
+  <div class="cm-card-flat p-6 mb-8">
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold text-gray-900">Bien démarrer</h2>
-      <span class="text-sm text-gray-500"><%= done_count %>/<%= steps.size %></span>
+      <h2 class="cm-display text-2xl">Bien démarrer</h2>
+      <span class="cm-tag"><%= done_count %>/<%= steps.size %></span>
     </div>
 
-    <div class="w-full bg-gray-100 rounded-full h-2 mb-5">
-      <div class="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all"
-           style="width: <%= (done_count.to_f / steps.size * 100).round %>%"></div>
+    <div class="w-full bg-cm-surface-2 border-2 border-cm-ink h-3 mb-5">
+      <div class="bg-cm-accent h-full transition-all" style="width: <%= (done_count.to_f / steps.size * 100).round %>%"></div>
     </div>
 
     <ul class="space-y-3">
@@ -29,19 +28,19 @@
         <li class="flex items-center justify-between gap-4">
           <div class="flex items-center gap-3 min-w-0">
             <% if step[:done] %>
-              <span class="flex-shrink-0 h-7 w-7 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              <span class="flex-shrink-0 h-8 w-8 bg-cm-success text-white flex items-center justify-center border-2 border-cm-ink">
+                <i class="fas fa-check text-sm"></i>
               </span>
             <% else %>
-              <span class="flex-shrink-0 h-7 w-7 rounded-full bg-indigo-100 text-indigo-700 font-semibold text-sm flex items-center justify-center"><%= i + 1 %></span>
+              <span class="flex-shrink-0 h-8 w-8 bg-cm-accent text-white cm-display flex items-center justify-center border-2 border-cm-ink"><%= i + 1 %></span>
             <% end %>
             <div class="min-w-0">
-              <p class="text-sm font-medium <%= step[:done] ? 'text-gray-400 line-through' : 'text-gray-900' %>"><%= step[:label] %></p>
-              <% unless step[:done] %><p class="text-xs text-gray-500 truncate"><%= step[:hint] %></p><% end %>
+              <p class="text-sm font-bold <%= step[:done] ? 'text-cm-text-subtle line-through' : 'text-cm-ink' %>"><%= step[:label] %></p>
+              <% unless step[:done] %><p class="text-xs text-cm-text-muted truncate"><%= step[:hint] %></p><% end %>
             </div>
           </div>
           <% unless step[:done] %>
-            <%= link_to step[:cta], step[:path], class: "flex-shrink-0 text-sm font-medium text-indigo-600 hover:text-indigo-800" %>
+            <%= link_to step[:cta], step[:path], class: "flex-shrink-0 text-sm font-bold uppercase tracking-wide text-cm-accent hover:underline" %>
           <% end %>
         </li>
       <% end %>

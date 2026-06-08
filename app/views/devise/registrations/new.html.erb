@@ -1,16 +1,17 @@
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 flex flex-col justify-center">
-  <div class="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12 mt-12">
-      <h2 class="text-4xl font-extrabold text-gray-900 tracking-tight">
+<div class="cm-theme min-h-screen flex flex-col justify-center py-12">
+  <div class="w-full max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <span class="cm-kicker text-cm-accent">Inscription</span>
+      <h2 class="cm-display text-4xl sm:text-5xl mt-1">
         <%= t('devise.registrations.new.title') %>
       </h2>
-      <p class="mt-3 text-lg text-gray-500">
+      <p class="mt-2 text-cm-text-muted">
         <%= t('devise.registrations.new.subtitle') %>
       </p>
     </div>
 
-    <div class="bg-white shadow-xl rounded-lg overflow-hidden">
-      <div class="p-6 sm:p-8 lg:p-12">
+    <div class="cm-card overflow-hidden">
+      <div class="p-6 sm:p-8">
         <%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
           <%= f.error_notification class: "mb-6 p-4 rounded-lg bg-red-50 text-red-600" %>
 
@@ -19,50 +20,50 @@
                         required: true,
                         autofocus: true,
                         input_html: { 
-                          class: "block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm",
+                          class: "cm-input py-3",
                           autocomplete: "email",
                           placeholder: "your@email.com"
                         },
                         wrapper_html: { class: "block" },
-                        label_html: { class: "block text-sm font-medium text-gray-700 mb-2" } %>
+                        label_html: { class: "block text-sm font-bold mb-2" } %>
 
             <%= f.input :password,
                         required: true,
                         hint: t('simple_form.hints.user.password', minimum_password_length: @minimum_password_length),
                         input_html: { 
-                          class: "block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm",
+                          class: "cm-input py-3",
                           autocomplete: "new-password",
                           placeholder: "••••••••"
                         },
                         wrapper_html: { class: "block" },
-                        label_html: { class: "block text-sm font-medium text-gray-700 mb-2" },
+                        label_html: { class: "block text-sm font-bold mb-2" },
                         hint_html: { class: "mt-2 text-sm text-gray-500" } %>
 
             <%= f.input :password_confirmation,
                         required: true,
                         input_html: {
-                          class: "block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm",
+                          class: "cm-input py-3",
                           autocomplete: "new-password",
                           placeholder: "••••••••"
                         },
                         wrapper_html: { class: "block" },
-                        label_html: { class: "block text-sm font-medium text-gray-700 mb-2" } %>
+                        label_html: { class: "block text-sm font-bold mb-2" } %>
 
             <%= f.input :address,
                         required: true,
                         label: "Ville ou adresse",
                         hint: "Pour vous proposer des échanges près de chez vous. Une ville suffit.",
                         input_html: {
-                          class: "block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm",
+                          class: "cm-input py-3",
                           autocomplete: "address-level2",
                           placeholder: "Lyon, France"
                         },
                         wrapper_html: { class: "block" },
-                        label_html: { class: "block text-sm font-medium text-gray-700 mb-2" },
+                        label_html: { class: "block text-sm font-bold mb-2" },
                         hint_html: { class: "mt-2 text-sm text-gray-500" } %>
 
             <div>
-              <%= f.button :submit, t('devise.registrations.new.sign_up'), class: "w-full flex justify-center py-4 px-6 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+              <%= f.button :submit, t('devise.registrations.new.sign_up'), class: "cm-btn-primary w-full" %>
             </div>
           </div>
         <% end %>
@@ -73,13 +74,12 @@
               <div class="w-full border-t border-gray-200"></div>
             </div>
             <div class="relative flex justify-center text-sm">
-              <span class="px-4 bg-white text-gray-500"><%= t('devise.registrations.new.already_have_account') %></span>
+              <span class="px-4 bg-cm-surface text-cm-text-muted"><%= t('devise.registrations.new.already_have_account') %></span>
             </div>
           </div>
 
           <div class="mt-6 grid grid-cols-1 gap-4">
-            <%= link_to t('devise.shared.links.sign_in'), new_session_path(resource_name), 
-                class: "w-full inline-flex justify-center py-4 px-6 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+            <%= link_to t('devise.shared.links.sign_in'), new_session_path(resource_name), class: "cm-btn-ghost w-full" %>
 
             <%- if devise_mapping.omniauthable? %>
               <%- resource_class.omniauth_providers.each do |provider| %>
