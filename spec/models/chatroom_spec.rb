@@ -88,9 +88,12 @@ RSpec.describe Chatroom, type: :model do
     let(:chatroom) { create(:chatroom, user: user, user_invit: other_user) }
 
     before do
-      create(:message, chatroom: chatroom, user: user, read_at: nil)
-      create(:message, chatroom: chatroom, user: other_user, read_at: nil)
-      create(:message, chatroom: chatroom, user: other_user, read_at: Time.current)
+      create(:message, chatroom: chatroom, user: user)
+      create(:message, chatroom: chatroom, user: other_user)
+      # Set read_at after creation to bypass the after_create callback that
+      # (legitimately) marks the latest incoming message as unread.
+      read = create(:message, chatroom: chatroom, user: other_user)
+      read.update_column(:read_at, Time.current)
     end
 
     it 'returns count of unread messages for a user' do

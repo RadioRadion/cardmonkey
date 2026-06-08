@@ -3,13 +3,25 @@ require 'rails_helper'
 RSpec.describe Trade, type: :model do
   describe 'associations' do
     it { should belong_to(:user) }
-    it { should belong_to(:user_invit).class_name('User').optional }
+    it { should belong_to(:user_invit).class_name('User') }
     it { should have_many(:trade_user_cards).dependent(:destroy) }
     it { should have_many(:user_cards).through(:trade_user_cards) }
   end
 
-  describe 'validations' do
-    it { should validate_presence_of(:status) }
+  describe 'status' do
+    # status is enum-backed with a default applied before validation; it is
+    # therefore always present rather than validatable as "blank".
+    it 'defaults to pending on a new record' do
+      trade = Trade.new
+      trade.valid?
+      expect(trade.status).to eq('pending')
+    end
+
+    it 'rejects participants being the same user' do
+      user = create(:user)
+      trade = build(:trade, user: user, user_invit: user)
+      expect(trade).not_to be_valid
+    end
   end
 
   describe 'scopes' do
@@ -39,10 +51,11 @@ RSpec.describe Trade, type: :model do
     end
 
     describe '.active' do
-      it 'returns trades that are pending or accepted with accepted_at not nil' do
-        active_pending = create(:trade, :pending, accepted_at: Time.current)
-        expect(Trade.active).to include(accepted_trade, active_pending)
-        expect(Trade.active).not_to include(pending_trade, done_trade)
+      it 'returns in-progress trades (pending, modified, accepted), not done/cancelled' do
+        modified_trade = create(:trade, :modified)
+        cancelled_trade = create(:trade, status: :cancelled)
+        expect(Trade.active).to include(pending_trade, accepted_trade, modified_trade)
+        expect(Trade.active).not_to include(done_trade, cancelled_trade)
       end
     end
   end
@@ -57,25 +70,8 @@ RSpec.describe Trade, type: :model do
       trade.user_invit = partner
     end
 
-    describe '#status_badge' do
-      it 'returns the correct HTML for pending status' do
-        trade.update!(status: "0")
-        expect(trade.status_badge).to include('En attente')
-        expect(trade.status_badge).to include('bg-yellow-100')
-      end
-
-      it 'returns the correct HTML for accepted status' do
-        trade.update!(status: "1")
-        expect(trade.status_badge).to include('Accepté')
-        expect(trade.status_badge).to include('bg-green-100')
-      end
-
-      it 'returns the correct HTML for done status' do
-        trade.update!(status: "2")
-        expect(trade.status_badge).to include('Complété')
-        expect(trade.status_badge).to include('bg-blue-100')
-      end
-    end
+    # Note: status badge rendering is a view concern (TradesHelper#trade_status_badge),
+    # not a model method — tested at the view/helper level.
 
     describe '#partner_for and #other_user' do
       it 'returns the correct partner for the current user' do
@@ -100,21 +96,8 @@ RSpec.describe Trade, type: :model do
       end
     end
 
-    describe '#notify_status_change' do
-      let(:trade) { create(:trade) }
-      let(:current_user) { create(:user) }
-      let(:partner) { create(:user) }
-
-      before do
-        trade.update(user: current_user, user_invit: partner)
-      end
-
-      it 'creates a notification and saves a message' do
-        expect(Notification).to receive(:create_notification).with(partner.id, "Test message")
-        expect(Trade).to receive(:save_message).with(current_user.id, partner.id, "trade_id:#{trade.id}")
-        trade.notify_status_change(current_user.id, "Test message")
-      end
-    end
+    # Note: notifying partners on status change is a controller concern
+    # (TradesController#notify_trade_status_change), not a model method.
   end
 
   describe 'class methods' do
