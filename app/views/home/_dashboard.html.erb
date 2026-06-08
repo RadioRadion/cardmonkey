@@ -1,31 +1,29 @@
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+<div class="cm-theme min-h-screen">
   <div class="container mx-auto px-4 py-8">
-    <%# Welcome Hero Section with Stats %>
-    <div class="bg-white rounded-2xl shadow-sm p-8 mb-8">
-      <div class="flex items-center justify-between">
+    <%# ───────────── Hero + stats ───────────── %>
+    <div class="cm-card-flat p-6 sm:p-8 mb-8">
+      <div class="flex items-start justify-between gap-6">
         <div class="flex-grow">
-          <h1 class="text-3xl font-bold text-gray-900">
-            Bienvenue, <span class="text-indigo-600"><%= current_user.username %></span>
+          <span class="cm-kicker text-cm-accent">Tableau de bord</span>
+          <h1 class="cm-display text-4xl sm:text-5xl mt-2">
+            Salut, <span class="text-cm-accent"><%= current_user.username %></span>
           </h1>
-          <p class="mt-2 text-gray-600">Gérez vos cartes et trouvez des échanges intéressants</p>
-          
-          <%# Quick Stats %>
-          <div class="mt-6 grid grid-cols-3 gap-4">
-            <div class="bg-gray-50 rounded-xl p-4">
-              <div class="text-2xl font-bold text-indigo-600"><%= current_user.user_cards.sum(:quantity) %></div>
-              <div class="text-sm text-gray-600">Cartes en collection</div>
-            </div>
-            <div class="bg-gray-50 rounded-xl p-4">
-              <div class="text-2xl font-bold text-purple-600"><%= current_user.user_wanted_cards.count %></div>
-              <div class="text-sm text-gray-600">Cartes recherchées</div>
-            </div>
-            <div class="bg-gray-50 rounded-xl p-4">
-              <div class="text-2xl font-bold text-green-600"><%= current_user.trades.where(status: :done).count %></div>
-              <div class="text-sm text-gray-600">Échanges réalisés</div>
-            </div>
+          <p class="mt-3 text-cm-text-muted">Gérez vos cartes et trouvez des échanges.</p>
+
+          <div class="mt-6 flex flex-wrap border-2 border-cm-ink divide-x-2 divide-cm-ink w-fit">
+            <% [
+                 [current_user.user_cards.sum(:quantity), "En collection"],
+                 [current_user.user_wanted_cards.count, "Recherchées"],
+                 [current_user.trades.where(status: :done).count, "Échanges faits"]
+               ].each do |num, label| %>
+              <div class="px-5 py-3">
+                <div class="cm-display text-3xl"><%= num %></div>
+                <div class="text-[11px] font-bold uppercase tracking-widest text-cm-text-muted"><%= label %></div>
+              </div>
+            <% end %>
           </div>
         </div>
-        <div class="hidden sm:block ml-6">
+        <div class="hidden sm:block flex-shrink-0">
           <%= render "users/avatar", user: current_user, size: "large" %>
         </div>
       </div>
@@ -34,213 +32,142 @@
     <%= render "home/onboarding" if @onboarding %>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <%# Quick Actions & Notifications Panel %>
-      <div class="lg:col-span-1">
-        <%# Opportunités d'échange %>
-        <div class="bg-white rounded-2xl shadow-sm p-6 mb-8">
-          <h2 class="text-xl font-semibold mb-6 text-gray-900">Opportunités d'échange</h2>
-          <div class="space-y-4">
-            <% if !current_user.user_wanted_cards.any? %>
-              <div class="text-center py-6">
-                <div class="mx-auto h-12 w-12 text-gray-400 mb-4">
-                  <i class="fas fa-search text-2xl"></i>
-                </div>
-                <p class="text-sm text-gray-500 mb-4">Ajoutez des cartes à votre liste de recherche pour voir les opportunités d'échange</p>
-                <%= link_to new_user_user_wanted_card_path(current_user), 
-                          class: "inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors",
-                          data: { turbo: false } do %>
-                  <i class="fas fa-plus-circle mr-2"></i>
-                  Ajouter des cartes recherchées
-                <% end %>
-              </div>
-            <% elsif @potential_matches.empty? %>
-              <div class="text-center py-6">
-                <div class="mx-auto h-12 w-12 text-gray-400 mb-4">
-                  <i class="fas fa-exclamation-circle text-2xl"></i>
-                </div>
-                <p class="text-sm text-gray-500 mb-2">Pas de match pour le moment</p>
-                <p class="text-sm text-gray-500">Pensez à enrichir votre collection pour augmenter vos chances de trouver des correspondances !</p>
-                <%= link_to new_user_user_card_path(current_user), 
-                          class: "mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors",
-                          data: { turbo: false } do %>
-                  <i class="fas fa-plus-circle mr-2"></i>
-                  Ajouter des cartes à échanger
-                <% end %>
-              </div>
-            <% else %>
-              <div class="space-y-4">
-                <% @potential_matches.first(3).each do |match| %>
-                  <div class="flex items-center justify-between py-3 border-b border-gray-200 last:border-0">
-                    <div class="flex items-center space-x-3">
-                      <div class="flex-shrink-0">
-                        <% if match.user_card.card_version.img_uri %>
-                          <%= image_tag match.user_card.card_version.img_uri, 
-                              class: "h-10 w-10 rounded-lg object-cover",
-                              loading: "lazy" %>
-                        <% end %>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-900"><%= match.user_card.card_version.card.name_fr %></p>
-                        <%= link_to user_path(match.user_card.user), class: "text-xs text-gray-500 hover:text-indigo-600" do %>
-                          <% if match.user_id == current_user.id %>
-                            Vous recherchez cette carte
-                          <% else %>
-                            Carte disponible dans votre collection
-                          <% end %>
-                        <% end %>
-                      </div>
-                    </div>
-                    <% partner = @match_users_by_id[match.user_id == current_user.id ? match.user_id_target : match.user_id] %>
-                    <%= link_to new_proposition_trade_path(partner, partner_id: partner.id), 
-                              class: "text-sm text-indigo-600 hover:text-indigo-800",
-                              data: { turbo: false } do %>
-                      <i class="fas fa-exchange-alt mr-1"></i>
-                      Échanger avec <%= partner.username %>
+      <%# ───────────── Left column ───────────── %>
+      <div class="lg:col-span-1 space-y-8">
+        <%# Opportunités %>
+        <div class="cm-card-flat p-6">
+          <h2 class="cm-display text-2xl mb-5">Opportunités</h2>
+          <% if !current_user.user_wanted_cards.any? %>
+            <div class="text-center py-6">
+              <p class="text-sm text-cm-text-muted mb-4">Ajoutez des cartes recherchées pour voir les opportunités d'échange.</p>
+              <%= link_to "Ajouter des recherches", new_user_user_wanted_card_path(current_user), class: "cm-btn-ink text-xs", data: { turbo: false } %>
+            </div>
+          <% elsif @potential_matches.empty? %>
+            <div class="text-center py-6">
+              <p class="text-sm text-cm-text-muted mb-4">Pas de match pour l'instant. Enrichissez votre collection pour augmenter vos chances.</p>
+              <%= link_to "Ajouter des cartes", new_user_user_card_path(current_user), class: "cm-btn-ink text-xs", data: { turbo: false } %>
+            </div>
+          <% else %>
+            <div class="space-y-3">
+              <% @potential_matches.first(3).each do |match| %>
+                <% partner = @match_users_by_id[match.user_id == current_user.id ? match.user_id_target : match.user_id] %>
+                <div class="flex items-center justify-between gap-3 border-b border-cm-border/30 pb-3 last:border-0">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <% if match.user_card.card_version.img_uri %>
+                      <%= image_tag match.user_card.card_version.img_uri, class: "h-10 w-8 object-cover border border-cm-ink", loading: "lazy" %>
                     <% end %>
+                    <div class="min-w-0">
+                      <p class="text-sm font-bold truncate"><%= match.user_card.card_version.card.name_fr %></p>
+                      <p class="text-xs text-cm-text-muted"><%= partner&.username %></p>
+                    </div>
                   </div>
-                <% end %>
-                <%= link_to trades_path, class: "block text-center text-sm text-indigo-600 hover:text-indigo-800 mt-4" do %>
-                  Voir toutes les opportunités
-                  <i class="fas fa-arrow-right ml-1"></i>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
+                  <% if partner %>
+                    <%= link_to "Échanger", new_proposition_trade_path(partner, partner_id: partner.id), class: "text-xs font-bold uppercase tracking-wide text-cm-accent hover:underline", data: { turbo: false } %>
+                  <% end %>
+                </div>
+              <% end %>
+              <%= link_to "Voir tout →", matches_path, class: "block text-center text-xs font-bold uppercase tracking-wide text-cm-accent hover:underline mt-3" %>
+            </div>
+          <% end %>
         </div>
 
-        <%# Other Quick Actions %>
-        <div class="bg-white rounded-2xl shadow-sm p-6 mb-8">
-          <h2 class="text-xl font-semibold mb-6 text-gray-900">Actions rapides</h2>
+        <%# Actions rapides %>
+        <div class="cm-card-flat p-6">
+          <h2 class="cm-display text-2xl mb-5">Actions</h2>
           <div class="space-y-3">
-            <%= link_to import_user_user_cards_path(current_user), class: "flex items-center justify-between w-full p-3 text-left rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-500 hover:to-purple-500 transition-colors duration-200" do %>
-              <span class="font-medium">Importer ma collection (liste / CSV)</span>
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-              </svg>
+            <%= link_to import_user_user_cards_path(current_user), class: "cm-btn-primary w-full justify-between" do %>
+              <span>Importer (liste / CSV)</span><i class="fas fa-file-import"></i>
             <% end %>
-
-            <%= link_to new_user_user_card_path(current_user), class: "flex items-center justify-between w-full p-3 text-left rounded-xl bg-green-600 text-white hover:bg-green-500 transition-colors duration-200" do %>
-              <span class="font-medium">Ajouter une carte</span>
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-              </svg>
+            <%= link_to new_user_user_card_path(current_user), class: "cm-btn-ink w-full justify-between" do %>
+              <span>Ajouter une carte</span><i class="fas fa-plus"></i>
             <% end %>
-
-            <%= link_to user_user_wanted_cards_path(current_user), class: "flex items-center justify-between w-full p-3 text-left rounded-xl bg-purple-600 text-white hover:bg-purple-500 transition-colors duration-200" do %>
-              <span class="font-medium">Liste de souhaits</span>
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-              </svg>
+            <%= link_to user_user_wanted_cards_path(current_user), class: "cm-btn-ghost w-full justify-between" do %>
+              <span>Liste de souhaits</span><i class="fas fa-star"></i>
             <% end %>
           </div>
         </div>
 
         <%# Notifications %>
-        <div class="bg-white rounded-2xl shadow-sm p-6">
-          <h2 class="text-xl font-semibold mb-4 text-gray-900">Notifications</h2>
-          <div class="space-y-2">
-            <%= render partial: "notifications/list", locals: { notifications: @notifications || [] } %>
-          </div>
+        <div class="cm-card-flat p-6">
+          <h2 class="cm-display text-2xl mb-4">Notifications</h2>
+          <%= render partial: "notifications/list", locals: { notifications: @notifications || [] } %>
         </div>
       </div>
 
-      <%# Main Content Area %>
+      <%# ───────────── Main column ───────────── %>
       <div class="lg:col-span-2 space-y-8">
-        <%# Collection Highlights %>
-        <div class="bg-white rounded-2xl shadow-sm p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-semibold text-gray-900">Points forts de votre collection</h2>
-            <%= link_to "Voir tout", user_user_cards_path(current_user), class: "text-indigo-600 hover:text-indigo-500" %>
+        <%# Collection highlights %>
+        <div class="cm-card-flat p-6">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="cm-display text-2xl">Votre collection</h2>
+            <%= link_to "Voir tout →", user_user_cards_path(current_user), class: "text-xs font-bold uppercase tracking-wide text-cm-accent hover:underline" %>
           </div>
-          
+
           <% if @user_cards.any? %>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <% @user_cards.includes(card_version: :card).order("card_versions.eur_price DESC").first(4).each do |user_card| %>
-                <div class="group relative">
-                  <%# Card Image %>
-                  <div class="aspect-[63/88] rounded-lg overflow-hidden">
-                    <img src="<%= user_card.card_version.img_uri %>" 
-                         alt="<%= user_card.card_version.card.name %>"
-                         class="w-full h-full object-cover transform transition-transform duration-200 group-hover:scale-110" />
+              <% @user_cards.first(4).each do |user_card| %>
+                <div class="group relative border-2 border-cm-ink">
+                  <div class="aspect-[63/88] overflow-hidden bg-cm-surface-2">
+                    <% if user_card.card_version.img_uri.present? %>
+                      <img src="<%= user_card.card_version.img_uri %>" alt="<%= user_card.card_version.card.name %>"
+                           class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" />
+                    <% end %>
                   </div>
-                  
-                  <%# Card Info Overlay %>
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-3">
-                    <h3 class="font-medium text-white text-sm"><%= user_card.card_version.card.name %></h3>
-                    <div class="flex items-center justify-between text-xs text-white/90">
-                      <span><%= user_card.quantity %>x</span>
-                      <span><%= number_to_currency(user_card.card_version.eur_price, unit: "€") %></span>
-                    </div>
-                  </div>
-                  
-                  <%# Rarity Indicator %>
-                  <div class="absolute top-2 right-2 h-2 w-2 rounded-full
-                    <%= case user_card.card_version.rarity
-                        when 'common' then 'bg-gray-400'
-                        when 'uncommon' then 'bg-blue-400'
-                        when 'rare' then 'bg-yellow-400'
-                        when 'mythic' then 'bg-red-400'
-                        end %>">
+                  <div class="absolute inset-x-0 bottom-0 bg-cm-ink/85 text-cm-bg px-2 py-1 flex items-center justify-between text-xs">
+                    <span class="font-bold"><%= user_card.quantity %>×</span>
+                    <span><%= number_to_currency(user_card.card_version.eur_price, unit: "€") %></span>
                   </div>
                 </div>
               <% end %>
             </div>
           <% else %>
-            <div class="text-center py-8 bg-gray-50 rounded-xl">
-              <p class="text-gray-600 mb-4">Vous n'avez pas encore ajouté de cartes</p>
-              <%= link_to "Ajouter des cartes", new_user_user_card_path(current_user), class: "text-indigo-600 hover:text-indigo-500" %>
+            <div class="text-center py-8 border-2 border-dashed border-cm-border">
+              <p class="text-cm-text-muted mb-4">Aucune carte pour l'instant.</p>
+              <%= link_to "Importer ma collection", import_user_user_cards_path(current_user), class: "cm-btn-primary text-xs" %>
             </div>
           <% end %>
         </div>
 
-        <%# Recent Trades %>
-        <div class="bg-white rounded-2xl shadow-sm p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-semibold text-gray-900">Trades récents</h2>
-            <%= link_to "Voir tout", trades_path, class: "text-indigo-600 hover:text-indigo-500" %>
+        <%# Recent trades %>
+        <div class="cm-card-flat p-6">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="cm-display text-2xl">Échanges récents</h2>
+            <%= link_to "Voir tout →", trades_path, class: "text-xs font-bold uppercase tracking-wide text-cm-accent hover:underline" %>
           </div>
           <%= render partial: "trades/recent_list", locals: { trades: @recent_trades || [] } %>
         </div>
 
-        <%# Wanted Cards %>
-        <div class="bg-white rounded-2xl shadow-sm p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-semibold text-gray-900">Cartes recherchées</h2>
-            <%= link_to "Gérer ma liste", user_user_wanted_cards_path(current_user), class: "text-indigo-600 hover:text-indigo-500" %>
+        <%# Wanted cards %>
+        <div class="cm-card-flat p-6">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="cm-display text-2xl">Recherchées</h2>
+            <%= link_to "Gérer →", user_user_wanted_cards_path(current_user), class: "text-xs font-bold uppercase tracking-wide text-cm-accent hover:underline" %>
           </div>
-          
+
           <% if @user_wanted_cards&.any? %>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <% @user_wanted_cards.includes(:card).first(4).each do |wanted_card| %>
-                <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
-                  <%# Small Card Image %>
-                  <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                    <img src="<%= wanted_card.card_version&.img_uri || wanted_card.card.card_versions.first&.img_uri %>" 
-                         alt="<%= wanted_card.card.name %>"
-                         class="w-full h-full object-cover" />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <% @user_wanted_cards.first(4).each do |wanted_card| %>
+                <div class="flex items-center gap-3 p-3 border-2 border-cm-ink">
+                  <div class="w-10 h-14 overflow-hidden flex-shrink-0 bg-cm-surface-2 border border-cm-ink">
+                    <% img = wanted_card.card_version&.img_uri || wanted_card.card.card_versions.first&.img_uri %>
+                    <% if img.present? %>
+                      <img src="<%= img %>" alt="<%= wanted_card.card.name %>" class="w-full h-full object-cover" />
+                    <% end %>
                   </div>
-                  
-                  <div class="flex-grow">
-                    <h3 class="font-medium text-gray-900"><%= wanted_card.card.name %></h3>
-                    <div class="flex items-center gap-2 text-sm text-gray-600">
-                      <% if wanted_card.min_condition %>
-                        <span>Min: <%= wanted_card.min_condition %></span>
-                      <% end %>
-                      <% if wanted_card.language %>
-                        <span>Lang: <%= wanted_card.language %></span>
-                      <% end %>
-                      <% if wanted_card.foil %>
-                        <span class="text-indigo-600">Foil</span>
-                      <% end %>
+                  <div class="min-w-0">
+                    <h3 class="font-bold truncate"><%= wanted_card.card.name %></h3>
+                    <div class="flex flex-wrap items-center gap-2 text-xs text-cm-text-muted">
+                      <% if wanted_card.min_condition %><span>Min: <%= wanted_card.min_condition.humanize %></span><% end %>
+                      <% if wanted_card.foil %><span class="text-cm-accent font-bold">Foil</span><% end %>
                     </div>
                   </div>
                 </div>
               <% end %>
             </div>
           <% else %>
-            <div class="text-center py-8 bg-gray-50 rounded-xl">
-              <p class="text-gray-600 mb-4">Aucune carte dans votre liste de souhaits</p>
-              <%= link_to "Ajouter des cartes", new_user_user_wanted_card_path(current_user), class: "text-indigo-600 hover:text-indigo-500" %>
+            <div class="text-center py-8 border-2 border-dashed border-cm-border">
+              <p class="text-cm-text-muted mb-4">Liste de souhaits vide.</p>
+              <%= link_to "Ajouter des recherches", new_user_user_wanted_card_path(current_user), class: "cm-btn-ink text-xs" %>
             </div>
           <% end %>
         </div>
