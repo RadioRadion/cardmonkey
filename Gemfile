@@ -44,7 +44,7 @@ gem "letter_opener", group: :development
 
 # Font Awesome loaded via CDN in application layout (no sassc dependency)
 gem 'simple_form'
-gem 'pagy', '~> 6.0'
+gem 'pagy', '~> 9.0'
 gem 'down'
 gem 'whenever', require: false
 gem 'cloudinary'

@@ -19,7 +19,7 @@ class MatchesController < ApplicationController
 
     @partner_users = User.where(id: partners.keys).index_by(&:id)
     sorted = partners.sort_by { |_id, lists| -(lists[:give].size + lists[:receive].size) }
-    @pagy, @partner_pairs = pagy_array(sorted, items: 10, page: params[:page] || 1)
+    @pagy, @partner_pairs = pagy_array(sorted, limit: 10, page: params[:page] || 1)
 
     @stats = {
       matches: matches.size,

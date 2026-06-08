@@ -6,7 +6,7 @@ class UserCardsController < ApplicationController
   def index
     @pagy, @user_cards = pagy(
       filtered_user_cards,
-      items: 15
+      limit: 15
     )
 
     respond_to do |format|

@@ -5,6 +5,7 @@ FactoryBot.define do
     
     sequence(:scryfall_id) { |n| "scryfall-#{n}" }
     sequence(:collector_number) { |n| n.to_s }
+    sequence(:img_uri) { |n| "https://cards.scryfall.io/normal/front/0/0/sample-#{n}.jpg" }
     rarity { ['common', 'uncommon', 'rare', 'mythic'].sample }
     frame { ['1993', '1997', '2003', '2015', 'future'].sample }
     border_color { ['black', 'white', 'borderless', 'silver', 'gold'].sample }

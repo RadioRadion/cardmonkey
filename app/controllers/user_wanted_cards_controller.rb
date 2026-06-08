@@ -8,7 +8,7 @@ class UserWantedCardsController < ApplicationController
       @user.user_wanted_cards
            .includes(:card, card_version: :extension)
            .order('card_versions.eur_price DESC NULLS LAST'),
-      items: 15
+      limit: 15
     )
   end
 

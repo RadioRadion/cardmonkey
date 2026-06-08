@@ -144,9 +144,15 @@
            data-foil="<%= user_card.foil %>">
         <%# Image de la carte %>
         <div class="relative aspect-[63/88] overflow-hidden">
-          <%= image_tag user_card.card_version.img_uri, 
-                      alt: user_card.card_version.card.name_en,
-                      class: "w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300" %>
+          <% if user_card.card_version.img_uri.present? %>
+            <%= image_tag user_card.card_version.img_uri,
+                        alt: user_card.card_version.card.name_en,
+                        class: "w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300" %>
+          <% else %>
+            <div class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-xs text-center p-2">
+              <%= user_card.card_version.card.name_en %>
+            </div>
+          <% end %>
           
           <%# Badge quantité %>
           <div class="absolute top-2 right-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-2 py-1 rounded-full text-sm font-bold">
