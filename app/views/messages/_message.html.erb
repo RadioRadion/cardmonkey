@@ -7,8 +7,8 @@
 
 <% if show_date && (!previous_message || !message.created_at.to_date.eql?(previous_message.created_at.to_date)) %>
   <div class="flex justify-center my-4">
-    <div class="bg-gray-100 text-gray-600 text-sm px-3 py-1 rounded-full">
-      <%= message.created_at.to_date == Date.today ? "Today" : message.created_at.strftime("%B %d, %Y") %>
+    <div class="bg-cm-surface-2 border border-cm-ink text-cm-text-muted text-xs font-bold uppercase tracking-wide px-3 py-1">
+      <%= message.created_at.to_date == Date.today ? "Aujourd'hui" : message.created_at.strftime("%d/%m/%Y") %>
     </div>
   </div>
 <% end %>
@@ -46,16 +46,16 @@
 
     <!-- Message Content -->
     <div class="relative group">
-      <div class="<%= is_own_message ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' : 'bg-gray-100 text-gray-900' %> 
+      <div class="<%= is_own_message ? 'bg-cm-accent text-white' : 'bg-cm-surface-2 text-cm-ink border-2 border-cm-ink' %>
                   rounded-lg px-4 py-2 break-words relative">
         
         <!-- Trade Message -->
         <% if message.trade_message? %>
           <div class="flex flex-col space-y-2">
             <div class="font-medium"><%= message.display_content %></div>
-            <%= link_to "Voir le trade", trade_path(message.trade_id), 
-                class: "#{is_own_message ? 'bg-white text-indigo-600' : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'} 
-                       px-4 py-2 rounded-lg inline-block hover:opacity-90 transition-opacity text-center" %>
+            <%= link_to "Voir l'échange", trade_path(message.trade_id),
+                class: "#{is_own_message ? 'bg-white text-cm-accent' : 'bg-cm-accent text-white'}
+                       px-3 py-1.5 inline-block font-bold uppercase text-xs tracking-wide hover:opacity-90 transition-opacity text-center" %>
           </div>
         
         <!-- Regular Message -->
