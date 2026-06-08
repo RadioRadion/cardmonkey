@@ -1,5 +1,12 @@
-<h1 class="text-xl font-bold text-center mb-6">Modifier la carte recherchée</h1>
+<div class="cm-theme min-h-screen py-8">
+  <div class="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-6">
+      <span class="cm-kicker text-cm-accent">Recherches</span>
+      <h1 class="cm-display text-4xl mt-1">Modifier la recherche</h1>
+    </div>
 
-<%= render 'form', 
-           form_url: user_user_wanted_card_path(@user, @user_wanted_card),
-           editing: true %>
+    <%= render 'form',
+               form_url: user_user_wanted_card_path(@user, @user_wanted_card),
+               editing: true %>
+  </div>
+</div>
