@@ -23,7 +23,7 @@ gem 'oj', '~> 3.16'
 gem 'sentry-ruby'
 gem 'sentry-rails'
 
-gem "turbo-rails", "~> 1.5.0"
+gem "turbo-rails", "~> 2.0"
 gem "stimulus-rails", "~> 1.3.0"
 gem "tailwindcss-rails", "~> 2.3.0"
 gem "importmap-rails"
