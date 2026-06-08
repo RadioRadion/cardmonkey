@@ -2,14 +2,24 @@
   <%# Header avec titre et stats %>
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Ma Collection</h1>
-    
-    <%= link_to new_user_user_card_path(@user), 
-        class: "inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-lg focus:ring-4 focus:ring-purple-300 focus:outline-none transition-colors" do %>
-      <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/>
-      </svg>
-      Ajouter une carte
-    <% end %>
+
+    <div class="flex items-center gap-3">
+      <%= link_to import_user_user_cards_path(@user),
+          class: "inline-flex items-center px-5 py-2.5 text-sm font-medium text-indigo-700 bg-white border border-indigo-200 hover:bg-indigo-50 rounded-lg transition-colors" do %>
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+        </svg>
+        Importer en masse
+      <% end %>
+
+      <%= link_to new_user_user_card_path(@user),
+          class: "inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-lg focus:ring-4 focus:ring-purple-300 focus:outline-none transition-colors" do %>
+        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/>
+        </svg>
+        Ajouter une carte
+      <% end %>
+    </div>
   </div>
 
   <%# Stats Cards avec animation au chargement %>

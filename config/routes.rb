@@ -18,7 +18,12 @@ Rails.application.routes.draw do
         end
       end
     end
-    resources :user_cards
+    resources :user_cards do
+      collection do
+        get :import
+        post :import_run
+      end
+    end
     resources :user_wanted_cards
   end
 

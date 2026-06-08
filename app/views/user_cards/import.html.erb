@@ -1,0 +1,97 @@
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 py-8">
+  <div class="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-6">
+      <h1 class="text-3xl font-bold text-gray-900">Importer ma collection</h1>
+      <p class="mt-2 text-gray-500">Ajoutez des centaines de cartes en quelques secondes.</p>
+    </div>
+
+    <%= form_with url: import_run_user_user_cards_path(@user), method: :post,
+                  data: { controller: "collection-import" },
+                  html: { multipart: true } do |f| %>
+      <%= hidden_field_tag :source, "decklist", data: { "collection-import-target": "source" } %>
+
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <%# Tabs %>
+        <div class="inline-flex rounded-lg bg-gray-100 p-1 mb-6">
+          <button type="button"
+                  data-source="decklist"
+                  data-action="collection-import#select"
+                  data-collection-import-target="tab"
+                  class="px-4 py-2 text-sm font-medium rounded-md transition">
+            Coller une liste
+          </button>
+          <button type="button"
+                  data-source="csv"
+                  data-action="collection-import#select"
+                  data-collection-import-target="tab"
+                  class="px-4 py-2 text-sm font-medium rounded-md transition">
+            Fichier CSV
+          </button>
+        </div>
+
+        <%# Panel: paste a list %>
+        <div data-source="decklist" data-collection-import-target="panel">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Votre liste de cartes</label>
+          <%= text_area_tag :decklist, nil, rows: 10,
+                placeholder: "4 Sol Ring (CMR) 472\n1 Black Lotus\n2 Arcane Signet *F*\nLightning Bolt",
+                class: "w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 font-mono text-sm" %>
+          <p class="mt-2 text-xs text-gray-500">
+            Une carte par ligne : <code>quantité nom (ÉDITION) numéro</code>. L'édition et le numéro sont optionnels.
+            Ajoutez <code>*F*</code> pour un foil.
+          </p>
+        </div>
+
+        <%# Panel: CSV %>
+        <div data-source="csv" data-collection-import-target="panel" class="hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fichier CSV</label>
+          <%= file_field_tag :file, accept: ".csv,text/csv",
+                class: "block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" %>
+          <div class="mt-3 rounded-lg bg-indigo-50 border border-indigo-100 p-3 text-xs text-indigo-900">
+            <p class="font-semibold mb-1">💡 Astuce : scannez votre collection</p>
+            <p>
+              Scannez vos cartes avec une app comme <strong>ManaBox</strong>, <strong>Moxfield</strong> ou
+              <strong>Deckbox</strong> (la caméra reconnaît les cartes), puis exportez en CSV et déposez le fichier ici.
+              Les colonnes <em>Name, Edition, Condition, Language, Foil, Count</em> (ou un <em>Scryfall ID</em>) sont reconnues.
+            </p>
+          </div>
+        </div>
+
+        <%# Defaults %>
+        <div class="mt-6 border-t border-gray-100 pt-5">
+          <p class="text-sm font-medium text-gray-700 mb-3">Valeurs par défaut
+            <span class="text-gray-400 font-normal">(appliquées quand l'info n'est pas dans la liste/fichier)</span>
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">État</label>
+              <%= select_tag :default_condition,
+                    options_for_select(
+                      UserCard.conditions.keys.map { |c| [c.humanize, c] },
+                      "near_mint"
+                    ),
+                    class: "w-full rounded-lg border-gray-300 shadow-sm text-sm" %>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Langue</label>
+              <%= select_tag :default_language,
+                    options_for_select(UserCard.languages.values.map { |l| [l.upcase, l] }, "en"),
+                    class: "w-full rounded-lg border-gray-300 shadow-sm text-sm" %>
+            </div>
+            <div class="flex items-end">
+              <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                <%= check_box_tag :default_foil, "foil", false, class: "rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" %>
+                Foil par défaut
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 flex items-center justify-between">
+          <%= link_to "Annuler", user_user_cards_path(@user), class: "text-sm text-gray-500 hover:text-gray-700" %>
+          <%= f.submit "Importer",
+                class: "inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-lg cursor-pointer transition" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

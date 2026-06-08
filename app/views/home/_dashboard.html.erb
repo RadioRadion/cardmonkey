@@ -110,8 +110,15 @@
         <div class="bg-white rounded-2xl shadow-sm p-6 mb-8">
           <h2 class="text-xl font-semibold mb-6 text-gray-900">Actions rapides</h2>
           <div class="space-y-3">
+            <%= link_to import_user_user_cards_path(current_user), class: "flex items-center justify-between w-full p-3 text-left rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-500 hover:to-purple-500 transition-colors duration-200" do %>
+              <span class="font-medium">Importer ma collection (liste / CSV)</span>
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+              </svg>
+            <% end %>
+
             <%= link_to new_user_user_card_path(current_user), class: "flex items-center justify-between w-full p-3 text-left rounded-xl bg-green-600 text-white hover:bg-green-500 transition-colors duration-200" do %>
-              <span class="font-medium">Ajouter des cartes</span>
+              <span class="font-medium">Ajouter une carte</span>
               <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
               </svg>
