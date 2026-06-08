@@ -1,5 +1,5 @@
 class TradesController < ApplicationController
-  before_action :set_trade, only: [:show, :edit, :update, :accept, :validate]
+  before_action :set_trade, only: [:show, :edit, :update, :accept, :validate, :decline, :cancel]
   before_action :set_trade_participants, only: [:show, :edit]
   before_action :set_partner, only: [:new_proposition, :update_trade_value, :search_cards]
 
@@ -105,13 +105,14 @@ class TradesController < ApplicationController
       status: :pending
     )
 
-    if @trade.save
+    Trade.transaction do
+      @trade.save!
       handle_trade_creation
-      redirect_to user_path(current_user), notice: "Proposition de trade envoyée !"
-    else
-      redirect_back fallback_location: root_path, 
-                    alert: "Erreur lors de la création du trade: #{@trade.errors.full_messages.join(', ')}"
     end
+    redirect_to user_path(current_user), notice: "Proposition de trade envoyée !"
+  rescue ActiveRecord::RecordInvalid
+    redirect_back fallback_location: root_path,
+                  alert: "Erreur lors de la création du trade: #{@trade.errors.full_messages.join(', ')}"
   end
 
   def update
@@ -120,6 +121,8 @@ class TradesController < ApplicationController
       handle_trade_acceptance
     when "done"
       handle_trade_completion
+    when "cancelled"
+      handle_trade_cancellation
     when "validated"
       handle_trade_validation
     when "modified"
@@ -150,6 +153,38 @@ class TradesController < ApplicationController
     else
       redirect_to trade_path(@trade), alert: "Vous ne pouvez pas valider cette modification."
     end
+  end
+
+  def decline
+    unless @trade.can_be_declined_by?(current_user)
+      redirect_to trade_path(@trade), alert: "Vous ne pouvez pas refuser ce trade."
+      return
+    end
+
+    Trade.transaction do
+      @trade.update!(status: :cancelled)
+      notify_trade_status_change(
+        "#{current_user.username} a refusé la proposition d'échange.",
+        I18n.t('notifications.trade.trade_declined', id: @trade.id, default: "La proposition d'échange ##{@trade.id} a été refusée.")
+      )
+    end
+    redirect_to trades_path, notice: "Proposition refusée."
+  end
+
+  def cancel
+    unless @trade.can_be_cancelled_by?(current_user)
+      redirect_to trade_path(@trade), alert: "Vous ne pouvez pas annuler ce trade."
+      return
+    end
+
+    Trade.transaction do
+      @trade.update!(status: :cancelled)
+      notify_trade_status_change(
+        "#{current_user.username} a annulé l'échange.",
+        I18n.t('notifications.trade.trade_cancelled', id: @trade.id, default: "L'échange ##{@trade.id} a été annulé.")
+      )
+    end
+    redirect_to trades_path, notice: "Échange annulé."
   end
 
   def new_proposition
@@ -221,7 +256,9 @@ class TradesController < ApplicationController
   private
 
   def set_trade
-    @trade = Trade.find(params[:id])
+    # Scope to trades the current user participates in (initiator or invitee).
+    # A non-participant triggers RecordNotFound -> 404 (see ApplicationController).
+    @trade = current_user.all_trades.find(params[:id])
   end
 
   def set_partner
@@ -266,11 +303,14 @@ class TradesController < ApplicationController
   def parse_card_quantities(cards_param)
     return [] if cards_param.blank?
 
-    cards_param.to_h.map do |card_id, quantity|
-      {
-        card: UserCard.find(card_id),
-        quantity: quantity.to_i
-      }
+    pairs = cards_param.to_h
+    cards_by_id = UserCard.where(id: pairs.keys).index_by(&:id)
+
+    pairs.filter_map do |card_id, quantity|
+      card = cards_by_id[card_id.to_i]
+      next unless card
+
+      { card: card, quantity: quantity.to_i }
     end
   end
 
@@ -291,15 +331,23 @@ class TradesController < ApplicationController
   end
 
   def process_trade_cards
-    offer_cards = params.dig(:trade, :offer).to_s.split(",").reject(&:blank?)
-    target_cards = params.dig(:trade, :target).to_s.split(",").reject(&:blank?)
+    requested_ids = submitted_trade_card_ids
+
+    # Security: only keep cards that actually belong to one of the two trade
+    # participants. Prevents injecting a third party's UserCard ids (IDOR).
+    participant_ids = [@trade.user_id, @trade.user_id_invit]
+    valid_card_ids = UserCard.where(id: requested_ids, user_id: participant_ids).pluck(:id)
 
     @trade.trade_user_cards.destroy_all
-
-    (offer_cards + target_cards).each do |card_id|
-      next if card_id.blank?
-      @trade.trade_user_cards.create!(user_card_id: card_id.to_i)
+    valid_card_ids.each do |user_card_id|
+      @trade.trade_user_cards.create!(user_card_id: user_card_id)
     end
+  end
+
+  def submitted_trade_card_ids
+    offer_cards = params.dig(:trade, :offer).to_s.split(",")
+    target_cards = params.dig(:trade, :target).to_s.split(",")
+    (offer_cards + target_cards).map(&:strip).reject(&:blank?).map(&:to_i).uniq
   end
 
   def notify_trade_creation
@@ -344,7 +392,8 @@ class TradesController < ApplicationController
     end
 
     Trade.transaction do
-      @trade.completed_by_user_ids = (@trade.completed_by_user_ids || []) + [current_user.id]
+      @trade.lock! # SELECT ... FOR UPDATE: serialize concurrent completions
+      @trade.completed_by_user_ids = ((@trade.completed_by_user_ids || []) + [current_user.id]).uniq
 
       if @trade.completed_by_user_ids.sort == [@trade.user_id, @trade.user_id_invit].sort
         @trade.status = :done
@@ -362,6 +411,22 @@ class TradesController < ApplicationController
       end
 
       @trade.save!
+    end
+    true
+  end
+
+  def handle_trade_cancellation
+    unless @trade.can_be_cancelled_by?(current_user)
+      redirect_to trade_path(@trade), alert: "Vous ne pouvez pas annuler ce trade."
+      return false
+    end
+
+    Trade.transaction do
+      @trade.update!(status: :cancelled)
+      notify_trade_status_change(
+        "#{current_user.username} a annulé l'échange.",
+        I18n.t('notifications.trade.trade_cancelled', id: @trade.id, default: "L'échange ##{@trade.id} a été annulé.")
+      )
     end
     true
   end

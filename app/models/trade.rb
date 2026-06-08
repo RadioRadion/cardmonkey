@@ -8,6 +8,7 @@ class Trade < ApplicationRecord
 
   validates :user_id_invit, presence: true
   validates :status, presence: true, inclusion: { in: %w[pending modified accepted done cancelled] }
+  validate :participants_must_differ
 
   before_validation :set_default_status, on: :create
 
@@ -29,7 +30,7 @@ class Trade < ApplicationRecord
   end
 
   def partner_name_for(current_user)
-    partner_for(current_user).username
+    partner_for(current_user)&.username || "Utilisateur supprimé"
   end
 
   def other_user(current_user)
@@ -56,6 +57,16 @@ class Trade < ApplicationRecord
 
   def can_be_accepted_by?(current_user)
     pending? && current_user.id == user_id_invit
+  end
+
+  def can_be_declined_by?(current_user)
+    return false unless pending? || modified?
+    current_user.id == user_id_invit
+  end
+
+  def can_be_cancelled_by?(current_user)
+    return false if done? || cancelled?
+    [user_id, user_id_invit].include?(current_user.id)
   end
 
   def can_be_rated_by?(current_user)
@@ -88,5 +99,11 @@ class Trade < ApplicationRecord
 
   def set_default_status
     self.status ||= :pending
+  end
+
+  def participants_must_differ
+    return if user_id_invit.blank? || user_id.blank?
+
+    errors.add(:user_id_invit, "ne peut pas être vous-même") if user_id_invit == user_id
   end
 end

@@ -3,9 +3,11 @@ class Chatroom < ApplicationRecord
   belongs_to :user_invit, class_name: 'User', foreign_key: 'user_id_invit'
   
   has_many :messages, -> { ordered }, dependent: :destroy
-  has_many :notifications, dependent: :destroy
 
-  validates :user_id, uniqueness: { scope: :user_id_invit }
+  validates :user_id, presence: true
+  validates :user_id_invit, presence: true
+  validate :users_are_different
+  validate :chatroom_uniqueness, on: :create
 
   scope :for_user, ->(user) { where(user: user).or(where(user_id_invit: user)) }
   scope :ordered_by_recent_message, -> { 
@@ -40,10 +42,12 @@ class Chatroom < ApplicationRecord
   def unread_count_for(user)
     messages.where.not(user: user).where(read_at: nil).count
   end
+  alias unread_messages_count unread_count_for
 
   def mark_as_read_for(user)
     messages.where.not(user: user).where(read_at: nil).update_all(read_at: Time.current)
   end
+  alias mark_messages_as_read! mark_as_read_for
 
   def mark_as_unread_for(user)
     last_message = messages.last
@@ -69,24 +73,23 @@ class Chatroom < ApplicationRecord
     end
   end
 
-  def active_users
-    User.where(id: [user_id, user_id_invit])
-         .where("last_seen_at > ?", 5.minutes.ago)
-  end
-
-  def typing_users
-    Redis.current.smembers("chatroom:#{id}:typing").map(&:to_i)
-  end
-
-  def set_typing(user_id, is_typing)
-    key = "chatroom:#{id}:typing"
-    if is_typing
-      Redis.current.sadd(key, user_id)
-      Redis.current.expire(key, 10) # Expire after 10 seconds of inactivity
-    else
-      Redis.current.srem(key, user_id)
-    end
-  end
-
   private
+
+  def users_are_different
+    return if user_id.blank? || user_id_invit.blank?
+
+    errors.add(:base, "You can't create a chat room with yourself") if user_id == user_id_invit
+  end
+
+  def chatroom_uniqueness
+    return if user_id.blank? || user_id_invit.blank?
+
+    exists = Chatroom
+             .where(user_id: user_id, user_id_invit: user_id_invit)
+             .or(Chatroom.where(user_id: user_id_invit, user_id_invit: user_id))
+             .where.not(id: id)
+             .exists?
+
+    errors.add(:base, "A chat room between these users already exists") if exists
+  end
 end

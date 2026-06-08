@@ -85,18 +85,37 @@
       <%# Trades Section %>
       <div class="space-y-6">
         <%# Trades en attente %>
-        <% if @trades['0'].present? %>
+        <% if @trades['pending'].present? %>
           <section class="bg-white rounded-lg shadow overflow-hidden">
             <div class="p-4 bg-white border-b border-gray-200">
               <h2 class="flex items-center">
                 <span class="text-lg font-medium text-gray-900">En attente</span>
                 <span class="ml-2 bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                  <%= @trades['0'].size %>
+                  <%= @trades['pending'].size %>
                 </span>
               </h2>
             </div>
             <div class="divide-y divide-gray-200">
-              <% @trades['0'].each do |trade| %>
+              <% @trades['pending'].each do |trade| %>
+                <%= render "trades/trade", trade: trade, data: { turbo: false } %>
+              <% end %>
+            </div>
+          </section>
+        <% end %>
+
+        <%# Trades modifiés (en attente de validation) %>
+        <% if @trades['modified'].present? %>
+          <section class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-4 bg-white border-b border-gray-200">
+              <h2 class="flex items-center">
+                <span class="text-lg font-medium text-gray-900">À valider</span>
+                <span class="ml-2 bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                  <%= @trades['modified'].size %>
+                </span>
+              </h2>
+            </div>
+            <div class="divide-y divide-gray-200">
+              <% @trades['modified'].each do |trade| %>
                 <%= render "trades/trade", trade: trade, data: { turbo: false } %>
               <% end %>
             </div>
@@ -104,18 +123,18 @@
         <% end %>
 
         <%# Trades acceptés %>
-        <% if @trades['1'].present? %>
+        <% if @trades['accepted'].present? %>
           <section class="bg-white rounded-lg shadow overflow-hidden">
             <div class="p-4 bg-white border-b border-gray-200">
               <h2 class="flex items-center">
                 <span class="text-lg font-medium text-gray-900">Acceptés</span>
                 <span class="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                  <%= @trades['1'].size %>
+                  <%= @trades['accepted'].size %>
                 </span>
               </h2>
             </div>
             <div class="divide-y divide-gray-200">
-              <% @trades['1'].each do |trade| %>
+              <% @trades['accepted'].each do |trade| %>
                 <%= render "trades/trade", trade: trade, data: { turbo: false } %>
               <% end %>
             </div>
@@ -123,18 +142,18 @@
         <% end %>
 
         <%# Trades récemment terminés %>
-        <% if @trades['2'].present? %>
+        <% if @trades['done'].present? %>
           <section class="bg-white rounded-lg shadow overflow-hidden">
             <div class="p-4 bg-white border-b border-gray-200">
               <h2 class="flex items-center">
                 <span class="text-lg font-medium text-gray-900">Récemment terminés</span>
                 <span class="ml-2 bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                  <%= @trades['2'].size %>
+                  <%= @trades['done'].size %>
                 </span>
               </h2>
             </div>
             <div class="divide-y divide-gray-200">
-              <% @trades['2'].take(3).each do |trade| %>
+              <% @trades['done'].take(3).each do |trade| %>
                 <%= render "trades/trade", trade: trade, data: { turbo: false } %>
               <% end %>
             </div>
@@ -142,7 +161,7 @@
         <% end %>
 
         <%# Message si aucun trade actif %>
-        <% if @trades.empty? %>
+        <% if @trades.values.all?(&:empty?) %>
           <div class="bg-white rounded-lg shadow-sm p-6">
             <div class="text-center">
               <div class="mx-auto h-12 w-12 text-gray-400">

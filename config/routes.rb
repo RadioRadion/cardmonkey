@@ -10,10 +10,6 @@ Rails.application.routes.draw do
     collection do
       get :search
     end
-    member do
-      get :profile
-      get :dashboard
-    end
     resources :chatrooms do
       resources :messages do
         member do
@@ -40,16 +36,11 @@ Rails.application.routes.draw do
     resources :ratings, only: [:new, :create]
   end
 
-  resources :matches do
-    collection do
-      get :dashboard
-    end
-  end
+  resources :matches, only: [:index, :show]
 
   resources :cards, only: [:index, :show] do
     collection do
       get :search
-      get :autocomplete
       get :versions
     end
   end
@@ -63,9 +54,6 @@ Rails.application.routes.draw do
     end
   end
 
-  # API endpoints for real-time features
-  post 'messages/:id/mark_read', to: 'messages#mark_read'
-  
   # Static pages
   get 'privacy-policy', to: 'pages#privacy_policy', as: :privacy_policy
 

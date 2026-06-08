@@ -37,11 +37,13 @@ class MatchesController < ApplicationController
     # Statistiques (count queries, not full loads)
     @matches_count = current_user.matches.count
     @matched_users_count = matched_users_data.length
-    @active_trades_count = current_user.trades.active.count rescue 0
+    @active_trades_count = current_user.trades.active.count
   end
 
   def show
-    @match = Match.find(params[:id])
+    # Security: only matches the current user is part of (owner or target).
+    @match = Match.where("user_id = :id OR user_id_target = :id", id: current_user.id)
+                  .find(params[:id])
     render json: {
       match: @match,
       user_card: @match.user_card.as_json(include: { card_version: { include: :card } }),

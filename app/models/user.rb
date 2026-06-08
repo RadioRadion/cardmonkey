@@ -48,6 +48,10 @@ class User < ApplicationRecord
     ratings_received.average(:score)&.round(1) || 0
   end
 
+  def avatar_thumbnail
+    avatar.attached? ? avatar : "https://via.placeholder.com/64"
+  end
+
   def rating_count
     ratings_received.count
   end
@@ -94,6 +98,9 @@ class User < ApplicationRecord
     self.username = email.split('@').first if email.present?
   end
 
+  public
+
+  # Public: used by MatchesController (#matches) and specs.
   def top_matching_users(limit = 10)
     User.find_by_sql([<<-SQL, { user_id: id, limit: limit }])
       WITH match_counts AS (

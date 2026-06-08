@@ -3,26 +3,6 @@ class CardsController < ApplicationController
   def index
   end
 
-  def edit
-    @card = Card.find(params[:id])
-  end
-
-  def update
-    @card = Card.find(params[:id])
-
-    if @card.update(cards_params)
-      redirect_to user_cards_path
-    else
-      render :new
-    end
-  end
-
-  def destroy
-    @card = Card.find(params[:id])
-    @card.destroy
-    redirect_to user_cards_path(current_user)
-  end
-
   def search
     query = params[:query]
     cards = Card.where('name_fr ILIKE :query OR name_en ILIKE :query', query: "%#{query}%")
@@ -83,12 +63,5 @@ class CardsController < ApplicationController
     end
   rescue => e
     render json: { error: e.message }, status: :internal_server_error
-  end  
-  
-  private
-
-  def cards_params
-    params.require(:card).permit(:name, :quantity, :extension, :foil, :condition, :language)
   end
-
 end

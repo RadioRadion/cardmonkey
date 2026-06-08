@@ -17,8 +17,8 @@ module Forms
     validates :user_id, :quantity, presence: true
     validates :quantity, numericality: { greater_than: 0 }
     validates :foil, inclusion: { in: [true, false, '0', '1', 0, 1] }
-    validates :scryfall_id, presence: true, unless: :card_id
-    validates :card_id, presence: true, unless: :scryfall_id
+    validates :scryfall_id, presence: true, unless: -> { card_id.present? }
+    validates :card_id, presence: true, unless: -> { scryfall_id.present? }
 
     # Méthode de classe pour initialiser le form à partir d'un modèle existant
     def self.from_model(user_wanted_card)
@@ -47,7 +47,8 @@ module Forms
       ActiveRecord::Base.transaction do
         create_or_update_user_wanted_card
       end
-    rescue => e
+      true
+    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       errors.add(:base, e.message)
       false
     end

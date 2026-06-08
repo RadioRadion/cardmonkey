@@ -55,7 +55,8 @@ module Forms
       ActiveRecord::Base.transaction do
         create_or_update_user_card
       end
-    rescue => e
+      true
+    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       errors.add(:base, e.message)
       false
     end
@@ -93,14 +94,21 @@ module Forms
     end
 
     def find_card_version
-      @card_version ||= if card_version_id.present?
-        CardVersion.find(card_version_id)
-      elsif scryfall_id.present?
-        # Si scryfall_id est en fait un oracle_id
-        card = Card.find_by!(scryfall_oracle_id: scryfall_id)
-        # Prendre la première version disponible
-        card.card_versions.first
+      return @card_version if defined?(@card_version)
+
+      @card_version =
+        if card_version_id.present?
+          CardVersion.find(card_version_id)
+        elsif scryfall_id.present?
+          # scryfall_id is actually an oracle_id here; pick a deterministic version
+          Card.find_by!(scryfall_oracle_id: scryfall_id).card_versions.order(:id).first
+        end
+
+      if @card_version.nil?
+        raise ActiveRecord::RecordNotFound, "Aucune version de carte disponible pour cette carte"
       end
+
+      @card_version
     end
 
     def user
