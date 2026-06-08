@@ -1,14 +1,22 @@
-<div class="flex items-start">
+<div class="flex items-start <%= 'border-l-2 border-indigo-500 pl-3' if notification.action_required? %>">
   <div class="flex-1 min-w-0">
+    <% if notification.action_required? %>
+      <span class="inline-block mb-1 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded bg-indigo-100 text-indigo-700">
+        Action requise
+      </span>
+    <% end %>
     <p class="text-sm text-gray-900 <%= 'group-hover:text-indigo-600' if notification.clickable? %>">
       <%= notification.content %>
     </p>
-    <p class="text-xs text-gray-500 mt-1">
-      <%= time_ago_in_words(notification.created_at) %>
-    </p>
+    <div class="flex items-center justify-between mt-1">
+      <p class="text-xs text-gray-500"><%= time_ago_in_words(notification.created_at) %></p>
+      <% if notification.action_required? && notification.clickable? %>
+        <span class="text-xs font-medium text-indigo-600 group-hover:underline">Voir et agir →</span>
+      <% end %>
+    </div>
   </div>
   <% if notification.unread? %>
-    <%= button_to mark_as_read_notification_path(notification), 
+    <%= button_to mark_as_read_notification_path(notification),
         method: :patch,
         class: "ml-2 text-gray-400 hover:text-gray-500",
         data: { turbo_stream: true } do %>

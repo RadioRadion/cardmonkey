@@ -21,9 +21,9 @@ class Trade < ApplicationRecord
   }
 
   # Scopes pour filtrer les trades par état
-  scope :active, -> { where(status: [:pending, :modified, :accepted]) }
+  scope :active, -> { where(status: %i[pending modified accepted]) }
   scope :completed, -> { where(status: :done) }
-  scope :in_progress, -> { where(status: [:pending, :modified]) }
+  scope :in_progress, -> { where(status: %i[pending modified]) }
 
   def partner_for(current_user)
     current_user.id == user_id ? user_invit : user
@@ -40,18 +40,24 @@ class Trade < ApplicationRecord
   def can_be_modified_by?(current_user)
     return false if accepted? || done? || cancelled?
     return false unless pending? || modified?
+    # Anti-oscillation : celui qui vient de modifier doit attendre la réponse de
+    # l'autre avant de pouvoir re-modifier.
+    return false if modified? && last_modifier_id == current_user.id
+
     [user_id, user_id_invit].include?(current_user.id)
   end
 
   def can_be_validated?(current_user)
     return false unless modified?
     return false if last_modifier_id == current_user.id
+
     [user_id, user_id_invit].include?(current_user.id)
   end
 
   def can_be_completed_by?(current_user)
     return false unless accepted?
     return false if completed_by_user_ids.include?(current_user.id)
+
     [user_id, user_id_invit].include?(current_user.id)
   end
 
@@ -61,17 +67,20 @@ class Trade < ApplicationRecord
 
   def can_be_declined_by?(current_user)
     return false unless pending? || modified?
+
     current_user.id == user_id_invit
   end
 
   def can_be_cancelled_by?(current_user)
     return false if done? || cancelled?
+
     [user_id, user_id_invit].include?(current_user.id)
   end
 
   def can_be_rated_by?(current_user)
     return false unless done?
     return false unless [user_id, user_id_invit].include?(current_user.id)
+
     !ratings.exists?(rater_id: current_user.id)
   end
 

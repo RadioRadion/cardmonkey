@@ -18,7 +18,9 @@
 | 4 | Écran matches ambigu (qui a / qui veut ?) + bruit technique | 🟠 | ✅ Phase 3 |
 | 5 | Cycle de vie des trades : « ma prochaine action ? » floue | 🟠 | ✅ Phase 4 |
 
-> **Phases 3 & 4 implémentées.** Matches reformulés « vous donnez / vous recevez » + distance + réputation. Trades : bannière « prochaine action » sur la fiche et indice sur les lignes, bouton Refuser pour l'invité, lien chat ↔ échange. Restent (confort, non bloquant) : notifications visuellement « action requise vs info », récap avant envoi d'une proposition, garde anti-oscillation modifier↔valider.
+> **Phases 3 & 4 implémentées.** Matches reformulés « vous donnez / vous recevez » + distance + réputation. Trades : bannière « prochaine action » sur la fiche et indice sur les lignes, bouton Refuser pour l'invité, lien chat ↔ échange.
+>
+> **Conforts trades ajoutés.** Notifications « action requise » distinctes (type `trade_action` : accent + badge + CTA « Voir et agir ») des notifications informatives ; récap avant envoi d'une proposition (modal de confirmation) ; garde anti-oscillation (celui qui vient de modifier doit attendre la réponse de l'autre).
 
 ---
 

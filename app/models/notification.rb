@@ -38,11 +38,11 @@ class Notification < ApplicationRecord
     nil
   end
 
-  def self.create_trade_notification(recipient_id, trade_id, message)
+  def self.create_trade_notification(recipient_id, trade_id, message, action_required: false)
     create_notification(
       recipient_id,
       message,
-      'trade',
+      action_required ? 'trade_action' : 'trade',
       trade_id
     )
   end
@@ -55,7 +55,7 @@ class Notification < ApplicationRecord
   # Instance methods
   def mark_as_read!
     return if read?
-    
+
     update!(
       status: :read,
       read_at: Time.current
@@ -78,9 +78,15 @@ class Notification < ApplicationRecord
     resource_path.present?
   end
 
+  # True when the notification asks the recipient to DO something
+  # (accept/validate/confirm a trade), as opposed to a simple FYI.
+  def action_required?
+    notification_type == 'trade_action'
+  end
+
   def resource_path
     case notification_type
-    when 'trade'
+    when 'trade', 'trade_action'
       "/trades/#{resource_id}"
     when 'message'
       "/chatrooms/#{resource_id}"
@@ -90,8 +96,6 @@ class Notification < ApplicationRecord
       else
         "/user_cards"
       end
-    else
-      nil
     end
   end
 

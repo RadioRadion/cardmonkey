@@ -2,14 +2,18 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = [
-    "userCardCount", 
-    "partnerCardCount", 
-    "userValue", 
-    "partnerValue", 
+    "userCardCount",
+    "partnerCardCount",
+    "userValue",
+    "partnerValue",
     "balance",
     "submitButton",
     "userCardsGrid",
-    "partnerCardsGrid"
+    "partnerCardsGrid",
+    "modal",
+    "recapGive",
+    "recapReceive",
+    "recapBalance"
   ]
 
   connect() {
@@ -175,15 +179,36 @@ export default class extends Controller {
       return
     }
 
-    const form = event.target
-    
-    // Préparation des cartes pour la soumission
-    const offerCards = this.formatCardsForSubmission(this.userCards)
-    const targetCards = this.formatCardsForSubmission(this.partnerCards)
+    // First pass: show a recap and wait for explicit confirmation.
+    if (!this.confirmed && this.hasModalTarget) {
+      event.preventDefault()
+      this.showRecap()
+      return
+    }
 
-    // Mise à jour des champs cachés
-    form.querySelector('input[name="trade[offer]"]').value = offerCards
-    form.querySelector('input[name="trade[target]"]').value = targetCards
+    // Confirmed pass: fill the hidden fields and let the form submit.
+    const form = event.target
+    form.querySelector('input[name="trade[offer]"]').value = this.formatCardsForSubmission(this.userCards)
+    form.querySelector('input[name="trade[target]"]').value = this.formatCardsForSubmission(this.partnerCards)
+  }
+
+  showRecap() {
+    if (this.hasRecapGiveTarget) {
+      this.recapGiveTarget.textContent = `${this.userCardCountTarget.textContent} carte(s) — ${this.userValueTarget.textContent}`
+      this.recapReceiveTarget.textContent = `${this.partnerCardCountTarget.textContent} carte(s) — ${this.partnerValueTarget.textContent}`
+      this.recapBalanceTarget.textContent = this.balanceTarget.textContent
+    }
+    this.modalTarget.classList.remove("hidden")
+  }
+
+  cancelRecap() {
+    this.modalTarget.classList.add("hidden")
+  }
+
+  confirmSubmit() {
+    this.confirmed = true
+    this.modalTarget.classList.add("hidden")
+    this.element.querySelector("form").requestSubmit()
   }
 
   formatCardsForSubmission(cards) {
