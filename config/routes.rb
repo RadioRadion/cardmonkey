@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
-  devise_for :users
-  
+  devise_for :users, controllers: { registrations: 'users/registrations' }
+
   root 'home#index'
+
+  get 'faq', to: 'pages#faq', as: :faq
 
   # Direct messaging route
   get 'messages', to: redirect { |p, req| "/users/#{req.env['warden'].user.id}/chatrooms" }, as: :messages

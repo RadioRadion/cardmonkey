@@ -1,0 +1,47 @@
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 py-10">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-bold text-gray-900">Comment ça marche ?</h1>
+      <p class="mt-2 text-gray-500">Tout pour démarrer en quelques minutes.</p>
+    </div>
+
+    <div class="space-y-4">
+      <% faqs = [
+        ["En 4 étapes",
+         "1) Renseignez votre ville (pour trouver des échanges près de chez vous). " \
+         "2) Importez votre collection (liste ou CSV). 3) Ajoutez les cartes que vous cherchez. " \
+         "4) CardMonkey calcule automatiquement les correspondances et vous propose des échanges."],
+        ["Comment ajouter 200 cartes rapidement ?",
+         "Allez dans Ma Collection → « Importer en masse ». Vous pouvez coller une liste " \
+         "(ex. « 4 Sol Ring (CMR) 472 ») ou importer un fichier CSV. Le plus rapide : scannez " \
+         "vos cartes avec une app comme ManaBox, Moxfield ou Deckbox, exportez en CSV, puis déposez le fichier."],
+        ["À quoi sert ma ville / mon adresse ?",
+         "Les échanges se font en physique : votre localisation sert à vous proposer des partenaires " \
+         "proches et à afficher la distance. Une ville suffit, l'adresse exacte n'est jamais montrée aux autres."],
+        ["Que veulent dire les états de carte ?",
+         "Du meilleur au moins bon : Mint, Near Mint, Excellent, Good, Light Played, Played, Poor. " \
+         "Quand vous cherchez une carte, vous indiquez l'état minimum qui vous convient."],
+        ["Comment se passe un échange ?",
+         "Vous proposez des cartes à donner et à recevoir, le partenaire accepte (ou propose une " \
+         "modification), puis vous convenez d'un rendez-vous via la messagerie. Une fois l'échange " \
+         "réalisé, les deux participants le confirment et peuvent se noter."]
+      ] %>
+
+      <% faqs.each do |title, body| %>
+        <details class="group bg-white rounded-xl shadow-sm border border-gray-200 open:ring-1 open:ring-indigo-100">
+          <summary class="cursor-pointer list-none px-5 py-4 flex items-center justify-between">
+            <span class="font-medium text-gray-900"><%= title %></span>
+            <svg class="h-5 w-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </summary>
+          <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed"><%= body %></div>
+        </details>
+      <% end %>
+    </div>
+
+    <div class="mt-10 text-center text-sm text-gray-500">
+      Une autre question ? <%= mail_to "6098609@proton.me", "Contactez-nous", class: "text-indigo-600 hover:text-indigo-800" %>
+    </div>
+  </div>
+</div>

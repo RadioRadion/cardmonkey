@@ -40,13 +40,26 @@
 
             <%= f.input :password_confirmation,
                         required: true,
-                        input_html: { 
+                        input_html: {
                           class: "block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm",
                           autocomplete: "new-password",
                           placeholder: "••••••••"
                         },
                         wrapper_html: { class: "block" },
                         label_html: { class: "block text-sm font-medium text-gray-700 mb-2" } %>
+
+            <%= f.input :address,
+                        required: true,
+                        label: "Ville ou adresse",
+                        hint: "Pour vous proposer des échanges près de chez vous. Une ville suffit.",
+                        input_html: {
+                          class: "block w-full px-6 py-4 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 transition duration-150 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm",
+                          autocomplete: "address-level2",
+                          placeholder: "Lyon, France"
+                        },
+                        wrapper_html: { class: "block" },
+                        label_html: { class: "block text-sm font-medium text-gray-700 mb-2" },
+                        hint_html: { class: "mt-2 text-sm text-gray-500" } %>
 
             <div>
               <%= f.button :submit, t('devise.registrations.new.sign_up'), class: "w-full flex justify-center py-4 px-6 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>

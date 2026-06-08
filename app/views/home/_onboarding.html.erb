@@ -1,0 +1,50 @@
+<%# Guided first steps — shown until everything is done. %>
+<% steps = [
+     { key: :address,  done: @onboarding[:address],  label: "Renseignez votre ville",
+       hint: "Pour trouver des échanges près de chez vous",
+       path: edit_user_path(current_user), cta: "Compléter" },
+     { key: :cards,    done: @onboarding[:cards],    label: "Importez votre collection",
+       hint: "Liste à coller ou fichier CSV (ManaBox, Moxfield…)",
+       path: import_user_user_cards_path(current_user), cta: "Importer" },
+     { key: :wishlist, done: @onboarding[:wishlist], label: "Ajoutez vos cartes recherchées",
+       hint: "Pour que l'algorithme trouve vos échanges",
+       path: new_user_user_wanted_card_path(current_user), cta: "Ajouter" }
+   ] %>
+<% done_count = steps.count { |s| s[:done] } %>
+
+<% unless done_count == steps.size %>
+  <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 p-6 mb-8">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-gray-900">Bien démarrer</h2>
+      <span class="text-sm text-gray-500"><%= done_count %>/<%= steps.size %></span>
+    </div>
+
+    <div class="w-full bg-gray-100 rounded-full h-2 mb-5">
+      <div class="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all"
+           style="width: <%= (done_count.to_f / steps.size * 100).round %>%"></div>
+    </div>
+
+    <ul class="space-y-3">
+      <% steps.each_with_index do |step, i| %>
+        <li class="flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3 min-w-0">
+            <% if step[:done] %>
+              <span class="flex-shrink-0 h-7 w-7 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </span>
+            <% else %>
+              <span class="flex-shrink-0 h-7 w-7 rounded-full bg-indigo-100 text-indigo-700 font-semibold text-sm flex items-center justify-center"><%= i + 1 %></span>
+            <% end %>
+            <div class="min-w-0">
+              <p class="text-sm font-medium <%= step[:done] ? 'text-gray-400 line-through' : 'text-gray-900' %>"><%= step[:label] %></p>
+              <% unless step[:done] %><p class="text-xs text-gray-500 truncate"><%= step[:hint] %></p><% end %>
+            </div>
+          </div>
+          <% unless step[:done] %>
+            <%= link_to step[:cta], step[:path], class: "flex-shrink-0 text-sm font-medium text-indigo-600 hover:text-indigo-800" %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

@@ -72,6 +72,7 @@
               <%= link_to t('navbar.profile.my_profile'), user_path(current_user), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
               <%= link_to t('navbar.profile.edit_profile'), edit_user_path(current_user), class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
               <%= link_to t('navbar.profile.dashboard'), matches_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+              <%= link_to "Aide / FAQ", faq_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
               <%= button_to t('navbar.profile.sign_out'), 
                 destroy_user_session_path, 
                 method: :delete,
