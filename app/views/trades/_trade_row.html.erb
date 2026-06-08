@@ -14,9 +14,9 @@
 
       <div class="mt-1 flex items-center gap-3 text-sm text-cm-text-muted">
         <% mine, theirs = trade.user_cards.partition { |uc| uc.user_id == current_user.id } %>
-        <span><%= pluralize(mine.size, t('.card_offered')) %></span>
+        <span><%= mine.size %> offerte<%= 's' if mine.size > 1 %></span>
         <span>•</span>
-        <span><%= pluralize(theirs.size, t('.card_requested')) %></span>
+        <span><%= theirs.size %> demandée<%= 's' if theirs.size > 1 %></span>
       </div>
 
       <p class="mt-1 text-xs text-cm-text-subtle"><%= time_ago_in_words(trade.updated_at) %></p>
