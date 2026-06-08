@@ -20,8 +20,8 @@ RSpec.describe "Matches index", type: :request do
 
     expect(response).to have_http_status(:ok)
     expect(response.body).to include("TradeBuddy")
-    expect(response.body).to include("Vous pouvez donner")
-    expect(response.body).to include("Vous pouvez recevoir")
+    expect(response.body).to include("Vous donnez")
+    expect(response.body).to include("Vous recevez")
     expect(response.body).to include("km")
   end
 
