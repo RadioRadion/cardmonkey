@@ -1,44 +1,36 @@
-<div class="cm-theme min-h-screen" data-controller="trade-selection" data-trade-selection-partner-id-value="<%= @partner.id %>">
-  <div class="max-w-7xl mx-auto px-4 py-6 pb-44 lg:pb-32">
+<div data-controller="trade-selection" data-trade-selection-partner-id-value="<%= @partner.id %>">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 py-6 pb-44 lg:pb-28">
     <%# En-tête + recherche %>
-    <div class="mb-6">
+    <div class="mb-5">
       <div class="flex flex-wrap justify-between items-end gap-3 mb-4">
         <div>
-          <span class="cm-kicker text-cm-accent">Proposition</span>
-          <h1 class="cm-display text-3xl sm:text-4xl mt-1"><%= t('.title', partner: @partner.username) %></h1>
+          <div class="ap-label">Proposition</div>
+          <h1 class="text-2xl font-bold tracking-tight mt-0.5"><%= t('.title', partner: @partner.username) %></h1>
         </div>
-        <span class="cm-tag"><%= pluralize(@partner.user_wanted_cards.count, t('.wanted_cards_count')) %></span>
+        <span class="ap-chip"><%= pluralize(@partner.user_wanted_cards.count, t('.wanted_cards_count')) %></span>
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-3">
-        <div class="flex-1 relative">
-          <div class="absolute left-3 inset-y-0 flex items-center text-cm-text-subtle"><i class="fas fa-search"></i></div>
-          <input type="text" name="user_query" placeholder="<%= t('.search_your_cards') %>"
-                 class="cm-input pl-10" data-action="input->trade-selection#search" autocomplete="off">
-        </div>
-        <div class="flex-1 relative">
-          <div class="absolute left-3 inset-y-0 flex items-center text-cm-text-subtle"><i class="fas fa-search"></i></div>
-          <input type="text" name="partner_query" placeholder="<%= t('.search_their_cards') %>"
-                 class="cm-input pl-10" data-action="input->trade-selection#search" autocomplete="off">
-        </div>
+      <div class="flex flex-col sm:flex-row gap-2">
+        <input type="text" name="user_query" placeholder="<%= t('.search_your_cards') %>" class="ap-search flex-1" data-action="input->trade-selection#search" autocomplete="off">
+        <input type="text" name="partner_query" placeholder="<%= t('.search_their_cards') %>" class="ap-search flex-1" data-action="input->trade-selection#search" autocomplete="off">
       </div>
     </div>
 
     <%# Grilles de cartes %>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="cm-card-flat">
-        <div class="px-5 py-3 border-b-2 border-cm-ink"><h2 class="cm-display text-xl"><%= t('.your_cards') %></h2></div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="ap-card overflow-hidden">
+        <div class="px-4 py-3 border-b ap-divide"><h2 class="ap-label"><%= t('.your_cards') %></h2></div>
         <div class="p-4">
-          <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3" data-trade-selection-target="userCardsGrid">
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-3" data-trade-selection-target="userCardsGrid">
             <%= render partial: "trades/card", collection: @user_cards, locals: { side: 'user' } %>
           </div>
         </div>
       </div>
 
-      <div class="cm-card-flat">
-        <div class="px-5 py-3 border-b-2 border-cm-ink"><h2 class="cm-display text-xl"><%= t('.partner_cards', partner: @partner.username) %></h2></div>
+      <div class="ap-card overflow-hidden">
+        <div class="px-4 py-3 border-b ap-divide"><h2 class="ap-label"><%= t('.partner_cards', partner: @partner.username) %></h2></div>
         <div class="p-4">
-          <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3" data-trade-selection-target="partnerCardsGrid">
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-3" data-trade-selection-target="partnerCardsGrid">
             <%= render partial: "trades/card", collection: @partner_cards, locals: { side: 'partner' } %>
           </div>
         </div>
@@ -47,8 +39,8 @@
   </div>
 
   <%# Barre de résumé fixe %>
-  <div class="fixed bottom-0 left-0 right-0 bg-cm-surface border-t-2 border-cm-ink z-50">
-    <div class="max-w-7xl mx-auto px-4 py-3">
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t ap-divide z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
       <%= form_with model: @trade, local: true, class: "w-full",
                     data: { turbo: false, action: "submit->trade-selection#submitTrade" } do |f| %>
         <%= f.hidden_field :user_id, value: current_user.id %>
@@ -57,25 +49,25 @@
         <%= f.hidden_field :target %>
 
         <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-3">
-          <div class="flex items-stretch border-2 border-cm-ink divide-x-2 divide-cm-ink text-sm w-fit">
+          <div class="flex items-stretch rounded-lg border ap-divide divide-x ap-divide text-sm w-fit">
             <div class="px-4 py-1.5">
-              <div class="text-[10px] font-bold uppercase tracking-widest text-cm-text-muted"><%= t('.you_give') %></div>
-              <div class="font-bold"><span data-trade-selection-target="userCardCount">0</span> · <span data-trade-selection-target="userValue">0,00 €</span></div>
+              <div class="ap-label !text-[9px]"><%= t('.you_give') %></div>
+              <div class="ap-num font-bold"><span data-trade-selection-target="userCardCount">0</span> · <span data-trade-selection-target="userValue">0,00 €</span></div>
             </div>
             <div class="px-4 py-1.5">
-              <div class="text-[10px] font-bold uppercase tracking-widest text-cm-text-muted"><%= t('.you_receive') %></div>
-              <div class="font-bold"><span data-trade-selection-target="partnerCardCount">0</span> · <span data-trade-selection-target="partnerValue">0,00 €</span></div>
+              <div class="ap-label !text-[9px]"><%= t('.you_receive') %></div>
+              <div class="ap-num font-bold"><span data-trade-selection-target="partnerCardCount">0</span> · <span data-trade-selection-target="partnerValue">0,00 €</span></div>
             </div>
             <div class="px-4 py-1.5">
-              <div class="text-[10px] font-bold uppercase tracking-widest text-cm-text-muted"><%= t('.balance') %></div>
-              <div class="font-bold" data-trade-selection-target="balance">0,00 €</div>
+              <div class="ap-label !text-[9px]"><%= t('.balance') %></div>
+              <div class="ap-num font-bold" data-trade-selection-target="balance">0,00 €</div>
             </div>
           </div>
 
-          <div class="flex items-center gap-3">
-            <%= link_to t('.cancel'), user_path(@partner), class: "cm-btn-ghost", data: { turbo: false } %>
+          <div class="flex items-center gap-2">
+            <%= link_to t('.cancel'), user_path(@partner), class: "ap-btn-ghost", data: { turbo: false } %>
             <%= f.submit t('.validate_trade'),
-                  class: "cm-btn-primary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+                  class: "ap-btn-accent disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
                   data: { trade_selection_target: "submitButton", disable_with: t('.validating') } %>
           </div>
         </div>
@@ -84,20 +76,18 @@
   </div>
 
   <%# Récap avant envoi %>
-  <div data-trade-selection-target="modal" class="hidden fixed inset-0 z-[60] bg-cm-ink/50 flex items-center justify-center p-4">
-    <div class="cm-card max-w-md w-full p-6">
-      <h3 class="cm-display text-2xl mb-4">Confirmer votre proposition</h3>
+  <div data-trade-selection-target="modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4" style="background: rgba(14,19,32,.5);">
+    <div class="ap-card max-w-md w-full p-6">
+      <h3 class="text-lg font-bold mb-4">Confirmer votre proposition</h3>
       <div class="space-y-2 text-sm">
-        <div class="flex justify-between"><span class="text-cm-text-muted">Vous donnez</span><span class="font-bold" data-trade-selection-target="recapGive">—</span></div>
-        <div class="flex justify-between"><span class="text-cm-text-muted">Vous recevez</span><span class="font-bold" data-trade-selection-target="recapReceive">—</span></div>
-        <div class="flex justify-between border-t-2 border-cm-ink pt-2 mt-2"><span class="text-cm-text-muted">Balance</span><span class="font-bold" data-trade-selection-target="recapBalance">—</span></div>
+        <div class="flex justify-between"><span class="ap-muted">Vous donnez</span><span class="ap-num font-bold" data-trade-selection-target="recapGive">—</span></div>
+        <div class="flex justify-between"><span class="ap-muted">Vous recevez</span><span class="ap-num font-bold" data-trade-selection-target="recapReceive">—</span></div>
+        <div class="flex justify-between border-t ap-divide pt-2 mt-2"><span class="ap-muted">Balance</span><span class="ap-num font-bold" data-trade-selection-target="recapBalance">—</span></div>
       </div>
-      <p class="mt-4 text-xs text-cm-text-muted">
-        Votre proposition sera envoyée à <%= @partner.username %>, qui pourra l'accepter, la modifier ou la refuser.
-      </p>
-      <div class="mt-6 flex justify-end gap-3">
-        <button type="button" data-action="trade-selection#cancelRecap" class="cm-btn-ghost text-xs">Annuler</button>
-        <button type="button" data-action="trade-selection#confirmSubmit" class="cm-btn-primary text-xs">Confirmer l'envoi</button>
+      <p class="mt-4 text-xs ap-muted">Votre proposition sera envoyée à <%= @partner.username %>, qui pourra l'accepter, la modifier ou la refuser.</p>
+      <div class="mt-6 flex justify-end gap-2">
+        <button type="button" data-action="trade-selection#cancelRecap" class="ap-btn-ghost text-xs">Annuler</button>
+        <button type="button" data-action="trade-selection#confirmSubmit" class="ap-btn-accent text-xs">Confirmer l'envoi</button>
       </div>
     </div>
   </div>

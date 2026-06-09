@@ -30,13 +30,13 @@ export default class extends Controller {
 
   toggleFoilFilter(event) {
     this.filters.foilOnly = !this.filters.foilOnly
-    event.currentTarget.classList.toggle('bg-yellow-100')
+    event.currentTarget.classList.toggle('bg-blue-50')
     this.applyFilters()
   }
 
   toggleMatchesFilter(event) {
     this.filters.hasMatches = !this.filters.hasMatches
-    event.currentTarget.classList.toggle('bg-green-100')
+    event.currentTarget.classList.toggle('bg-blue-50')
     this.applyFilters()
   }
 

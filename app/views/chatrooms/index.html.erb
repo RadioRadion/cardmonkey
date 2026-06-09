@@ -1,52 +1,42 @@
-<div class="cm-theme min-h-screen">
-  <div class="container mx-auto px-4 py-8">
-    <div class="mb-6">
-      <span class="cm-kicker text-cm-accent">Messagerie</span>
-      <h1 class="cm-display text-4xl sm:text-5xl mt-1">Messages</h1>
-    </div>
+<div class="mx-auto max-w-4xl px-4 sm:px-6 py-6">
+  <h1 class="text-2xl font-bold tracking-tight">Messages</h1>
 
-    <div class="cm-card-flat overflow-hidden">
-      <div class="divide-y-2 divide-cm-border/20">
-        <% if @chatrooms.any? %>
-          <% @chatrooms.each do |chatroom| %>
-            <% other_user = chatroom.other_user(current_user) %>
-            <% last_message = @last_messages[chatroom.id] %>
-            <% unread_count = @unread_counts[chatroom.id] %>
-            <%= link_to user_chatroom_path(current_user, chatroom), class: "block hover:bg-cm-surface-2 transition-colors" do %>
-              <div class="p-4 flex items-center gap-4">
-                <span class="w-12 h-12 flex items-center justify-center bg-cm-ink text-cm-bg font-bold text-lg border-2 border-cm-ink">
-                  <%= other_user&.username ? other_user.username[0].upcase : '?' %>
-                </span>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between gap-2">
-                    <h3 class="font-bold truncate"><%= other_user&.username || "Inconnu" %></h3>
-                    <% if last_message %>
-                      <span class="text-xs text-cm-text-subtle whitespace-nowrap">
-                        <%= t('datetime.distance_in_words.ago', count: time_ago_in_words(last_message.created_at)) %>
-                      </span>
-                    <% end %>
-                  </div>
+  <div class="mt-5 ap-card overflow-hidden">
+    <div class="divide-y ap-divide">
+      <% if @chatrooms.any? %>
+        <% @chatrooms.each do |chatroom| %>
+          <% other_user = chatroom.other_user(current_user) %>
+          <% last_message = @last_messages[chatroom.id] %>
+          <% unread_count = @unread_counts[chatroom.id] %>
+          <%= link_to user_chatroom_path(current_user, chatroom), class: "block ap-row transition-colors" do %>
+            <div class="p-4 flex items-center gap-4">
+              <span class="w-11 h-11 flex items-center justify-center rounded-full text-white font-semibold" style="background: var(--ap-ink);"><%= other_user&.username ? other_user.username[0].upcase : '?' %></span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="font-semibold truncate"><%= other_user&.username || "Inconnu" %></h3>
                   <% if last_message %>
-                    <p class="text-sm text-cm-text-muted truncate"><%= last_message.display_content %></p>
-                  <% else %>
-                    <p class="text-sm text-cm-text-subtle">Démarrer une conversation</p>
-                  <% end %>
-                  <% if unread_count > 0 %>
-                    <span class="cm-tag-pop mt-1"><%= unread_count %> nouveau<%= 's' if unread_count > 1 %></span>
+                    <span class="text-xs ap-faint whitespace-nowrap"><%= t('datetime.distance_in_words.ago', count: time_ago_in_words(last_message.created_at)) %></span>
                   <% end %>
                 </div>
-                <span class="text-cm-text-subtle">→</span>
+                <% if last_message %>
+                  <p class="text-sm ap-muted truncate"><%= last_message.display_content %></p>
+                <% else %>
+                  <p class="text-sm ap-faint">Démarrer une conversation</p>
+                <% end %>
+                <% if unread_count > 0 %>
+                  <span class="ap-chip ap-chip-accent ap-num mt-1"><%= unread_count %> nouveau<%= 's' if unread_count > 1 %></span>
+                <% end %>
               </div>
-            <% end %>
+              <span class="ap-faint">→</span>
+            </div>
           <% end %>
-        <% else %>
-          <div class="p-12 text-center">
-            <i class="fas fa-comments text-4xl text-cm-text-subtle mb-3"></i>
-            <h3 class="cm-display text-xl">Pas encore de messages</h3>
-            <p class="text-cm-text-muted mt-1">Lancez un échange pour discuter avec d'autres joueurs.</p>
-          </div>
         <% end %>
-      </div>
+      <% else %>
+        <div class="p-12 text-center">
+          <h3 class="text-base font-bold">Pas encore de messages</h3>
+          <p class="ap-muted text-sm mt-1">Lancez un échange pour discuter avec d'autres joueurs.</p>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>

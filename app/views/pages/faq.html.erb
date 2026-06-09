@@ -1,9 +1,9 @@
-<div class="cm-theme min-h-screen py-12">
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="mb-10">
-      <span class="cm-kicker text-cm-accent">Aide</span>
-      <h1 class="cm-display text-4xl sm:text-5xl mt-1">Comment ça marche ?</h1>
-      <p class="mt-2 text-cm-text-muted">Tout pour démarrer en quelques minutes.</p>
+<div class="py-10">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6">
+    <div class="mb-8">
+      <div class="ap-label">Aide</div>
+      <h1 class="text-2xl font-bold tracking-tight mt-1">Comment ça marche ?</h1>
+      <p class="mt-1 text-sm ap-muted">Tout pour démarrer en quelques minutes.</p>
     </div>
 
     <div class="space-y-4">
@@ -29,20 +29,20 @@
       ] %>
 
       <% faqs.each do |title, body| %>
-        <details class="group cm-card-flat">
+        <details class="group ap-card">
           <summary class="cursor-pointer list-none px-5 py-4 flex items-center justify-between">
-            <span class="font-bold"><%= title %></span>
-            <svg class="h-5 w-5 text-cm-text-muted transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span class="font-semibold text-sm"><%= title %></span>
+            <svg class="h-5 w-5 ap-faint transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
             </svg>
           </summary>
-          <div class="px-5 pb-5 text-sm text-cm-text-muted leading-relaxed"><%= body %></div>
+          <div class="px-5 pb-5 text-sm ap-muted leading-relaxed"><%= body %></div>
         </details>
       <% end %>
     </div>
 
-    <div class="mt-10 text-center text-sm text-cm-text-muted">
-      Une autre question ? <%= mail_to "6098609@proton.me", "Contactez-nous", class: "text-cm-accent font-bold hover:underline" %>
+    <div class="mt-10 text-center text-sm ap-muted">
+      Une autre question ? <%= mail_to "6098609@proton.me", "Contactez-nous", class: "ap-link font-semibold" %>
     </div>
   </div>
 </div>

@@ -1,115 +1,103 @@
-<div class="cm-theme min-h-screen">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-controller="cards">
-    <%# Header %>
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-      <div>
-        <span class="cm-kicker text-cm-accent">Votre collection</span>
-        <h1 class="cm-display text-4xl sm:text-5xl mt-1">Ma collection</h1>
+<div class="mx-auto max-w-7xl px-4 sm:px-6 py-6" data-controller="cards">
+  <%# Header %>
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight">Ma collection</h1>
+      <p class="text-sm ap-muted mt-0.5">Vos cartes disponibles à l'échange.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <%= link_to "Importer", import_user_user_cards_path(@user), class: "ap-btn-accent" %>
+      <%= link_to "Ajouter une carte", new_user_user_card_path(@user), class: "ap-btn-ghost" %>
+    </div>
+  </div>
+
+  <%# Stats %>
+  <div class="mt-5 ap-card overflow-hidden flex divide-x ap-divide">
+    <% total_value = @user_cards.reduce(0) { |s, uc| s + (((uc.foil ? uc.card_version&.eur_foil_price : uc.card_version&.eur_price) || 0) * uc.quantity) } %>
+    <% [
+         [(@user_cards.sum(&:quantity) rescue 0), "Cartes"],
+         [(@user_cards.count rescue 0), "Uniques"],
+         [number_to_currency(total_value, unit: "€", format: "%n %u"), "Valeur"],
+         [@user_cards.pluck(:language).uniq.compact.count, "Langues"]
+       ].each do |num, label| %>
+      <div class="px-5 py-3.5 flex-1">
+        <div class="ap-num text-xl font-bold"><%= num %></div>
+        <div class="ap-label !text-[10px] mt-0.5"><%= label %></div>
       </div>
-      <div class="flex items-center gap-3">
-        <%= link_to import_user_user_cards_path(@user), class: "cm-btn-primary" do %>
-          <i class="fas fa-file-import"></i> Importer en masse
-        <% end %>
-        <%= link_to new_user_user_card_path(@user), class: "cm-btn-ink" do %>
-          <i class="fas fa-plus"></i> Ajouter
-        <% end %>
-      </div>
-    </div>
-
-    <%# Stats %>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-cm-ink border-2 border-cm-ink mb-6">
-      <% total_value = @user_cards.reduce(0) do |sum, uc|
-           price = (uc.foil ? uc.card_version&.eur_foil_price : uc.card_version&.eur_price) || 0
-           sum + (price * uc.quantity)
-         end %>
-      <% [
-           [(@user_cards.sum(&:quantity) rescue 0), "Cartes"],
-           [(@user_cards.count rescue 0), "Uniques"],
-           [number_to_currency(total_value, unit: "€", format: "%n %u"), "Valeur"],
-           [@user_cards.pluck(:language).uniq.compact.count, "Langues"]
-         ].each do |num, label| %>
-        <div class="bg-cm-bg px-5 py-4">
-          <div class="cm-display text-2xl sm:text-3xl"><%= num %></div>
-          <div class="text-[11px] font-bold uppercase tracking-widest text-cm-text-muted"><%= label %></div>
-        </div>
-      <% end %>
-    </div>
-
-    <%# Filtres %>
-    <div class="cm-card-flat p-4 mb-6">
-      <div class="flex flex-col md:flex-row gap-3">
-        <input type="text" placeholder="Rechercher une carte…" class="cm-input flex-1" data-action="input->cards#search">
-        <div class="flex gap-2 flex-wrap">
-          <select class="cm-input" data-action="change->cards#filterByLanguage">
-            <option value="">Toutes les langues</option>
-            <% @user_cards.pluck(:language).uniq.compact.each do |lang| %>
-              <option value="<%= lang %>"><%= language_label(lang) %></option>
-            <% end %>
-          </select>
-          <select class="cm-input" data-action="change->cards#filterByCondition">
-            <option value="">Tous états</option>
-            <% %w[mint near_mint excellent good light_played played poor].each do |c| %>
-              <option value="<%= c %>"><%= c.humanize %></option>
-            <% end %>
-          </select>
-          <button class="cm-btn-ghost" data-action="click->cards#toggleFoilFilter">
-            <i class="fas fa-star text-cm-accent"></i> Foil
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <%# Grille %>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
-      <% @user_cards.each do |user_card| %>
-        <div class="group cm-card overflow-hidden"
-             data-cards-target="card"
-             data-card-name-en="<%= user_card.card_version.card.name_en %>"
-             data-card-name-fr="<%= user_card.card_version.card.name_fr %>"
-             data-language="<%= user_card.language %>"
-             data-condition="<%= user_card.condition %>"
-             data-foil="<%= user_card.foil %>">
-          <div class="relative aspect-[63/88] overflow-hidden bg-cm-surface-2 border-b-2 border-cm-ink">
-            <% if user_card.card_version.img_uri.present? %>
-              <%= image_tag user_card.card_version.img_uri, alt: user_card.card_version.card.name_en,
-                    class: "w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" %>
-            <% else %>
-              <div class="w-full h-full flex items-center justify-center text-cm-text-subtle text-xs text-center p-2"><%= user_card.card_version.card.name_en %></div>
-            <% end %>
-            <div class="absolute top-2 right-2 cm-tag-pop"><%= user_card.quantity %>×</div>
-            <% if user_card.foil %>
-              <div class="absolute top-2 left-2 cm-tag">FOIL</div>
-            <% end %>
-          </div>
-
-          <div class="p-3">
-            <h3 class="font-bold truncate text-sm" title="<%= user_card.card_version.card.name_en %>"><%= user_card.card_version.card.name_en %></h3>
-            <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
-              <span class="inline-block w-3 h-3 rounded-full <%= rarity_color(user_card.card_version.rarity) %>" title="<%= rarity_label(user_card.card_version.rarity) %>"></span>
-              <span class="px-1.5 py-0.5 bg-cm-surface-2 text-cm-text-muted font-bold uppercase tracking-wide"><%= language_label(user_card.language) %></span>
-              <span class="px-1.5 py-0.5 bg-cm-surface-2 text-cm-text-muted font-bold uppercase tracking-wide"><%= user_card.condition&.humanize %></span>
-            </div>
-            <div class="mt-3 flex items-center justify-between">
-              <span class="cm-display text-lg">
-                <% price = user_card.foil ? user_card.card_version.eur_foil_price : user_card.card_version.eur_price %>
-                <%= number_to_currency(price, unit: "€", format: "%n %u") %>
-              </span>
-              <div class="flex items-center gap-1">
-                <%= link_to edit_user_user_card_path(user_card.user, user_card), class: "p-2 text-cm-ink hover:text-cm-accent transition-colors", title: t('cards.table.actions.edit') do %>
-                  <i class="fas fa-pen text-sm"></i>
-                <% end %>
-                <button data-action="card-preview#delete" class="p-2 text-cm-danger hover:opacity-70 transition" title="<%= t('cards.table.actions.delete') %>">
-                  <i class="fas fa-trash text-sm"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      <% end %>
-    </div>
-
-    <% if @pagy && @pagy.pages > 1 %>
-      <%= render "shared/pagination", pagy: @pagy %>
     <% end %>
   </div>
+
+  <%# Filtres %>
+  <div class="mt-4 flex flex-col md:flex-row gap-2">
+    <div class="relative flex-1">
+      <span class="absolute left-3 top-1/2 -translate-y-1/2 ap-faint">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </span>
+      <input type="text" placeholder="Rechercher dans ma collection…" class="ap-search !pl-9" data-action="input->cards#search">
+    </div>
+    <div class="flex gap-2 flex-wrap">
+      <select class="rounded-md border bg-white text-sm px-3 py-2" style="border-color: var(--ap-line);" data-action="change->cards#filterByLanguage">
+        <option value="">Toutes les langues</option>
+        <% @user_cards.pluck(:language).uniq.compact.each do |lang| %>
+          <option value="<%= lang %>"><%= language_label(lang) %></option>
+        <% end %>
+      </select>
+      <select class="rounded-md border bg-white text-sm px-3 py-2" style="border-color: var(--ap-line);" data-action="change->cards#filterByCondition">
+        <option value="">Tous états</option>
+        <% %w[mint near_mint excellent good light_played played poor].each do |c| %>
+          <option value="<%= c %>"><%= c.humanize %></option>
+        <% end %>
+      </select>
+      <button class="ap-btn-ghost" data-action="click->cards#toggleFoilFilter">Foil</button>
+    </div>
+  </div>
+
+  <%# Grille %>
+  <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+    <% @user_cards.each do |user_card| %>
+      <div class="group ap-card overflow-hidden"
+           data-cards-target="card"
+           data-card-name-en="<%= user_card.card_version.card.name_en %>"
+           data-card-name-fr="<%= user_card.card_version.card.name_fr %>"
+           data-language="<%= user_card.language %>"
+           data-condition="<%= user_card.condition %>"
+           data-foil="<%= user_card.foil %>">
+        <div class="relative ap-scan !rounded-none !border-0 border-b ap-divide">
+          <% if user_card.card_version.img_uri.present? %>
+            <%= image_tag user_card.card_version.img_uri, alt: user_card.card_version.card.name_en, loading: "lazy", class: "w-full aspect-[63/88] object-cover" %>
+          <% else %>
+            <div class="w-full aspect-[63/88] flex items-center justify-center text-xs ap-faint text-center p-2"><%= user_card.card_version.card.name_en %></div>
+          <% end %>
+          <span class="absolute top-1.5 right-1.5 ap-num text-[10px] font-bold text-white px-1.5 rounded" style="background: rgba(0,0,0,.6);"><%= user_card.quantity %>×</span>
+          <% if user_card.foil %><span class="absolute top-1.5 left-1.5 ap-chip ap-chip-accent !text-[9px] !px-1.5">FOIL</span><% end %>
+        </div>
+        <div class="p-2.5">
+          <h3 class="text-xs font-semibold truncate" title="<%= user_card.card_version.card.name_en %>"><%= user_card.card_version.card.name_en %></h3>
+          <div class="mt-1.5 flex items-center gap-1.5">
+            <span class="inline-block w-2.5 h-2.5 rounded-full <%= rarity_color(user_card.card_version.rarity) %>"></span>
+            <span class="ap-chip !text-[9px] !px-1.5 uppercase"><%= language_label(user_card.language) %></span>
+            <span class="ap-chip !text-[9px] !px-1.5"><%= user_card.condition&.humanize %></span>
+          </div>
+          <div class="mt-2 flex items-center justify-between">
+            <span class="ap-num text-sm font-bold ap-link">
+              <% price = user_card.foil ? user_card.card_version.eur_foil_price : user_card.card_version.eur_price %>
+              <%= number_to_currency(price, unit: "€", format: "%n %u") %>
+            </span>
+            <div class="flex items-center gap-0.5">
+              <%= link_to edit_user_user_card_path(user_card.user, user_card), class: "p-1.5 ap-muted hover:text-[color:var(--ap-ink)]", title: t('cards.table.actions.edit') do %>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+              <% end %>
+              <button data-action="card-preview#delete" class="p-1.5 ap-muted hover:text-red-600" title="<%= t('cards.table.actions.delete') %>">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @pagy && @pagy.pages > 1 %>
+    <%= render "shared/pagination", pagy: @pagy %>
+  <% end %>
 </div>

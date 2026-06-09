@@ -1,31 +1,28 @@
 <!DOCTYPE html>
 <html data-turbo="true">
 <head>
-  <title>Godeck</title>
+  <title>CardMonkey</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
-  <%# Removed favicon_link_tag - using default favicon.ico in public directory %>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="turbo-cache-control" content="no-cache">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
   <%= javascript_importmap_tags %>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 </head>
-<body class="flex flex-col min-h-screen <%= 'bg-gray-50' unless current_page?(root_path) && !user_signed_in? %>" data-turbo-preserve-scroll>
-  <div class="flex-grow">
-    <%= render 'shared/navbar' %> 
-    <%= render 'shared/flashes' %> 
-    <div class="<%= 'container mx-auto px-4' unless current_page?(root_path) && !user_signed_in? %>"> 
-      <%= yield %>
-    </div>
-  </div>
-  <%= render 'shared/footer' %> 
+<body class="ap-root flex flex-col min-h-screen" data-turbo-preserve-scroll>
+  <%= render 'shared/app_nav' %>
+  <%= render 'shared/flashes' %>
+  <main class="flex-grow">
+    <%= yield %>
+  </main>
+  <%= render 'shared/app_footer' %>
 </body>
 </html>

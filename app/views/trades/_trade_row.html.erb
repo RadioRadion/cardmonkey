@@ -1,41 +1,41 @@
 <%# app/views/trades/_trade_row.html.erb %>
-<div class="p-4 hover:bg-cm-surface-2 transition-colors">
+<div class="px-4 py-3 ap-row transition-colors">
   <div class="flex items-start justify-between gap-4">
     <div class="min-w-0 flex-1">
       <div class="flex items-center gap-2 flex-wrap">
-        <span class="cm-tag"><%= trade_status_text(trade.status) %></span>
-        <p class="truncate font-bold"><%= t('.with') %> <%= trade.partner_name_for(current_user) %></p>
+        <span class="ap-chip"><%= trade_status_text(trade.status) %></span>
+        <p class="truncate font-semibold text-sm"><%= t('.with') %> <%= trade.partner_name_for(current_user) %></p>
       </div>
 
       <% next_action = trade_next_action(trade) %>
       <% if next_action && next_action[:actionable] %>
-        <p class="mt-1 text-xs font-bold text-cm-accent">👉 <%= next_action[:text] %></p>
+        <p class="mt-1 text-xs font-semibold ap-link">→ <%= next_action[:text] %></p>
       <% end %>
 
-      <div class="mt-1 flex items-center gap-3 text-sm text-cm-text-muted">
+      <div class="mt-1 flex items-center gap-2 text-xs ap-muted">
         <% mine, theirs = trade.user_cards.partition { |uc| uc.user_id == current_user.id } %>
-        <span><%= mine.size %> offerte<%= 's' if mine.size > 1 %></span>
-        <span>•</span>
-        <span><%= theirs.size %> demandée<%= 's' if theirs.size > 1 %></span>
+        <span><span class="ap-num"><%= mine.size %></span> offerte<%= 's' if mine.size > 1 %></span>
+        <span>·</span>
+        <span><span class="ap-num"><%= theirs.size %></span> demandée<%= 's' if theirs.size > 1 %></span>
+        <span>·</span>
+        <span><%= time_ago_in_words(trade.updated_at) %></span>
       </div>
-
-      <p class="mt-1 text-xs text-cm-text-subtle"><%= time_ago_in_words(trade.updated_at) %></p>
     </div>
 
-    <%= link_to trade_path(trade), class: "shrink-0 text-sm font-bold uppercase tracking-wide text-cm-accent hover:underline whitespace-nowrap", data: { turbo: false } do %>
+    <%= link_to trade_path(trade), class: "shrink-0 text-sm font-semibold ap-link whitespace-nowrap", data: { turbo: false } do %>
       <%= t('.view_details') %> →
     <% end %>
   </div>
 
   <% if trade.pending? && trade.user_id_invit == current_user.id %>
-    <div class="mt-4 flex items-center gap-3">
+    <div class="mt-3 flex items-center gap-2">
       <%= form_with model: trade, method: :patch, local: true, class: "inline" do |f| %>
         <%= f.hidden_field :status, value: "accepted" %>
-        <%= f.submit t('.accept_trade'), class: "cm-btn-primary text-xs cursor-pointer" %>
+        <%= f.submit t('.accept_trade'), class: "ap-btn-accent text-xs cursor-pointer" %>
       <% end %>
       <%= form_with model: trade, method: :patch, local: true, class: "inline" do |f| %>
         <%= f.hidden_field :status, value: "cancelled" %>
-        <%= f.submit t('.reject'), class: "cm-btn-ghost text-xs cursor-pointer" %>
+        <%= f.submit t('.reject'), class: "ap-btn-ghost text-xs cursor-pointer" %>
       <% end %>
     </div>
   <% end %>

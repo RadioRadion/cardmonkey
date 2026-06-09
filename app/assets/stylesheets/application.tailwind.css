@@ -2,62 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ───────────────────────── CardMonkey design system ─────────────────────────
-   "Editorial / bold" — cream paper + ink + one pop color, heavy display type,
-   hard borders & offset shadows (print/sticker feel), broken grid.
-   Scoped via the `.cm-theme` wrapper so it rolls out page by page.
+/* ───────────────────────── APP FONCTIONNELLE — expérimental ──────────────────
+   "Outil d'échange" — brut, efficace, dense (esprit Cardmarket).
+   Noir + une couleur + police simple. Barre sombre, listes serrées, l'essentiel.
+   Scopé sous .ap-root.
    ------------------------------------------------------------------------- */
 @layer components {
-  .cm-theme {
-    @apply bg-cm-bg text-cm-ink font-sans;
+  .ap-root {
+    --ap-bg:#eef1f5; --ap-surface:#ffffff; --ap-line:#e2e6ec;
+    --ap-ink:#0e1320; --ap-muted:#5a6473; --ap-faint:#97a1b1;
+    --ap-header:#0c111d; --ap-accent:#1f6bff; --ap-accent-ink:#1657d6;
+    --ap-accent-tint:#e6efff; --ap-warn-tint:#fdf0dd; --ap-warn-ink:#9a6a00;
+    background: var(--ap-bg);
+    color: var(--ap-ink);
+    font-family: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
+  /* Chiffres en mono — identité "data / terminal" */
+  .ap-num { font-family: 'Geist Mono', ui-monospace, SFMono-Regular, monospace; font-feature-settings: "tnum" 1; letter-spacing: -0.01em; }
+  /* Label de section — mono majuscule */
+  .ap-label { @apply text-[11px] font-semibold uppercase; font-family: 'Geist Mono', ui-monospace, monospace; letter-spacing: 0.08em; color: var(--ap-muted); }
 
-  /* Display headline */
-  .cm-display {
-    @apply font-display uppercase leading-[0.9] tracking-tight;
-  }
+  /* Buttons — compacts */
+  .ap-btn { @apply inline-flex items-center justify-center gap-2 rounded-md px-3.5 py-2 text-sm font-semibold transition-colors duration-150; }
+  .ap-btn:active { transform: scale(0.99); }
+  .ap-btn-primary { @apply ap-btn text-white; background: var(--ap-ink); }
+  .ap-btn-primary:hover { background:#000; }
+  .ap-btn-accent { @apply ap-btn text-white; background: var(--ap-accent); }
+  .ap-btn-accent:hover { background: var(--ap-accent-ink); }
+  .ap-btn-ghost { @apply ap-btn; background: var(--ap-surface); color: var(--ap-ink); border:1px solid var(--ap-line); }
+  .ap-btn-ghost:hover { background:#fafbfc; border-color:#d4d8de; }
 
-  /* Eyebrow / kicker label */
-  .cm-kicker {
-    @apply inline-block text-xs font-bold uppercase tracking-[0.2em];
-  }
+  /* Surfaces — minces, sans ombre */
+  .ap-card { background: var(--ap-surface); border:1px solid var(--ap-line); border-radius:10px; }
+  .ap-divide { border-color: var(--ap-line); }
+  .ap-row:hover { background:#f7f8fa; }
 
-  /* Surfaces — bold ink border + hard offset shadow */
-  .cm-card {
-    @apply bg-cm-surface border-2 border-cm-ink rounded-none shadow-cm-hard;
+  /* Search — élément central */
+  .ap-search {
+    @apply w-full rounded-md text-sm;
+    background:#fff; border:1px solid var(--ap-line); color: var(--ap-ink);
+    padding:0.6rem 0.9rem;
   }
-  .cm-card-flat {
-    @apply bg-cm-surface border-2 border-cm-ink rounded-none;
-  }
+  .ap-search::placeholder { color: var(--ap-faint); }
+  .ap-search:focus { outline:none; border-color: var(--ap-accent); box-shadow:0 0 0 3px rgba(47,109,246,.12); }
 
-  /* Buttons */
-  .cm-btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-none border-2 border-cm-ink px-5 py-3 text-sm font-bold uppercase tracking-wide transition-transform;
-  }
-  .cm-btn-primary {
-    @apply cm-btn bg-cm-accent text-white shadow-cm-hard-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none;
-  }
-  .cm-btn-ink {
-    @apply cm-btn bg-cm-ink text-cm-bg shadow-cm-hard-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none;
-  }
-  .cm-btn-ghost {
-    @apply cm-btn bg-transparent text-cm-ink hover:bg-cm-ink hover:text-cm-bg;
-  }
+  /* Chips / badges */
+  .ap-chip { @apply inline-flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-semibold; background:#eef0f3; color: var(--ap-muted); }
+  .ap-chip-accent { background: var(--ap-accent-tint); color: var(--ap-accent-ink); }
+  .ap-chip-warn { background: var(--ap-warn-tint); color: var(--ap-warn-ink); }
 
-  /* Tag / chip */
-  .cm-tag {
-    @apply inline-flex items-center gap-1 bg-cm-ink text-cm-bg px-2 py-0.5 text-xs font-bold uppercase tracking-wider;
-  }
-  .cm-tag-pop {
-    @apply inline-flex items-center gap-1 bg-cm-accent text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wider;
-  }
-
-  /* Text helpers */
-  .cm-muted { @apply text-cm-text-muted; }
-  .cm-subtle { @apply text-cm-text-subtle; }
-
-  /* Inputs */
-  .cm-input {
-    @apply block w-full rounded-none bg-white border-2 border-cm-ink text-cm-ink placeholder-cm-text-subtle focus:ring-0 focus:border-cm-accent;
-  }
+  .ap-scan { @apply overflow-hidden; border:1px solid var(--ap-line); border-radius:6px; background:#f1f3f5; }
+  .ap-link { color: var(--ap-accent-ink); }
+  .ap-link:hover { text-decoration: underline; }
+  .ap-muted { color: var(--ap-muted); }
+  .ap-faint { color: var(--ap-faint); }
 }

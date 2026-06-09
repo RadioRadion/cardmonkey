@@ -1,0 +1,171 @@
+<%# Dashboard — "app fonctionnelle" vivante (layout dashboard_app, classes ap-*). Dense, coloré, esprit Cardmarket. %>
+<% scan = ->(name, version: "small") { "https://api.scryfall.com/cards/named?exact=#{CGI.escape(name)}&format=image&version=#{version}" } %>
+<div class="mx-auto max-w-7xl px-4 sm:px-6 py-5">
+
+  <%# Bandeau de bienvenue — coloré %>
+  <div class="rounded-xl p-5 sm:p-6 text-white flex flex-wrap items-center justify-between gap-4" style="background: linear-gradient(135deg, var(--ap-accent), var(--ap-accent-ink));">
+    <div>
+      <h1 class="text-xl sm:text-2xl font-bold">Bonjour, <%= current_user.username %></h1>
+      <p class="text-white/85 text-sm mt-1.5 flex items-center gap-3">
+        <span><span class="ap-num font-semibold"><%= current_user.user_cards.sum(:quantity) %></span> cartes</span>
+        <span class="text-white/40">·</span>
+        <span><span class="ap-num font-semibold"><%= current_user.user_wanted_cards.count %></span> recherchées</span>
+        <span class="text-white/40">·</span>
+        <span><span class="ap-num font-semibold"><%= @potential_matches.size %></span> opportunités</span>
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <%= link_to "Importer ma collection", import_user_user_cards_path(current_user), class: "inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-semibold", style: "color: var(--ap-accent-ink);" %>
+      <%= link_to "Ajouter une carte", new_user_user_card_path(current_user), class: "inline-flex items-center rounded-md border border-white/40 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 transition-colors" %>
+    </div>
+  </div>
+
+  <%# Onboarding — checklist pour nouveaux utilisateurs %>
+  <%= render "home/onboarding" if @onboarding %>
+
+  <%# À TRAITER — seulement si action requise %>
+  <% todo = @recent_trades.select { |t| (na = trade_next_action(t)) && na[:actionable] } %>
+  <% if todo.any? %>
+    <section class="ap-card mt-5 overflow-hidden">
+      <div class="px-4 py-3 border-b ap-divide flex items-center gap-2" style="background: var(--ap-warn-tint);">
+        <span class="ap-label" style="color: var(--ap-warn-ink);">À traiter</span>
+        <span class="ap-chip ap-chip-warn"><%= todo.size %></span>
+      </div>
+      <ul class="divide-y ap-divide">
+        <% todo.each do |trade| %>
+          <% na = trade_next_action(trade) %>
+          <li>
+            <%= link_to trade_path(trade), class: "ap-row flex items-center gap-3 px-4 py-3 transition-colors", data: { turbo: false } do %>
+              <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-white text-xs font-semibold shrink-0" style="background: var(--ap-ink);"><%= trade.partner_name_for(current_user).to_s.first&.upcase || "?" %></span>
+              <span class="min-w-0 flex-1">
+                <span class="block text-sm font-semibold truncate">Échange avec <%= trade.partner_name_for(current_user) %></span>
+                <span class="block text-xs ap-link font-medium">→ <%= na[:text] %></span>
+              </span>
+              <span class="ap-chip"><%= trade_status_text(trade.status) %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
+  <%# TENDANCES — vivant, plein de cartes + prix %>
+  <section class="ap-card mt-5 overflow-hidden">
+    <div class="px-4 py-3 border-b ap-divide flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center w-6 h-6 rounded" style="background: var(--ap-accent-tint); color: var(--ap-accent-ink);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+        </span>
+        <h2 class="ap-label">Tendances près de chez vous</h2>
+      </div>
+      <%= link_to "Tout voir", matches_path, class: "text-xs ap-link font-semibold" %>
+    </div>
+    <div class="p-4 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+      <% [["Sol Ring","1,20 €"], ["Lightning Bolt","0,40 €"], ["Counterspell","0,90 €"], ["Brainstorm","0,30 €"], ["Llanowar Elves","0,25 €"], ["Birds of Paradise","2,10 €"], ["Swords to Plowshares","1,80 €"], ["Snapcaster Mage","3,50 €"]].each do |name, price| %>
+        <div class="group cursor-pointer">
+          <div class="ap-scan transition-transform group-hover:-translate-y-0.5">
+            <img src="<%= scan.(name) %>" alt="<%= name %>" loading="lazy" class="w-full aspect-[63/88] object-cover">
+          </div>
+          <p class="mt-1.5 text-xs font-medium truncate"><%= name %></p>
+          <p class="text-xs font-bold ap-link ap-num"><%= price %></p>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <%# Deux colonnes denses %>
+  <div class="grid lg:grid-cols-2 gap-5 mt-5">
+    <%# Vos échanges %>
+    <section class="ap-card overflow-hidden">
+      <div class="px-4 py-3 border-b ap-divide flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded" style="background: var(--ap-accent-tint); color: var(--ap-accent-ink);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          </span>
+          <h2 class="ap-label">Mes échanges</h2>
+        </div>
+        <%= link_to "Tout voir", trades_path, class: "text-xs ap-link font-semibold" %>
+      </div>
+      <% if @recent_trades.any? %>
+        <ul class="divide-y ap-divide">
+          <% @recent_trades.first(6).each do |trade| %>
+            <li>
+              <%= link_to trade_path(trade), class: "ap-row flex items-center gap-3 px-4 py-2.5 transition-colors", data: { turbo: false } do %>
+                <span class="inline-flex items-center justify-center w-7 h-7 rounded-full text-white text-[11px] font-semibold shrink-0" style="background: var(--ap-ink);"><%= trade.partner_name_for(current_user).to_s.first&.upcase || "?" %></span>
+                <span class="min-w-0 flex-1 text-sm font-medium truncate"><%= trade.partner_name_for(current_user) %></span>
+                <span class="text-xs ap-faint"><%= pluralize(trade.user_cards.count, "carte") %></span>
+                <span class="ap-chip"><%= trade_status_text(trade.status) %></span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="px-4 py-8 text-center text-sm ap-muted">Aucun échange. <%= link_to "Trouver des joueurs", matches_path, class: "ap-link font-semibold" %>.</p>
+      <% end %>
+    </section>
+
+    <%# Opportunités %>
+    <section class="ap-card overflow-hidden">
+      <div class="px-4 py-3 border-b ap-divide flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded" style="background: var(--ap-accent-tint); color: var(--ap-accent-ink);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </span>
+          <h2 class="ap-label">Opportunités</h2>
+        </div>
+        <%= link_to "Tout voir", matches_path, class: "text-xs ap-link font-semibold" %>
+      </div>
+      <% if @potential_matches.any? %>
+        <ul class="divide-y ap-divide">
+          <% @potential_matches.first(6).each do |match| %>
+            <% partner = @match_users_by_id[match.user_id == current_user.id ? match.user_id_target : match.user_id] %>
+            <li class="ap-row flex items-center gap-3 px-4 py-2.5 transition-colors">
+              <div class="ap-scan w-7 shrink-0">
+                <% if match.user_card.card_version.img_uri.present? %>
+                  <img src="<%= match.user_card.card_version.img_uri %>" alt="" loading="lazy" class="w-full aspect-[63/88] object-cover">
+                <% end %>
+              </div>
+              <span class="min-w-0 flex-1">
+                <span class="block text-sm font-medium truncate"><%= match.user_card.card_version.card.name_fr || match.user_card.card_version.card.name_en %></span>
+                <span class="block text-xs ap-faint truncate"><%= partner&.username %></span>
+              </span>
+              <% if partner %>
+                <%= link_to "Échanger", new_proposition_trade_path(partner, partner_id: partner.id), class: "ap-chip ap-chip-accent", data: { turbo: false } %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="px-4 py-8 text-center text-sm ap-muted">Pas d'opportunité. <%= link_to "Ajouter des recherches", new_user_user_wanted_card_path(current_user), class: "ap-link font-semibold" %>.</p>
+      <% end %>
+    </section>
+  </div>
+
+  <%# Votre collection — vignettes denses %>
+  <% if @user_cards.any? %>
+    <section class="ap-card mt-5 overflow-hidden">
+      <div class="px-4 py-3 border-b ap-divide flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded" style="background: var(--ap-accent-tint); color: var(--ap-accent-ink);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </span>
+          <h2 class="ap-label">Votre collection</h2>
+        </div>
+        <%= link_to "Tout voir", user_user_cards_path(current_user), class: "text-xs ap-link font-semibold" %>
+      </div>
+      <div class="p-4 grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-3">
+        <% @user_cards.each do |uc| %>
+          <div>
+            <div class="ap-scan relative">
+              <% if uc.card_version.img_uri.present? %>
+                <img src="<%= uc.card_version.img_uri %>" alt="<%= uc.card_version.card.name %>" loading="lazy" class="w-full aspect-[63/88] object-cover">
+              <% end %>
+              <span class="absolute top-1 right-1 ap-num text-[10px] font-bold text-white px-1.5 rounded" style="background: rgba(0,0,0,.6);"><%= uc.quantity %>×</span>
+            </div>
+            <p class="mt-1 text-xs font-bold ap-link ap-num"><%= number_to_currency(uc.card_version.eur_price, unit: "€", format: "%n %u") %></p>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>

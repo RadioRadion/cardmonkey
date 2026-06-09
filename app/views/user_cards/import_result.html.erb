@@ -1,37 +1,36 @@
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 py-8">
-  <div class="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-900">Import terminé</h1>
+<div class="py-8">
+  <div class="w-full max-w-3xl mx-auto px-4 sm:px-6">
+    <div class="mb-6">
+      <div class="ap-label">Collection</div>
+      <h1 class="text-2xl font-bold tracking-tight mt-1">Import terminé</h1>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 text-center">
-        <p class="text-3xl font-bold text-green-600"><%= @result.imported %></p>
-        <p class="text-sm text-gray-500">ajoutée(s)</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+      <div class="ap-card p-5 text-center">
+        <p class="ap-num text-3xl font-bold" style="color: var(--ap-accent-ink);"><%= @result.imported %></p>
+        <p class="text-sm ap-muted mt-1">ajoutée(s)</p>
       </div>
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 text-center">
-        <p class="text-3xl font-bold text-indigo-600"><%= @result.updated %></p>
-        <p class="text-sm text-gray-500">quantité mise à jour</p>
+      <div class="ap-card p-5 text-center">
+        <p class="ap-num text-3xl font-bold"><%= @result.updated %></p>
+        <p class="text-sm ap-muted mt-1">quantité mise à jour</p>
       </div>
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 text-center">
-        <p class="text-3xl font-bold <%= @result.skipped_count.positive? ? 'text-amber-600' : 'text-gray-300' %>">
-          <%= @result.skipped_count %>
-        </p>
-        <p class="text-sm text-gray-500">ignorée(s)</p>
+      <div class="ap-card p-5 text-center">
+        <p class="ap-num text-3xl font-bold <%= @result.skipped_count.positive? ? '' : 'ap-faint' %>" style="<%= 'color: var(--ap-warn-ink);' if @result.skipped_count.positive? %>"><%= @result.skipped_count %></p>
+        <p class="text-sm ap-muted mt-1">ignorée(s)</p>
       </div>
     </div>
 
     <% if @result.skipped.any? %>
-      <div class="bg-white rounded-xl shadow-sm border border-amber-200 overflow-hidden mb-6">
-        <div class="px-5 py-3 bg-amber-50 border-b border-amber-100">
-          <h2 class="text-sm font-semibold text-amber-800">Lignes non importées</h2>
-          <p class="text-xs text-amber-700">Vérifie l'orthographe du nom ou précise l'édition.</p>
+      <div class="ap-card overflow-hidden mb-6">
+        <div class="px-5 py-3 border-b ap-divide" style="background: var(--ap-warn-tint);">
+          <h2 class="text-sm font-semibold" style="color: var(--ap-warn-ink);">Lignes non importées</h2>
+          <p class="text-xs" style="color: var(--ap-warn-ink);">Vérifie l'orthographe du nom ou précise l'édition.</p>
         </div>
-        <ul class="divide-y divide-gray-100 max-h-80 overflow-y-auto">
+        <ul class="divide-y ap-divide max-h-80 overflow-y-auto">
           <% @result.skipped.each do |s| %>
             <li class="px-5 py-2 text-sm flex justify-between gap-4">
-              <span class="text-gray-800 truncate"><%= s[:label] %></span>
-              <span class="text-gray-400 whitespace-nowrap"><%= s[:reason] %></span>
+              <span class="truncate"><%= s[:label] %></span>
+              <span class="ap-faint whitespace-nowrap"><%= s[:reason] %></span>
             </li>
           <% end %>
         </ul>
@@ -39,10 +38,8 @@
     <% end %>
 
     <div class="flex items-center justify-center gap-4">
-      <%= link_to "Voir ma collection", user_user_cards_path(@user),
-            class: "inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-lg transition" %>
-      <%= link_to "Importer encore", import_user_user_cards_path(@user),
-            class: "text-sm text-gray-500 hover:text-gray-700" %>
+      <%= link_to "Voir ma collection", user_user_cards_path(@user), class: "ap-btn-accent" %>
+      <%= link_to "Importer encore", import_user_user_cards_path(@user), class: "text-sm ap-muted hover:text-[color:var(--ap-ink)]" %>
     </div>
   </div>
 </div>

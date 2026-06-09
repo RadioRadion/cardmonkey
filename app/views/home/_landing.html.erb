@@ -1,105 +1,92 @@
-<div class="cm-theme overflow-hidden">
-  <%# ───────────── Marquee ticker ───────────── %>
-  <div class="bg-cm-ink text-cm-bg py-2 border-b-2 border-cm-ink overflow-hidden">
-    <div class="flex whitespace-nowrap animate-marquee">
-      <% 2.times do %>
-        <div class="flex items-center gap-6 pr-6 text-sm font-bold uppercase tracking-[0.2em]">
-          <span>Échangez</span><span class="text-cm-accent">✦</span>
-          <span>Collectionnez</span><span class="text-cm-accent">✦</span>
-          <span>Près de chez vous</span><span class="text-cm-accent">✦</span>
-          <span>Zéro frais</span><span class="text-cm-accent">✦</span>
-          <span>Magic: The Gathering</span><span class="text-cm-accent">✦</span>
+<%# LANDING — identité "app fonctionnelle" (Geist + bleu électrique + scans). Sous le layout global. %>
+<% scan = ->(name, version: "small") { "https://api.scryfall.com/cards/named?exact=#{CGI.escape(name)}&format=image&version=#{version}" } %>
+
+<%# Hero %>
+<section class="mx-auto max-w-7xl px-4 sm:px-6 pt-14 sm:pt-20 pb-14">
+  <div class="grid lg:grid-cols-2 gap-12 items-center">
+    <div>
+      <div class="ap-label">Échange de cartes · Magic: The Gathering</div>
+      <h1 class="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.05] mt-3">
+        Échangez vos cartes Magic, <span class="ap-accent">près de chez vous.</span>
+      </h1>
+      <p class="mt-5 max-w-md text-[1.0625rem] leading-relaxed ap-muted">
+        Importez votre collection en quelques secondes. CardMonkey trouve les joueurs autour de vous
+        qui veulent vos cartes — et celles que vous cherchez.
+      </p>
+      <div class="mt-7 flex flex-wrap items-center gap-3">
+        <%= link_to "Créer un compte — gratuit", new_user_registration_path, class: "ap-btn-accent" %>
+        <%= link_to "Se connecter", new_user_session_path, class: "ap-btn-ghost" %>
+      </div>
+      <div class="mt-6 flex items-center gap-2">
+        <span class="ap-chip ap-chip-accent">0 % commission</span>
+        <span class="ap-chip">Import CSV</span>
+        <span class="ap-chip">10 langues</span>
+      </div>
+    </div>
+
+    <%# Aperçu cartes-produit %>
+    <div class="grid grid-cols-3 gap-3">
+      <% [["Black Lotus","Lyon"], ["Lightning Bolt","Paris"], ["Counterspell","Lyon"], ["Llanowar Elves","Lille"], ["Sol Ring","Nantes"], ["Demonic Tutor","Lyon"]].each do |name, place| %>
+        <div class="ap-card ap-card-h overflow-hidden">
+          <div class="ap-scan !rounded-none !border-0 border-b ap-divide"><img src="<%= scan.(name) %>" alt="<%= name %>" loading="lazy" class="w-full aspect-[63/88] object-cover"></div>
+          <div class="p-2">
+            <p class="text-[11px] font-semibold truncate"><%= name %></p>
+            <p class="text-[10px] ap-faint">près de <%= place %></p>
+          </div>
         </div>
       <% end %>
     </div>
   </div>
+</section>
 
-  <%# ───────────── Hero ───────────── %>
-  <section class="mx-auto max-w-7xl px-6 pt-14 pb-20">
-    <div class="grid lg:grid-cols-12 gap-10 items-center">
-      <div class="lg:col-span-7">
-        <span class="cm-tag-pop">MARKETPLACE D'ÉCHANGE MTG</span>
-
-        <h1 class="cm-display mt-5 text-6xl sm:text-7xl xl:text-8xl">
-          Échangez<br>
-          vos cartes<br>
-          <span class="text-cm-accent">Magic.</span>
-        </h1>
-
-        <p class="mt-6 max-w-md text-lg text-cm-text-muted">
-          Importez votre collection en quelques secondes. On trouve les joueurs près de chez vous
-          qui veulent vos cartes — et l'inverse.
-        </p>
-
-        <div class="mt-8 flex flex-wrap items-center gap-4">
-          <%= link_to "Commencer — c'est gratuit", new_user_registration_path, class: "cm-btn-primary text-base" %>
-          <%= link_to "Se connecter", new_user_session_path, class: "cm-btn-ghost text-base" %>
-        </div>
-
-        <%# Stats — big bold, divided %>
-        <div class="mt-12 flex flex-wrap items-stretch border-2 border-cm-ink divide-x-2 divide-cm-ink w-fit">
-          <% [["10K+", "Joueurs"], ["50K+", "Échanges"], ["95%", "Satisfaits"]].each do |num, label| %>
-            <div class="px-6 py-3">
-              <div class="cm-display text-3xl"><%= num %></div>
-              <div class="text-xs font-bold uppercase tracking-widest text-cm-text-muted"><%= label %></div>
-            </div>
-          <% end %>
-        </div>
+<%# Bande recherche / base %>
+<section class="border-y ap-divide bg-white">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 py-12">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <div class="ap-label">Une base complète</div>
+        <h2 class="text-2xl font-bold tracking-tight mt-2">Toutes les cartes, tous les sets.</h2>
+        <p class="mt-1 text-sm ap-muted">Recherchez, filtrez, ajoutez. Des milliers de versions à jour.</p>
       </div>
-
-      <%# Card "sticker" — tilted, hard shadow %>
-      <div class="lg:col-span-5 flex justify-center">
-        <div class="relative">
-          <div class="absolute -inset-3 bg-cm-accent border-2 border-cm-ink rotate-3"></div>
-          <img src="https://cards.scryfall.io/large/front/b/a/bad6b494-d773-4f7d-ac39-85d82e1d3015.jpg?1559591839"
-               alt="Black Lotus"
-               class="relative w-[17rem] sm:w-[21rem] aspect-[63/88] object-cover border-2 border-cm-ink shadow-cm-hard -rotate-2 hover:rotate-0 transition-transform duration-300" />
-          <span class="cm-tag absolute -bottom-3 -left-3 rotate-[-3deg]">⌖ près de vous</span>
-        </div>
+      <div class="ap-search w-full sm:w-80 flex items-center gap-2 ap-muted">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Rechercher une carte…
       </div>
     </div>
-  </section>
-
-  <%# ───────────── Features — broken numbered grid ───────────── %>
-  <section class="border-y-2 border-cm-ink bg-cm-surface-2">
-    <div class="mx-auto max-w-7xl px-6 py-16">
-      <h2 class="cm-display text-4xl sm:text-5xl">Comment ça<br class="sm:hidden"> marche</h2>
-      <div class="mt-10 grid md:grid-cols-3 gap-6">
-        <% [
-          ["01", "Importez", "Collez une liste ou un CSV (ManaBox, Moxfield…). 200 cartes en quelques secondes.", "bg-white"],
-          ["02", "On matche", "L'algo croise vos cartes et vos recherches avec les joueurs autour de vous.", "bg-cm-accent text-white"],
-          ["03", "Échangez", "Vous discutez, vous vous donnez rendez-vous, vous notez. Simple.", "bg-white"]
-        ].each do |num, title, desc, klass| %>
-          <div class="<%= klass %> border-2 border-cm-ink rounded-none p-7 shadow-cm-hard">
-            <div class="cm-display text-5xl opacity-90"><%= num %></div>
-            <h3 class="cm-display text-2xl mt-3"><%= title %></h3>
-            <p class="mt-2 text-sm leading-relaxed <%= klass.include?('text-white') ? 'text-white/90' : 'text-cm-text-muted' %>"><%= desc %></p>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  </section>
-
-  <%# ───────────── CTA — pop block ───────────── %>
-  <section class="bg-cm-accent border-b-2 border-cm-ink">
-    <div class="mx-auto max-w-7xl px-6 py-16 flex flex-col md:flex-row items-center justify-between gap-8">
-      <h2 class="cm-display text-white text-5xl sm:text-6xl">Prêt à<br>échanger ?</h2>
-      <div class="flex flex-col items-start gap-4">
-        <p class="text-white/90 max-w-sm text-lg">Rejoignez la communauté française d'échange de cartes Magic.</p>
-        <%= link_to "Créer un compte", new_user_registration_path, class: "cm-btn-ink text-base" %>
-      </div>
-    </div>
-  </section>
-
-  <%# ───────────── Trust strip ───────────── %>
-  <section class="mx-auto max-w-7xl px-6 py-12">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-cm-ink border-2 border-cm-ink">
-      <% [["24/7", "Communauté"], ["100%", "Gratuit"], ["FR/EN", "Langues"], ["SSL", "Sécurisé"]].each do |num, label| %>
-        <div class="bg-cm-bg px-6 py-6 text-center">
-          <div class="cm-display text-3xl text-cm-accent"><%= num %></div>
-          <div class="mt-1 text-xs font-bold uppercase tracking-widest text-cm-text-muted"><%= label %></div>
-        </div>
+    <div class="mt-6 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+      <% ["Brainstorm","Swords to Plowshares","Dark Ritual","Lightning Bolt","Birds of Paradise","Sol Ring","Lightning Helix","Snapcaster Mage"].each do |c| %>
+        <div class="ap-scan ap-card-h"><img src="<%= scan.(c) %>" alt="<%= c %>" loading="lazy" class="w-full aspect-[63/88] object-cover"></div>
       <% end %>
     </div>
-  </section>
-</div>
+  </div>
+</section>
+
+<%# Comment ça marche %>
+<section class="mx-auto max-w-7xl px-4 sm:px-6 py-14">
+  <div class="ap-label">Comment ça marche</div>
+  <h2 class="text-2xl font-bold tracking-tight mt-2">Trois étapes, puis vous échangez.</h2>
+  <div class="mt-7 grid md:grid-cols-3 gap-4">
+    <% [
+      ["Importez", "Collez une liste ou un CSV (ManaBox, Moxfield). Prêt en quelques secondes."],
+      ["On vous matche", "L'algorithme croise vos cartes et vos recherches avec les joueurs proches."],
+      ["Échangez", "Vous discutez, vous convenez d'un lieu, vous notez l'échange."]
+    ].each_with_index do |(title, desc), i| %>
+      <div class="ap-card p-5">
+        <span class="ap-num inline-flex items-center justify-center w-9 h-9 rounded-lg text-white font-bold" style="background: var(--ap-accent);"><%= i + 1 %></span>
+        <h3 class="font-bold mt-3"><%= title %></h3>
+        <p class="mt-1.5 text-sm leading-relaxed ap-muted"><%= desc %></p>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<%# CTA %>
+<section class="mx-auto max-w-7xl px-4 sm:px-6 pb-16">
+  <div class="rounded-2xl px-6 py-12 text-center text-white" style="background: linear-gradient(135deg, var(--ap-accent), var(--ap-accent-ink));">
+    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Prêt à faire tourner votre collection ?</h2>
+    <p class="mt-2 text-white/85">Rejoignez la communauté française d'échange de cartes Magic.</p>
+    <div class="mt-6 flex justify-center">
+      <%= link_to "Créer un compte — gratuit", new_user_registration_path, class: "inline-flex items-center rounded-lg bg-white px-5 py-3 text-sm font-semibold", style: "color: var(--ap-accent-ink);" %>
+    </div>
+  </div>
+</section>

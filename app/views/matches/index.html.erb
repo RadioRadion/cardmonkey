@@ -1,77 +1,75 @@
 <%# app/views/matches/index.html.erb %>
-<div class="cm-theme min-h-screen">
-  <div class="container mx-auto px-4 py-8">
-    <div class="mb-6">
-      <span class="cm-kicker text-cm-accent">Correspondances</span>
-      <h1 class="cm-display text-4xl sm:text-5xl mt-1">Vos matchs</h1>
-    </div>
+<div class="mx-auto max-w-7xl px-4 sm:px-6 py-6">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight">Vos matchs</h1>
+    <p class="text-sm ap-muted mt-0.5">Les joueurs avec qui un échange est possible.</p>
+  </div>
 
-    <%# Stats %>
-    <div class="grid grid-cols-3 gap-px bg-cm-ink border-2 border-cm-ink mb-8 w-full sm:w-fit">
-      <% [
-           [@stats[:matches], "Correspondances"],
-           [@stats[:partners], "Partenaires"],
-           [@stats[:active_trades], "Échanges en cours"]
-         ].each do |num, label| %>
-        <div class="bg-cm-bg px-6 py-4">
-          <div class="cm-display text-3xl"><%= num %></div>
-          <div class="text-[11px] font-bold uppercase tracking-widest text-cm-text-muted"><%= label %></div>
-        </div>
-      <% end %>
-    </div>
-
-    <% if @partner_pairs.empty? %>
-      <div class="cm-card p-10 text-center">
-        <h2 class="cm-display text-2xl mb-2">Aucune correspondance pour l'instant</h2>
-        <p class="text-cm-text-muted mb-6">Ajoutez des cartes à votre collection et à votre liste de recherche pour trouver des échanges.</p>
-        <%= link_to "Importer ma collection", import_user_user_cards_path(current_user), class: "cm-btn-primary" %>
+  <%# Stats %>
+  <div class="mt-5 ap-card overflow-hidden flex divide-x ap-divide w-full sm:w-fit">
+    <% [
+         [@stats[:matches], "Correspondances"],
+         [@stats[:partners], "Partenaires"],
+         [@stats[:active_trades], "En cours"]
+       ].each do |num, label| %>
+      <div class="px-6 py-3.5 flex-1">
+        <div class="ap-num text-xl font-bold"><%= num %></div>
+        <div class="ap-label !text-[10px] mt-0.5"><%= label %></div>
       </div>
     <% end %>
+  </div>
 
-    <div class="space-y-6">
-      <% @partner_pairs.each do |partner_id, lists| %>
-        <% partner = @partner_users[partner_id] %>
-        <% next unless partner %>
-        <% distance = (current_user.distance_to(partner) if current_user.latitude.present? && partner.latitude.present?) %>
+  <% if @partner_pairs.empty? %>
+    <div class="ap-card p-10 text-center mt-5">
+      <h2 class="text-base font-bold mb-1">Aucune correspondance pour l'instant</h2>
+      <p class="ap-muted text-sm mb-5">Ajoutez des cartes à votre collection et à votre liste de recherche.</p>
+      <%= link_to "Importer ma collection", import_user_user_cards_path(current_user), class: "ap-btn-accent" %>
+    </div>
+  <% end %>
 
-        <div class="cm-card-flat overflow-hidden">
-          <div class="px-6 py-4 border-b-2 border-cm-ink flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 class="cm-display text-2xl"><%= partner.username %></h2>
-              <div class="mt-1 flex items-center gap-3 text-sm text-cm-text-muted">
-                <% if distance %><span>📍 <%= distance.round %> km</span><% end %>
-                <% if partner.rating_count.positive? %>
-                  <span>⭐ <%= partner.average_rating %> (<%= partner.rating_count %>)</span>
-                <% else %>
-                  <span class="text-cm-text-subtle">Pas encore noté</span>
-                <% end %>
-              </div>
+  <div class="space-y-4 mt-5">
+    <% @partner_pairs.each do |partner_id, lists| %>
+      <% partner = @partner_users[partner_id] %>
+      <% next unless partner %>
+      <% distance = (current_user.distance_to(partner) if current_user.latitude.present? && partner.latitude.present?) %>
+
+      <div class="ap-card overflow-hidden">
+        <div class="px-5 py-3.5 border-b ap-divide flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold"><%= partner.username %></h2>
+            <div class="mt-0.5 flex items-center gap-3 text-xs ap-muted">
+              <% if distance %><span>📍 <span class="ap-num"><%= distance.round %></span> km</span><% end %>
+              <% if partner.rating_count.positive? %>
+                <span>★ <span class="ap-num"><%= partner.average_rating %></span> (<%= partner.rating_count %>)</span>
+              <% else %>
+                <span class="ap-faint">Pas encore noté</span>
+              <% end %>
             </div>
-            <%= link_to "Proposer un échange", new_proposition_trade_path(partner, partner_id: partner.id), class: "cm-btn-primary", data: { turbo: false } %>
           </div>
+          <%= link_to "Proposer un échange", new_proposition_trade_path(partner, partner_id: partner.id), class: "ap-btn-accent text-sm", data: { turbo: false } %>
+        </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 md:divide-x-2 divide-cm-ink">
-            <div class="p-5 border-b-2 md:border-b-0 border-cm-ink">
-              <h3 class="text-sm font-bold uppercase tracking-wide mb-3 flex items-center gap-2">
-                <span class="inline-block h-2.5 w-2.5 bg-cm-accent-2"></span>
-                Vous donnez <span class="text-cm-text-subtle">(<%= lists[:give].size %>)</span>
-              </h3>
-              <%= render "matches/card_chips", matches: lists[:give], empty: "Aucune carte qu'il/elle recherche." %>
-            </div>
-            <div class="p-5">
-              <h3 class="text-sm font-bold uppercase tracking-wide mb-3 flex items-center gap-2">
-                <span class="inline-block h-2.5 w-2.5 bg-cm-accent"></span>
-                Vous recevez <span class="text-cm-text-subtle">(<%= lists[:receive].size %>)</span>
-              </h3>
-              <%= render "matches/card_chips", matches: lists[:receive], empty: "Rien que vous recherchez chez lui/elle." %>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 md:divide-x ap-divide">
+          <div class="p-4 border-b md:border-b-0 ap-divide">
+            <h3 class="ap-label mb-3 flex items-center gap-2">
+              <span class="inline-block h-2 w-2 rounded-full" style="background:#9a3b2c;"></span>
+              Vous donnez <span class="ap-faint normal-case">(<%= lists[:give].size %>)</span>
+            </h3>
+            <%= render "matches/card_chips", matches: lists[:give], empty: "Aucune carte qu'il/elle recherche." %>
+          </div>
+          <div class="p-4">
+            <h3 class="ap-label mb-3 flex items-center gap-2">
+              <span class="inline-block h-2 w-2 rounded-full" style="background: var(--ap-accent);"></span>
+              Vous recevez <span class="ap-faint normal-case">(<%= lists[:receive].size %>)</span>
+            </h3>
+            <%= render "matches/card_chips", matches: lists[:receive], empty: "Rien que vous recherchez chez lui/elle." %>
           </div>
         </div>
-      <% end %>
-    </div>
-
-    <% if @pagy && @pagy.pages > 1 %>
-      <%= render "shared/pagination", pagy: @pagy %>
+      </div>
     <% end %>
   </div>
+
+  <% if @pagy && @pagy.pages > 1 %>
+    <%= render "shared/pagination", pagy: @pagy %>
+  <% end %>
 </div>

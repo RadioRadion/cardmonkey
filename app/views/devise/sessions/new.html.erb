@@ -1,98 +1,44 @@
-<div class="cm-theme min-h-screen flex flex-col justify-center py-12">
-  <div class="w-full max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="mb-8">
-      <span class="cm-kicker text-cm-accent">Connexion</span>
-      <h2 class="cm-display text-4xl sm:text-5xl mt-1">
-        <%= t('devise.sessions.new.welcome_back') %>
-      </h2>
-      <p class="mt-2 text-cm-text-muted">
-        <%= t('devise.sessions.new.sign_in_to_continue') %>
-      </p>
+<div class="flex flex-col justify-center py-12">
+  <div class="w-full max-w-md mx-auto px-4 sm:px-6">
+    <div class="mb-6">
+      <div class="ap-label">Connexion</div>
+      <h2 class="text-2xl font-bold tracking-tight mt-1"><%= t('devise.sessions.new.welcome_back') %></h2>
+      <p class="mt-1 text-sm ap-muted"><%= t('devise.sessions.new.sign_in_to_continue') %></p>
     </div>
 
-    <div class="cm-card overflow-hidden">
-      <div class="p-6 sm:p-8">
-        <%= simple_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-          <div class="space-y-6">
-            <%= f.input :email,
-                        required: false,
-                        autofocus: true,
-                        hint: false,
-                        input_html: { 
-                          class: "cm-input py-3",
-                          autocomplete: "email",
-                          placeholder: "your@email.com"
-                        },
-                        wrapper_html: { class: "block" },
-                        label_html: { class: "block text-sm font-bold mb-2" } %>
-            
-            <%= f.input :password,
-                        required: false,
-                        hint: false,
-                        input_html: { 
-                          class: "cm-input py-3",
-                          autocomplete: "current-password",
-                          placeholder: "••••••••"
-                        },
-                        wrapper_html: { class: "block" },
-                        label_html: { class: "block text-sm font-bold mb-2" } %>
+    <div class="ap-card p-6 sm:p-7">
+      <%= simple_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+        <div class="space-y-5">
+          <%= f.input :email, required: false, autofocus: true, hint: false,
+                      input_html: { class: "ap-search", autocomplete: "email", placeholder: "vous@email.com" },
+                      wrapper_html: { class: "block" },
+                      label_html: { class: "block text-sm font-semibold mb-1.5" } %>
+          <%= f.input :password, required: false, hint: false,
+                      input_html: { class: "ap-search", autocomplete: "current-password", placeholder: "••••••••" },
+                      wrapper_html: { class: "block" },
+                      label_html: { class: "block text-sm font-semibold mb-1.5" } %>
 
-            <div class="flex items-center justify-between">
-              <% if devise_mapping.rememberable? %>
-                <div class="flex items-center">
-                  <%= f.input :remember_me, 
-                              as: :boolean,
-                              hint: false,
-                              input_html: { class: "h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" },
-                              wrapper_html: { class: "flex items-center" },
-                              label_html: { class: "ml-2 text-sm text-gray-600" } %>
-                </div>
-              <% end %>
-
-              <%- if devise_mapping.recoverable? %>
-                <%= link_to t('devise.shared.links.forgot_password'), new_password_path(resource_name), class: "text-sm font-bold text-cm-accent hover:underline" %>
-              <% end %>
-            </div>
-
-            <div>
-              <%= f.button :submit, t('devise.sessions.new.sign_in'), class: "cm-btn-primary w-full" %>
-            </div>
-          </div>
-        <% end %>
-
-        <div class="mt-8">
-          <div class="relative">
-            <div class="absolute inset-0 flex items-center">
-              <div class="w-full border-t border-gray-200"></div>
-            </div>
-            <div class="relative flex justify-center text-sm">
-              <span class="px-4 bg-cm-surface text-cm-text-muted"><%= t('devise.sessions.new.or_continue_with') %></span>
-            </div>
-          </div>
-
-          <div class="mt-6 grid grid-cols-1 gap-4">
-            <%- if devise_mapping.registerable? %>
-              <%= link_to t('devise.shared.links.sign_up'), new_registration_path(resource_name), class: "cm-btn-ghost w-full" %>
+          <div class="flex items-center justify-between">
+            <% if devise_mapping.rememberable? %>
+              <%= f.input :remember_me, as: :boolean, hint: false,
+                          input_html: { class: "h-4 w-4 rounded" },
+                          wrapper_html: { class: "flex items-center" },
+                          label_html: { class: "ml-2 text-sm ap-muted" } %>
             <% end %>
-
-            <%- if devise_mapping.omniauthable? %>
-              <%- resource_class.omniauth_providers.each do |provider| %>
-                <%= link_to omniauth_authorize_path(resource_name, provider), 
-                    class: "w-full inline-flex items-center justify-center py-4 px-6 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
-                  <% case provider.to_s %>
-                  <% when 'google_oauth2' %>
-                    <svg class="w-5 h-5 mr-2 text-gray-700" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
-                    </svg>
-                    <span><%= t('devise.sessions.new.sign_in_with_google') %></span>
-                  <% else %>
-                    <span><%= t('.sign_in_with', provider: OmniAuth::Utils.camelize(provider)) %></span>
-                  <% end %>
-                <% end %>
-              <% end %>
+            <%- if devise_mapping.recoverable? %>
+              <%= link_to t('devise.shared.links.forgot_password'), new_password_path(resource_name), class: "text-sm font-semibold ap-link" %>
             <% end %>
           </div>
+
+          <%= f.button :submit, t('devise.sessions.new.sign_in'), class: "ap-btn-accent w-full" %>
         </div>
+      <% end %>
+
+      <div class="mt-6 pt-5 border-t ap-divide text-center text-sm ap-muted">
+        <%= t('devise.sessions.new.or_continue_with') %>
+        <%- if devise_mapping.registerable? %>
+          <%= link_to t('devise.shared.links.sign_up'), new_registration_path(resource_name), class: "ap-link font-semibold ml-1" %>
+        <% end %>
       </div>
     </div>
   </div>

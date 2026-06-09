@@ -13,7 +13,8 @@
        class="h-full">
     
     <%= image_tag trade_card.card_version.img_uri,
-                  class: "w-full aspect-[63/88] object-cover border-2 border-cm-ink transition-all hover:shadow-cm-hard-sm cursor-pointer",
+                  class: "w-full aspect-[63/88] object-cover rounded-md border cursor-pointer",
+                  style: "border-color: var(--ap-line);",
                   loading: "lazy" %>
 
     <%# Quantité et condition %>

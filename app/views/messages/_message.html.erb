@@ -7,7 +7,7 @@
 
 <% if show_date && (!previous_message || !message.created_at.to_date.eql?(previous_message.created_at.to_date)) %>
   <div class="flex justify-center my-4">
-    <div class="bg-cm-surface-2 border border-cm-ink text-cm-text-muted text-xs font-bold uppercase tracking-wide px-3 py-1">
+    <div class="ap-chip ap-label !text-[10px] px-3 py-1">
       <%= message.created_at.to_date == Date.today ? "Aujourd'hui" : message.created_at.strftime("%d/%m/%Y") %>
     </div>
   </div>
@@ -46,16 +46,16 @@
 
     <!-- Message Content -->
     <div class="relative group">
-      <div class="<%= is_own_message ? 'bg-cm-accent text-white' : 'bg-cm-surface-2 text-cm-ink border-2 border-cm-ink' %>
-                  rounded-lg px-4 py-2 break-words relative">
+      <div class="<%= is_own_message ? 'text-white' : 'bg-white border ap-divide' %>
+                  rounded-xl px-4 py-2 break-words relative" style="<%= 'background: var(--ap-accent);' if is_own_message %>">
         
         <!-- Trade Message -->
         <% if message.trade_message? %>
           <div class="flex flex-col space-y-2">
             <div class="font-medium"><%= message.display_content %></div>
             <%= link_to "Voir l'échange", trade_path(message.trade_id),
-                class: "#{is_own_message ? 'bg-white text-cm-accent' : 'bg-cm-accent text-white'}
-                       px-3 py-1.5 inline-block font-bold uppercase text-xs tracking-wide hover:opacity-90 transition-opacity text-center" %>
+                class: "#{is_own_message ? 'bg-white' : 'text-white'} px-3 py-1.5 inline-block rounded-md font-semibold text-xs hover:opacity-90 transition-opacity text-center",
+                style: (is_own_message ? "color: var(--ap-accent-ink);" : "background: var(--ap-accent);") %>
           </div>
         
         <!-- Regular Message -->

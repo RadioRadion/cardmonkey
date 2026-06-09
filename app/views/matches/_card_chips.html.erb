@@ -1,5 +1,5 @@
 <% if matches.blank? %>
-  <p class="text-sm text-cm-text-subtle"><%= empty %></p>
+  <p class="text-sm ap-faint"><%= empty %></p>
 <% else %>
   <ul class="space-y-2 max-h-72 overflow-y-auto">
     <% matches.first(20).each do |match| %>
@@ -7,18 +7,19 @@
       <% next unless user_card&.card_version&.card %>
       <li class="flex items-center gap-3">
         <%= image_tag user_card.card_version.img_uri,
-              class: "h-10 w-8 object-cover flex-shrink-0 bg-cm-surface-2 border border-cm-ink",
+              class: "h-10 w-8 object-cover flex-shrink-0 rounded border",
+              style: "border-color: var(--ap-line);",
               loading: "lazy", alt: "" if user_card.card_version.img_uri.present? %>
         <div class="min-w-0">
-          <p class="text-sm font-bold truncate">
+          <p class="text-sm font-medium truncate">
             <%= user_card.card_version.card.name_fr.presence || user_card.card_version.card.name_en %>
           </p>
-          <p class="text-xs text-cm-text-muted"><%= condition_label(user_card.condition) %><%= " · Foil" if user_card.foil %></p>
+          <p class="text-xs ap-muted"><%= condition_label(user_card.condition) %><%= " · Foil" if user_card.foil %></p>
         </div>
       </li>
     <% end %>
     <% if matches.size > 20 %>
-      <li class="text-xs text-cm-text-subtle pt-1">+ <%= matches.size - 20 %> autre(s)…</li>
+      <li class="text-xs ap-faint pt-1">+ <%= matches.size - 20 %> autre(s)…</li>
     <% end %>
   </ul>
 <% end %>

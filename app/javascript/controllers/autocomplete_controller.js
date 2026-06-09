@@ -50,7 +50,7 @@ export default class extends Controller {
     
     // Réinitialiser tous les éléments
     Array.from(this.suggestionsTarget.children).forEach(item => {
-      item.classList.remove('bg-indigo-50', 'border-l-4', 'border-indigo-500')
+      item.classList.remove('bg-blue-50', 'border-l-4', 'border-blue-500')
     })
 
     // Ajuster l'index si nécessaire
@@ -59,7 +59,7 @@ export default class extends Controller {
 
     // Ajouter la classe active
     if (this.suggestionsTarget.children[this.currentFocus]) {
-      this.suggestionsTarget.children[this.currentFocus].classList.add('bg-indigo-50', 'border-l-4', 'border-indigo-500')
+      this.suggestionsTarget.children[this.currentFocus].classList.add('bg-blue-50', 'border-l-4', 'border-blue-500')
       this.suggestionsTarget.children[this.currentFocus].scrollIntoView({ block: 'nearest' })
     }
   }
@@ -102,7 +102,7 @@ export default class extends Controller {
       const cardVersion = card.card_versions?.find(v => v.img_uri) || card.card_versions?.[0]
       
       return `
-        <div class="suggestion-item p-4 hover:bg-indigo-50 cursor-pointer transition-all duration-200 flex items-center gap-4 border-b border-gray-100 last:border-b-0"
+        <div class="suggestion-item p-4 hover:bg-blue-50 cursor-pointer transition-all duration-200 flex items-center gap-4 border-b border-gray-100 last:border-b-0"
              data-action="click->autocomplete#selectCard"
              data-card-index="${index}">
           <div class="w-12 h-16 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
@@ -123,7 +123,7 @@ export default class extends Controller {
             <div class="font-medium text-gray-900 truncate">${card.name_fr}</div>
             <div class="text-sm text-gray-500 truncate">${card.name_en}</div>
           </div>
-          <div class="text-indigo-600 flex-shrink-0">
+          <div class="text-blue-600 flex-shrink-0">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>

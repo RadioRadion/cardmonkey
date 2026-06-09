@@ -29,7 +29,7 @@ export default class extends Controller {
 
   toggleFoilFilter(event) {
     this.filters.foilOnly = !this.filters.foilOnly
-    event.currentTarget.classList.toggle('bg-yellow-100')
+    event.currentTarget.classList.toggle('bg-blue-50')
     this.applyFilters()
   }
 

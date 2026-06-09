@@ -1,96 +1,86 @@
-<div class="cm-theme min-h-screen">
-  <div class="container mx-auto px-4 py-6 pb-44 lg:pb-32">
-    <%# En-tête %>
-    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <span class="cm-kicker text-cm-accent">Échange</span>
-        <h1 class="cm-display text-3xl sm:text-4xl mt-1">Avec <%= @trade.partner_name_for(current_user) %></h1>
-      </div>
-      <span class="cm-tag text-sm"><%= trade_status_text(@trade.status) %></span>
+<div class="mx-auto max-w-7xl px-4 sm:px-6 py-6 pb-44 lg:pb-28">
+  <%# En-tête %>
+  <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <div class="ap-label">Échange</div>
+      <h1 class="text-2xl font-bold tracking-tight mt-0.5">Avec <%= @trade.partner_name_for(current_user) %></h1>
     </div>
+    <span class="ap-chip"><%= trade_status_text(@trade.status) %></span>
+  </div>
 
-    <%# Prochaine action %>
-    <% next_action = trade_next_action(@trade) %>
-    <% if next_action %>
-      <div class="mb-6 border-2 border-cm-ink px-5 py-4 flex items-center gap-3 <%= next_action[:actionable] ? 'bg-cm-accent text-white' : 'bg-cm-surface-2 text-cm-text-muted' %>">
-        <span class="text-lg"><%= next_action[:actionable] ? '👉' : '⏳' %></span>
-        <p class="text-sm font-bold"><%= next_action[:text] %></p>
+  <%# Prochaine action %>
+  <% next_action = trade_next_action(@trade) %>
+  <% if next_action %>
+    <div class="mb-5 rounded-lg px-4 py-3 flex items-center gap-3 text-sm font-medium <%= next_action[:actionable] ? 'text-white' : '' %>"
+         style="<%= next_action[:actionable] ? 'background: var(--ap-accent);' : 'background: var(--ap-accent-tint); color: var(--ap-accent-ink);' %>">
+      <span><%= next_action[:text] %></span>
+    </div>
+  <% end %>
+
+  <%# Grilles de cartes %>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <% [[current_user.id, "Vos cartes"], [@trade.partner_for(current_user).id, "Cartes de #{@trade.partner_name_for(current_user)}"]].each do |uid, title| %>
+      <div class="ap-card overflow-hidden">
+        <div class="px-4 py-3 border-b ap-divide"><h2 class="ap-label"><%= title %></h2></div>
+        <div class="p-4">
+          <% if @cards_by_user[uid].present? %>
+            <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+              <%= render partial: "trades/trade_card", collection: @cards_by_user[uid][:cards], locals: { readonly: true } %>
+            </div>
+            <div class="mt-4 text-right text-sm font-bold">Total : <span class="ap-num"><%= number_to_currency(@cards_by_user[uid][:total_price], unit: "€", format: "%n %u") %></span></div>
+          <% else %>
+            <p class="ap-muted text-center py-6 text-sm">Aucune carte sélectionnée</p>
+          <% end %>
+        </div>
       </div>
     <% end %>
+  </div>
 
-    <%# Grilles de cartes %>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <% [[current_user.id, "Vos cartes"], [@trade.partner_for(current_user).id, "Cartes de #{@trade.partner_name_for(current_user)}"]].each do |uid, title| %>
-        <div class="cm-card-flat">
-          <div class="px-5 py-3 border-b-2 border-cm-ink">
-            <h2 class="cm-display text-xl"><%= title %></h2>
+  <%# Barre d'action fixe %>
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t ap-divide z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+      <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-3">
+        <% partner_id = @trade.partner_for(current_user).id %>
+        <% give = @cards_by_user.dig(current_user.id, :total_price) || 0 %>
+        <% recv = @cards_by_user.dig(partner_id, :total_price) || 0 %>
+        <div class="flex items-stretch rounded-lg border ap-divide divide-x ap-divide text-sm w-fit">
+          <div class="px-4 py-1.5">
+            <div class="ap-label !text-[9px]">Vous donnez</div>
+            <div class="ap-num font-bold"><%= @cards_by_user.dig(current_user.id, :cards)&.size || 0 %> · <%= number_to_currency(give, unit: "€", format: "%n %u") %></div>
           </div>
-          <div class="p-4">
-            <% if @cards_by_user[uid].present? %>
-              <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
-                <%= render partial: "trades/trade_card", collection: @cards_by_user[uid][:cards], locals: { readonly: true } %>
-              </div>
-              <div class="mt-4 text-right text-sm font-bold">
-                Total : <%= number_to_currency(@cards_by_user[uid][:total_price], unit: "€", format: "%n %u") %>
-              </div>
-            <% else %>
-              <p class="text-cm-text-muted text-center py-6">Aucune carte sélectionnée</p>
-            <% end %>
+          <div class="px-4 py-1.5">
+            <div class="ap-label !text-[9px]">Vous recevez</div>
+            <div class="ap-num font-bold"><%= @cards_by_user.dig(partner_id, :cards)&.size || 0 %> · <%= number_to_currency(recv, unit: "€", format: "%n %u") %></div>
+          </div>
+          <div class="px-4 py-1.5">
+            <div class="ap-label !text-[9px]">Balance</div>
+            <div class="ap-num font-bold"><%= number_to_currency((give - recv).abs, unit: "€", format: "%n %u") %></div>
           </div>
         </div>
-      <% end %>
-    </div>
 
-    <%# Barre d'action fixe %>
-    <div class="fixed bottom-0 left-0 right-0 bg-cm-surface border-t-2 border-cm-ink z-50">
-      <div class="max-w-7xl mx-auto px-4 py-3">
-        <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-3">
-          <%# Totaux %>
-          <% partner_id = @trade.partner_for(current_user).id %>
-          <% give = @cards_by_user.dig(current_user.id, :total_price) || 0 %>
-          <% recv = @cards_by_user.dig(partner_id, :total_price) || 0 %>
-          <div class="flex items-stretch border-2 border-cm-ink divide-x-2 divide-cm-ink text-sm w-fit">
-            <div class="px-4 py-1.5">
-              <div class="text-[10px] font-bold uppercase tracking-widest text-cm-text-muted">Vous donnez</div>
-              <div class="font-bold"><%= @cards_by_user.dig(current_user.id, :cards)&.size || 0 %> · <%= number_to_currency(give, unit: "€", format: "%n %u") %></div>
-            </div>
-            <div class="px-4 py-1.5">
-              <div class="text-[10px] font-bold uppercase tracking-widest text-cm-text-muted">Vous recevez</div>
-              <div class="font-bold"><%= @cards_by_user.dig(partner_id, :cards)&.size || 0 %> · <%= number_to_currency(recv, unit: "€", format: "%n %u") %></div>
-            </div>
-            <div class="px-4 py-1.5">
-              <div class="text-[10px] font-bold uppercase tracking-widest text-cm-text-muted">Balance</div>
-              <div class="font-bold"><%= number_to_currency((give - recv).abs, unit: "€", format: "%n %u") %></div>
-            </div>
-          </div>
-
-          <%# Actions %>
-          <div class="flex flex-wrap items-center gap-3">
-            <% if @trade.modified? && @trade.can_be_validated?(current_user) %>
-              <%= button_to "Valider la modification", validate_trade_path(@trade), method: :patch, class: "cm-btn-primary" %>
-            <% elsif @trade.accepted? %>
-              <%= link_to user_chatroom_path(current_user, Chatroom.between(current_user, @trade.partner_for(current_user))), class: "cm-btn-ink" do %>
-                <i class="fas fa-comments"></i> Discuter
-              <% end %>
-              <% if @trade.completed_by_user_ids&.include?(current_user.id) %>
-                <span class="cm-btn-ghost opacity-70 cursor-default"><i class="fas fa-check"></i> Confirmé</span>
-              <% else %>
-                <%= button_to "Confirmer l'échange", trade_path(@trade), method: :patch, params: { status: "done" },
-                      class: "cm-btn-primary",
-                      data: { confirm: "Confirmez-vous avoir réalisé l'échange physique avec #{@trade.partner_name_for(current_user)} ?" } %>
-              <% end %>
+        <div class="flex flex-wrap items-center gap-2">
+          <% if @trade.modified? && @trade.can_be_validated?(current_user) %>
+            <%= button_to "Valider la modification", validate_trade_path(@trade), method: :patch, class: "ap-btn-accent" %>
+          <% elsif @trade.accepted? %>
+            <%= link_to "Discuter", user_chatroom_path(current_user, Chatroom.between(current_user, @trade.partner_for(current_user))), class: "ap-btn-primary" %>
+            <% if @trade.completed_by_user_ids&.include?(current_user.id) %>
+              <span class="ap-btn-ghost opacity-70 cursor-default">Confirmé</span>
             <% else %>
-              <% if (@trade.pending? || @trade.modified?) && @trade.can_be_modified_by?(current_user) %>
-                <%= link_to "Modifier", edit_trade_path(@trade), class: "cm-btn-ghost", data: { turbo: false } %>
-              <% end %>
-              <% if @trade.pending? && @trade.can_be_accepted_by?(current_user) %>
-                <%= button_to "Accepter", trade_path(@trade), method: :patch, params: { status: "accepted" }, class: "cm-btn-primary" %>
-                <%= button_to "Refuser", decline_trade_path(@trade), method: :post,
-                      class: "cm-btn-ghost !text-cm-danger", data: { confirm: "Refuser cette proposition d'échange ?" } %>
-              <% end %>
+              <%= button_to "Confirmer l'échange", trade_path(@trade), method: :patch, params: { status: "done" },
+                    class: "ap-btn-accent",
+                    data: { confirm: "Confirmez-vous avoir réalisé l'échange physique avec #{@trade.partner_name_for(current_user)} ?" } %>
             <% end %>
-            <%= link_to "Retour", trades_path, class: "cm-btn-ghost", data: { turbo: false } %>
-          </div>
+          <% else %>
+            <% if (@trade.pending? || @trade.modified?) && @trade.can_be_modified_by?(current_user) %>
+              <%= link_to "Modifier", edit_trade_path(@trade), class: "ap-btn-ghost", data: { turbo: false } %>
+            <% end %>
+            <% if @trade.pending? && @trade.can_be_accepted_by?(current_user) %>
+              <%= button_to "Accepter", trade_path(@trade), method: :patch, params: { status: "accepted" }, class: "ap-btn-accent" %>
+              <%= button_to "Refuser", decline_trade_path(@trade), method: :post,
+                    class: "ap-btn-ghost !text-red-600", data: { confirm: "Refuser cette proposition d'échange ?" } %>
+            <% end %>
+          <% end %>
+          <%= link_to "Retour", trades_path, class: "ap-btn-ghost", data: { turbo: false } %>
         </div>
       </div>
     </div>

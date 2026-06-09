@@ -20,7 +20,7 @@ export default class extends Controller {
     this.tabTargets.forEach((tab) => {
       const active = tab.dataset.source === source
       tab.classList.toggle("bg-white", active)
-      tab.classList.toggle("text-indigo-700", active)
+      tab.classList.toggle("text-gray-900", active)
       tab.classList.toggle("shadow", active)
       tab.classList.toggle("text-gray-500", !active)
     })

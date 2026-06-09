@@ -1,139 +1,116 @@
-<div class="cm-theme min-h-screen">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <%# Header %>
-    <div class="mb-8">
-      <span class="cm-kicker text-cm-accent">Échanges</span>
-      <h1 class="cm-display text-4xl sm:text-5xl mt-1">Espace d'échange</h1>
-      <p class="mt-2 text-cm-text-muted">Trouvez les cartes que vous cherchez et proposez des échanges équitables.</p>
+<div class="mx-auto max-w-7xl px-4 sm:px-6 py-6">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight">Échanges</h1>
+      <p class="text-sm ap-muted mt-0.5">Proposez et suivez vos échanges.</p>
     </div>
+  </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <%# Main column %>
-      <div class="lg:col-span-2 space-y-6">
-        <%# Recherche utilisateur %>
-        <div class="cm-card-flat p-5">
-          <h2 class="cm-display text-xl mb-1">Trouver un joueur</h2>
-          <p class="text-sm text-cm-text-muted mb-4">Recherchez quelqu'un pour lui proposer un échange.</p>
-          <div class="relative" data-controller="user-search" data-action="click@window->user-search#clickOutside">
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i class="fas fa-search text-cm-text-subtle"></i>
-              </div>
-              <%= text_field_tag :user_search, nil,
-                    placeholder: "Nom d'utilisateur (min. 3 caractères)…",
-                    class: "cm-input pl-10",
-                    data: { action: "input->user-search#search blur->user-search#blur", user_search_target: "input" } %>
-            </div>
-            <div data-user-search-target="results" id="search_results"
-                 class="absolute left-0 right-0 mt-2 bg-white border-2 border-cm-ink shadow-cm-hard z-50 max-h-96 overflow-y-auto"></div>
-          </div>
+  <%# Stats %>
+  <div class="mt-5 ap-card overflow-hidden flex divide-x ap-divide">
+    <% [
+         [@stats[:trades_completed], "Réalisés"],
+         [@stats[:cards_available], "Cartes"],
+         [@stats[:cards_wanted], "Recherchées"],
+         [@stats[:potential_matches], "Matchs"]
+       ].each do |num, label| %>
+      <div class="px-5 py-3.5 flex-1">
+        <div class="ap-num text-xl font-bold"><%= num %></div>
+        <div class="ap-label !text-[10px] mt-0.5"><%= label %></div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-5 grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <%# Main column %>
+    <div class="lg:col-span-2 space-y-5">
+      <%# Recherche joueur %>
+      <div class="ap-card p-4" data-controller="user-search" data-action="click@window->user-search#clickOutside">
+        <h2 class="ap-label mb-2">Trouver un joueur</h2>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 ap-faint">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          <%= text_field_tag :user_search, nil,
+                placeholder: "Nom d'utilisateur (min. 3 caractères)…",
+                class: "ap-search !pl-9",
+                data: { action: "input->user-search#search blur->user-search#blur", user_search_target: "input" } %>
+          <div data-user-search-target="results" id="search_results"
+               class="absolute left-0 right-0 mt-2 bg-white border ap-divide rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto"></div>
         </div>
-
-        <%# Statistiques %>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-cm-ink border-2 border-cm-ink">
-          <% [
-               [@stats[:trades_completed], "Réalisés"],
-               [@stats[:cards_available], "Cartes"],
-               [@stats[:cards_wanted], "Recherchées"],
-               [@stats[:potential_matches], "Matchs"]
-             ].each do |num, label| %>
-            <div class="bg-cm-bg px-4 py-4 text-center">
-              <div class="cm-display text-2xl sm:text-3xl"><%= num %></div>
-              <div class="text-[11px] font-bold uppercase tracking-widest text-cm-text-muted"><%= label %></div>
-            </div>
-          <% end %>
-        </div>
-
-        <%# Sections d'échanges %>
-        <% sections = [
-             ["pending", "En attente", "bg-cm-warning"],
-             ["modified", "À valider", "bg-cm-accent-2"],
-             ["accepted", "Acceptés", "bg-cm-success"],
-             ["done", "Récemment terminés", "bg-cm-ink"]
-           ] %>
-        <% sections.each do |key, title, dot| %>
-          <% trades = @trades[key] %>
-          <% next if trades.blank? %>
-          <% trades = trades.take(3) if key == "done" %>
-          <section class="cm-card-flat overflow-hidden">
-            <div class="px-5 py-3 border-b-2 border-cm-ink flex items-center gap-2">
-              <span class="inline-block h-2.5 w-2.5 <%= dot %>"></span>
-              <h2 class="cm-display text-lg"><%= title %></h2>
-              <span class="cm-tag ml-1"><%= @trades[key].size %></span>
-            </div>
-            <div class="divide-y-2 divide-cm-border/20">
-              <% trades.each do |trade| %>
-                <%= render "trades/trade", trade: trade, data: { turbo: false } %>
-              <% end %>
-            </div>
-          </section>
-        <% end %>
-
-        <% if @trades.values.all?(&:empty?) %>
-          <div class="cm-card-flat p-10 text-center">
-            <i class="fas fa-handshake text-3xl text-cm-text-subtle"></i>
-            <h3 class="cm-display text-xl mt-3">Aucun échange en cours</h3>
-            <p class="mt-1 text-sm text-cm-text-muted">Proposez un échange à un autre joueur pour démarrer.</p>
-          </div>
-        <% end %>
       </div>
 
-      <%# Right column %>
-      <div class="space-y-6">
-        <section class="cm-card-flat overflow-hidden lg:sticky lg:top-20">
-          <div class="px-5 py-3 border-b-2 border-cm-ink">
-            <h2 class="cm-display text-lg">Opportunités</h2>
+      <%# Sections d'échanges %>
+      <% sections = [
+           ["pending", "En attente", "#9a6a00"],
+           ["modified", "À valider", "#1657d6"],
+           ["accepted", "Acceptés", "#0a7d57"],
+           ["done", "Récemment terminés", "#5a6473"]
+         ] %>
+      <% any = false %>
+      <% sections.each do |key, title, dot| %>
+        <% trades = @trades[key] %>
+        <% next if trades.blank? %>
+        <% any = true %>
+        <% trades = trades.take(3) if key == "done" %>
+        <section class="ap-card overflow-hidden">
+          <div class="px-4 py-3 border-b ap-divide flex items-center gap-2">
+            <span class="inline-block h-2 w-2 rounded-full" style="background: <%= dot %>;"></span>
+            <h2 class="ap-label"><%= title %></h2>
+            <span class="ap-chip ap-num"><%= @trades[key].size %></span>
           </div>
-          <div class="p-5">
-            <% if !current_user.user_wanted_cards.any? %>
-              <div class="text-center py-4">
-                <p class="text-sm text-cm-text-muted mb-4">Ajoutez des cartes recherchées pour voir des opportunités.</p>
-                <%= link_to "Ajouter des recherches", new_user_user_wanted_card_path(current_user), class: "cm-btn-ink text-xs", data: { turbo: false } %>
-              </div>
-            <% elsif @matches.empty? %>
-              <div class="text-center py-4">
-                <p class="text-sm text-cm-text-muted mb-4">Pas de match pour l'instant. Enrichissez votre collection.</p>
-                <%= link_to "Ajouter des cartes", new_user_user_card_path(current_user), class: "cm-btn-ink text-xs", data: { turbo: false } %>
-              </div>
-            <% else %>
-              <div class="space-y-3">
-                <% @matches.each do |match| %>
-                  <% partner = @match_users_by_id[match.user_id == current_user.id ? match.user_id_target : match.user_id] %>
-                  <div class="flex items-center justify-between gap-3 border-b border-cm-border/20 pb-3 last:border-0">
-                    <div class="flex items-center gap-3 min-w-0">
-                      <% if match.user_card.card_version.img_uri %>
-                        <%= image_tag match.user_card.card_version.img_uri, class: "h-10 w-8 object-cover border border-cm-ink", loading: "lazy" %>
-                      <% end %>
-                      <div class="min-w-0">
-                        <p class="text-sm font-bold truncate"><%= match.user_card.card_version.card.name_fr %></p>
-                        <p class="text-xs text-cm-text-muted"><%= partner&.username %></p>
-                      </div>
-                    </div>
-                    <% if partner %>
-                      <%= link_to "Échanger", new_proposition_trade_path(partner, partner_id: partner.id), class: "text-xs font-bold uppercase tracking-wide text-cm-accent hover:underline whitespace-nowrap", data: { turbo: false } %>
-                    <% end %>
-                  </div>
-                <% end %>
-              </div>
+          <div class="divide-y ap-divide">
+            <% trades.each do |trade| %>
+              <%= render "trades/trade", trade: trade, data: { turbo: false } %>
             <% end %>
           </div>
         </section>
+      <% end %>
 
-        <section class="cm-card-flat overflow-hidden">
-          <div class="px-5 py-3 border-b-2 border-cm-ink">
-            <h2 class="cm-display text-lg">Conseils</h2>
+      <% unless any %>
+        <div class="ap-card p-10 text-center">
+          <h3 class="text-base font-bold">Aucun échange en cours</h3>
+          <p class="mt-1 text-sm ap-muted">Proposez un échange à un autre joueur pour démarrer.</p>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Right column %>
+    <div class="space-y-5">
+      <section class="ap-card overflow-hidden lg:sticky lg:top-4">
+        <div class="px-4 py-3 border-b ap-divide"><h2 class="ap-label">Opportunités</h2></div>
+        <% if !current_user.user_wanted_cards.any? %>
+          <div class="text-center p-5">
+            <p class="text-sm ap-muted mb-3">Ajoutez des cartes recherchées pour voir des opportunités.</p>
+            <%= link_to "Ajouter des recherches", new_user_user_wanted_card_path(current_user), class: "ap-btn-ghost text-xs", data: { turbo: false } %>
           </div>
-          <ul class="p-5 space-y-3">
-            <% ["Remplissez collection et liste de recherche pour plus de matchs.",
-                "Vérifiez vos opportunités régulièrement.",
-                "Utilisez le chat pour caler le rendez-vous."].each do |tip| %>
-              <li class="flex items-start gap-2 text-sm text-cm-text-muted">
-                <i class="fas fa-check text-cm-success mt-0.5"></i><span><%= tip %></span>
+        <% elsif @matches.empty? %>
+          <div class="text-center p-5">
+            <p class="text-sm ap-muted mb-3">Pas de match pour l'instant.</p>
+            <%= link_to "Ajouter des cartes", new_user_user_card_path(current_user), class: "ap-btn-ghost text-xs", data: { turbo: false } %>
+          </div>
+        <% else %>
+          <ul class="divide-y ap-divide">
+            <% @matches.each do |match| %>
+              <% partner = @match_users_by_id[match.user_id == current_user.id ? match.user_id_target : match.user_id] %>
+              <li class="ap-row flex items-center gap-3 px-4 py-2.5">
+                <div class="ap-scan w-7 shrink-0">
+                  <% if match.user_card.card_version.img_uri %>
+                    <%= image_tag match.user_card.card_version.img_uri, class: "w-full aspect-[63/88] object-cover", loading: "lazy" %>
+                  <% end %>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-medium truncate"><%= match.user_card.card_version.card.name_fr %></p>
+                  <p class="text-xs ap-faint truncate"><%= partner&.username %></p>
+                </div>
+                <% if partner %>
+                  <%= link_to "Échanger", new_proposition_trade_path(partner, partner_id: partner.id), class: "ap-chip ap-chip-accent whitespace-nowrap", data: { turbo: false } %>
+                <% end %>
               </li>
             <% end %>
           </ul>
-        </section>
-      </div>
+        <% end %>
+      </section>
     </div>
   </div>
 </div>

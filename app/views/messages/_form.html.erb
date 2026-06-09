@@ -8,11 +8,11 @@
               }) do |f| %>
   <%= f.text_field :content,
                   id: "message_content",
-                  class: "cm-input flex-1 #{'border-cm-danger' if message.errors.any?}",
+                  class: "ap-search flex-1",
                   placeholder: "Écrivez votre message…",
                   data: { action: "keydown.enter->reset-form#submitOnEnter" },
                   autofocus: true %>
-  <%= f.submit "Envoyer", class: "cm-btn-primary cursor-pointer" %>
+  <%= f.submit "Envoyer", class: "ap-btn-accent cursor-pointer" %>
   
   <% if message.errors.any? %>
     <div class="text-red-500 text-sm mt-1">
